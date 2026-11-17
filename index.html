@@ -5,29 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>תהדר – סלטים לשבת, אוכל מוכן, חלות</title>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="תהדר">
-<meta name="theme-color" content="#2f7d4f">
+<meta name="theme-color" content="#fbead4">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Rubik:wght@500;700;800&family=Secular+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Rubik:wght@500;700;800&family=Secular+One&family=Gveret+Levin&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #fbf6ec; --card: #ffffff; --ink: #2b2a26; --muted: #7a7466; --line: #eadfca;
   --green: #2f7d4f; --green-ink: #ffffff; --orange: #e8892b; --orange-soft: #fdeed8; --red: #c0392b; --ok: #2f7d4f;
   --shadow: 0 6px 20px rgba(60,40,10,.10);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --bg: #1b1a17; --card: #26241f; --ink: #f3ecdd; --muted: #b3aa96; --line: #3a362d; --green: #4fa874; --green-ink: #0f2218; --orange: #f0a04d; --orange-soft: #3a2c18; --red: #ff7a6b; --shadow: 0 6px 20px rgba(0,0,0,.4); }
-}
-:root[data-theme="dark"] { --bg: #1b1a17; --card: #26241f; --ink: #f3ecdd; --muted: #b3aa96; --line: #3a362d; --green: #4fa874; --green-ink: #0f2218; --orange: #f0a04d; --orange-soft: #3a2c18; --red: #ff7a6b; --shadow: 0 6px 20px rgba(0,0,0,.4); }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif; line-height: 1.45; padding-bottom: 96px; }
 button, input, select, textarea { font: inherit; color: inherit; }
 .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
-#splash { position: fixed; inset: 0; z-index: 9999; background: #ecdac2; display: flex; align-items: center; justify-content: center; transition: opacity .35s ease; }
+#splash { position: fixed; inset: 0; z-index: 9999; background: #ecdac2; display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; transition: opacity .35s ease; }
 #splash.out { opacity: 0; pointer-events: none; }
-#splash img { width: min(68vw, 300px); height: min(68vw, 300px); border-radius: 50%; display: block; animation: wob 2.5s ease-in-out 1 both; }
+#splash img:first-child { width: min(58vw, 260px); height: min(58vw, 260px); border-radius: 50%; display: block; animation: wob 2.5s ease-in-out 1 both; }
 @keyframes wob { 0% { transform: rotate(0); } 25% { transform: rotate(15deg); } 50% { transform: rotate(0); } 75% { transform: rotate(-15deg); } 100% { transform: rotate(0); } }
 @media (prefers-reduced-motion: reduce) { #splash img { animation: none; } }
+.chef { display: block; height: auto; margin: 0 auto 6px; }
+#splash .chef { width: 110px; height: auto; border-radius: 0; animation: none; }
 header.hero .hlogo { display: block; width: 104px; height: 104px; border-radius: 50%; margin: 0 auto 14px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
 header.hero { background: linear-gradient(160deg, var(--green), #1f5c39); color: #fff; padding: 28px 0 40px; border-radius: 0 0 28px 28px; }
 header.hero h1 { font-family: 'Secular One', 'Heebo', sans-serif; font-weight: 400; font-size: clamp(1.9rem, 8vw, 2.6rem); margin: 0; letter-spacing: .3px; }
@@ -91,7 +89,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible { outline: 3px s
 .msg.ok { color: var(--ok); } .msg.err { color: var(--red); }
 .note { background: var(--orange-soft); border-radius: 12px; padding: 10px 12px; font-size: .9rem; margin: 10px 0; }
 .done { text-align: center; padding: 10px 0 4px; }
-.done .big { font-size: 3rem; }
+.done > div.big { font-size: 3rem; }
 .done code { display: inline-block; background: var(--card); border: 1.5px dashed var(--line); border-radius: 10px; padding: 6px 12px; font-size: 1.2rem; letter-spacing: 2px; font-weight: 800; margin: 6px 0; }
 footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 26px 0 8px; }
 footer a { color: inherit; }
@@ -139,10 +137,49 @@ header.hero .bsd { position: absolute; top: 10px; right: 16px; font-size: .75rem
 .hc summary::-webkit-details-marker { display: none; }
 .hc .map { position: relative; margin-top: 10px; border-radius: 16px; overflow: hidden; height: 280px; background: #e8e4da; }
 .hc .map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* ===== סגנון תפריט: קרם, ירוק כהה, זהב ===== */
+:root { --bg: #fbead4; --card: #fff6e6; --ink: #2a2a20; --muted: #6b6451; --line: #d6b678; --green: #23401f; --green-ink: #fff3dc; --gold: #b3862f; --orange: #b3862f; --orange-soft: #f6e2bd; color-scheme: light; }
+body { background: radial-gradient(ellipse at 50% 0, #fdf0dd, #fbead4 60%) fixed; position: relative; overflow-x: hidden; font-family: 'Heebo', sans-serif; }
+.lf { overflow: visible; position: absolute; z-index: 5; pointer-events: none; width: 96px; height: 118px; }
+.lf.tl { top: 0; left: 0; } .lf.tr { top: 0; right: 0; transform: scaleX(-1); }
+.lf.bl { bottom: 0; left: 0; width: 84px; height: 104px; } .lf.br { bottom: 0; right: 0; transform: scaleX(-1); width: 84px; height: 104px; }
+header.hero { background: transparent; color: var(--ink); text-align: center; padding: 22px 0 18px; border-radius: 0; }
+header.hero .wrap { display: flex; flex-direction: column; align-items: center; }
+header.hero .hlogo { width: 150px; height: 150px; margin: 6px auto 6px; border: 4px double #8a5a1c; padding: 3px; background: #ecdac2; box-shadow: none; }
+header.hero .bsd { color: var(--ink); opacity: .75; z-index: 6; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.hand { font-family: 'Gveret Levin', 'Heebo', cursive; font-size: 1.7rem; margin: 0 0 4px; color: var(--ink); opacity: 1; }
+.hand span { color: #2a2a20; font-size: 1.3rem; }
+.badges { justify-content: center; }
+.badge { background: transparent; border: 1.5px solid var(--gold); color: var(--green); font-weight: 700; }
+.hc { width: 100%; }
+.hc .map { border: 2px solid var(--gold); width: 100%; }
+nav.cats { background: #fbead4; margin-top: 0; }
+.chip { background: transparent; border-color: var(--gold); color: var(--green); }
+.chip[aria-current="true"] { background: var(--green); border-color: var(--green); color: var(--green-ink); }
+section.cat { text-align: center; padding-top: 22px; }
+section.cat h2 { display: table; margin: 0 auto -18px; position: relative; z-index: 2; color: var(--green-ink); font-family: 'Heebo', sans-serif; font-weight: 800; font-size: 1.45rem; padding: 4px 38px; }
+section.cat h2::before { content: ''; position: absolute; inset: 0; background: var(--green); z-index: -1; filter: url(#rough); border-radius: 8px; }
+.cardlist { text-align: right; background: rgba(255,248,234,.75); border: 1.5px solid var(--gold); box-shadow: none; padding: 26px 16px 4px; border-radius: 22px; }
+.item { border-bottom: 1px dashed var(--line); }
+.item h3 { font-family: 'Heebo', sans-serif; }
+.item .pic { border: 1.5px solid var(--line); }
+.item .price { font-family: 'Heebo', sans-serif; font-weight: 800; color: var(--green); }
+.opt { border-color: var(--green); color: var(--green); }
+.opt[aria-pressed="true"] { background: var(--green); color: var(--green-ink); }
+.pill.dark { background: var(--green); border-color: var(--green); color: var(--green-ink); }
+#cartbar button { background: var(--green); color: var(--green-ink); border: 2px solid var(--gold); }
+.sheet { background: #fbead4; }
+.sheet h2 { font-family: 'Heebo', sans-serif; font-weight: 800; color: var(--green); }
+.btn.alt { background: var(--gold); color: #fff; }
+.admin h1 { font-family: 'Heebo', sans-serif; font-weight: 800; color: var(--green); }
+#sidetab .sp, #sidetab .sh { background: var(--green); }
+footer { color: var(--ink); padding-bottom: 70px; }
 </style>
 </head>
 <body>
-<div id="splash"><img src="images/logo.jpg" alt="תהדר"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="branch" viewBox="0 0 170 210"><path d="M4,196 Q30,90 140,16" fill="none" stroke="#4a4a1c" stroke-width="2.2" stroke-linecap="round"/><g transform="translate(11.4,171.0) rotate(-115.7) scale(0.96)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#3d5a1e"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(11.4,171.0) rotate(-24.2) scale(0.96)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(20.4,148.9) rotate(-106.5) scale(0.92)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(20.4,148.9) rotate(-23.8) scale(0.92)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(31.4,127.6) rotate(-101.1) scale(0.88)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(31.4,127.6) rotate(-16.7) scale(0.88)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(44.4,107.1) rotate(-102.1) scale(0.84)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(44.4,107.1) rotate(-11.3) scale(0.84)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(59.5,87.3) rotate(-97.1) scale(0.80)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(59.5,87.3) rotate(-8.4) scale(0.80)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#3d5a1e"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(76.5,68.3) rotate(-95.9) scale(0.76)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(76.5,68.3) rotate(9.4) scale(0.76)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(95.7,50.1) rotate(-90.9) scale(0.72)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(95.7,50.1) rotate(14.1) scale(0.72)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(116.8,32.7) rotate(-86.5) scale(0.68)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#3d5a1e"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(116.8,32.7) rotate(7.1) scale(0.68)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#3d5a1e"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(140.0,16.0) rotate(-82.6) scale(0.64)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(140.0,16.0) rotate(11.0) scale(0.64)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#33501b"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(140.0,16.0) rotate(-33.9) scale(.75)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#5d6a22"/></g></symbol><filter id="rough" x="-6%" y="-30%" width="112%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.45" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="8"/></filter></defs></svg><svg class="lf tl" viewBox="0 0 170 210" aria-hidden="true"><use href="#branch"/></svg><svg class="lf tr" viewBox="0 0 170 210" aria-hidden="true"><use href="#branch"/></svg><svg class="lf bl" viewBox="0 0 170 210" aria-hidden="true"><use href="#branch"/></svg><svg class="lf br" viewBox="0 0 170 210" aria-hidden="true"><use href="#branch"/></svg><div id="splash"><img src="images/logo.jpg" alt="תהדר"><img class="chef" src="images/chef.png" alt="" width="110"></div>
 <div id="app"></div>
 <script>setTimeout(function () { var e = document.getElementById("splash"); if (!e) return; e.classList.add("out"); setTimeout(function () { e.remove(); }, 400); }, 2500);</script>
 <div id="cartbar" hidden><button id="cartBtn" type="button"><span id="cartCount"></span><span>לקופה ←</span><span id="cartTotal"></span></button></div>
@@ -272,7 +309,7 @@ header.hero .bsd { position: absolute; top: 10px; right: 16px; font-size: .75rem
   var selOpt = {};   // itemId -> option index (default 0)
   var openOpt = {};  // itemId -> האם פאנל האפשרויות פתוח
   function renderMenu() {
-    var h = '<header class="hero"><span class="bsd">בס"ד</span><div class="wrap"><img class="hlogo" src="images/logo.jpg" alt="תהדר"><h1>' + esc(CONFIG.name) + '</h1><p>' + esc(CONFIG.tagline) + '</p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🥖 חלות</span><span class="badge">🏷️ קופונים</span></div>' + heroContact() + '</div></header>';
+    var h = '<header class="hero"><span class="bsd">בס"ד</span><div class="wrap"><h1 class="sr">' + esc(CONFIG.name) + '</h1><img class="hlogo" src="images/logo.jpg" alt="תהדר"><p class="hand">טעם של בית <span>♥</span></p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🥖 חלות</span><span class="badge">🏷️ קופונים</span></div>' + heroContact() + '</div></header>';
     h += '<nav class="cats"><div class="row">' + MENU.map(function (c, i) { return '<button class="chip" data-cat="' + c.id + '"' + (i === 0 ? ' aria-current="true"' : '') + '>' + esc(c.name) + '</button>'; }).join('') + '</div></nav><main class="wrap">';
     MENU.forEach(function (c) {
       h += '<section class="cat" id="cat-' + c.id + '"><h2>' + esc(c.name) + '</h2><div class="cardlist">';
@@ -352,8 +389,13 @@ header.hero .bsd { position: absolute; top: 10px; right: 16px; font-size: .75rem
     $('#fsend').onclick = send;
     $('#clines').addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return; var row = b.closest('[data-k]'); if (!row) return; var l = cart[row.dataset.k]; if (!l) return;
-      change(l.id, l.opt, b.hasAttribute('data-plus') ? 1 : -1); paintCheckout(); updateBar(); renderMenuKeep(); if (!count()) closeModal();
+      change(l.id, l.opt, b.hasAttribute('data-plus') ? 1 : -1); paintCheckout(); updateBar(); renderMenuKeep(); if (!count()) emptyCart();
     });
+  }
+  function emptyCart() {
+    $('#modal').innerHTML = '<div class="overlay" id="ov"><div class="sheet"><div class="done"><img class="chef" src="images/chef.png" alt="" width="140"><h2>הסל ריק</h2><p>הוסיפו משהו טעים מהתפריט</p><button class="btn big" id="eback" type="button">חזרה לתפריט</button></div></div></div>';
+    $('#eback').onclick = closeModal;
+    $('#ov').addEventListener('click', function (e) { if (e.target.id === 'ov') closeModal(); });
   }
   function closeModal() { $('#modal').innerHTML = ''; }
   function paintCheckout() {
@@ -402,7 +444,7 @@ header.hero .bsd { position: absolute; top: 10px; right: 16px; font-size: .75rem
     return t;
   }
   function done(o) {
-    var h = '<div class="overlay"><div class="sheet"><div class="done"><div class="big">✅</div><h2>ההזמנה התקבלה!</h2><p>מספר הזמנה:</p><code>' + esc(o.id) + '</code><p>סה״כ ' + money(o.total) + ' · ' + esc(CONFIG.pickupNote) + '</p>';
+    var h = '<div class="overlay"><div class="sheet"><div class="done"><img class="chef" src="images/chef.png" alt="" width="130"><h2>ההזמנה התקבלה!</h2><p>מספר הזמנה:</p><code>' + esc(o.id) + '</code><p>סה״כ ' + money(o.total) + ' · ' + esc(CONFIG.pickupNote) + '</p>';
     if (CONFIG.whatsapp) h += '<a class="btn alt big" style="display:block;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/' + esc(CONFIG.whatsapp) + '?text=' + encodeURIComponent(waText(o)) + '">שלח גם בוואטסאפ</a>';
     if (store.mode === 'local') h += '<div class="note">מצב הדגמה: ההזמנה נשמרה רק במכשיר הזה.</div>';
     h += '<button class="btn ghost big" id="dclose">סגור</button></div></div></div>';
