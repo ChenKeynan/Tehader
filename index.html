@@ -81,6 +81,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible { outline: 3px s
 footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 26px 0 8px; }
 footer a { color: inherit; }
 /* admin */
+.admin a { color: var(--green); font-weight: 700; }
 .admin h1 { font-family: 'Secular One', sans-serif; font-weight: 400; }
 .tabs { display: flex; gap: 8px; margin: 12px 0; }
 .ord { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
@@ -324,7 +325,15 @@ footer a { color: inherit; }
     if (store.mode === 'firebase') {
       fb.auth.onAuthStateChanged(function (u) {
         var box = $('#adm'); if (!box) return;
-        if (!u) { box.innerHTML = '<button class="btn" id="gl">התחברות עם Google</button>'; $('#gl').onclick = function () { fb.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }; return; }
+        if (!u) { box.innerHTML = '<button class="btn" id="gl">התחברות עם Google</button><div class="msg err" id="gerr" role="alert"></div>';
+          $('#gl').onclick = function () {
+            $('#gerr').textContent = '';
+            fb.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function (er) {
+              var c = er && er.code || '', m = { 'auth/unauthorized-domain': 'הדומיין של האתר לא מורשה ב-Firebase (Authentication → Settings → Authorized domains).', 'auth/operation-not-allowed': 'התחברות Google לא הופעלה ב-Firebase (Authentication → Sign-in method).', 'auth/popup-blocked': 'הדפדפן חסם את החלון. אפשר חלונות קופצים לאתר ונסה שוב.', 'auth/popup-closed-by-user': 'החלון נסגר לפני סיום ההתחברות.', 'auth/cancelled-popup-request': 'הבקשה בוטלה, נסה שוב.', 'auth/network-request-failed': 'בעיית רשת, נסה שוב.' };
+              $('#gerr').textContent = (m[c] || 'ההתחברות נכשלה') + ' [' + c + ']';
+            });
+          };
+          return; }
         if (CONFIG.ownerEmails.indexOf((u.email || '').toLowerCase()) < 0 || !u.emailVerified) { box.innerHTML = '<p>אין הרשאה למשתמש ' + esc(u.email) + '</p><button class="btn ghost" id="lo">התנתק</button>'; $('#lo').onclick = function () { fb.auth.signOut(); }; return; }
         adminBody();
       });
