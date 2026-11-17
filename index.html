@@ -120,7 +120,12 @@ footer a { color: inherit; }
 #sidetab .sp a.ic.wa { background: #25d366; padding: 5px; }
 #sidetab .sp a.ic.waze { background: #33ccff; padding: 5px; }
 #sidetab .sh { align-self: center; width: 34px; height: 64px; border: 0; padding: 0; cursor: pointer; background: #24613f; color: #fff; font-size: 1.6rem; font-weight: 800; border-radius: 0 14px 14px 0; box-shadow: 4px 2px 10px rgba(0,0,0,.2); }
-#sidetab .sh span { display: inline-block; transition: transform .25s; }
+#sidetab .sh span { display: inline-block; animation: nudge 3s ease-in-out infinite; }
+#sidetab.open .sh span { animation: none; }
+@keyframes nudge { 0%, 45%, 100% { transform: translateX(0); } 12% { transform: translateX(5px); } 24% { transform: translateX(-3px); } 36% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { #sidetab .sh span { animation: none; } }
+header.hero { position: relative; }
+header.hero .bsd { position: absolute; top: 10px; right: 16px; font-size: .75rem; opacity: .85; letter-spacing: .3px; }
 .hc { margin-top: 16px; }
 .hc .addr { margin: 0 0 10px; font-size: .95rem; opacity: .92; }
 .hc .acts { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -267,7 +272,7 @@ footer a { color: inherit; }
   var selOpt = {};   // itemId -> option index (default 0)
   var openOpt = {};  // itemId -> האם פאנל האפשרויות פתוח
   function renderMenu() {
-    var h = '<header class="hero"><div class="wrap"><img class="hlogo" src="images/logo.jpg" alt="תהדר"><h1>' + esc(CONFIG.name) + '</h1><p>' + esc(CONFIG.tagline) + '</p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🥖 חלות</span><span class="badge">🏷️ קופונים</span></div>' + heroContact() + '</div></header>';
+    var h = '<header class="hero"><span class="bsd">בס"ד</span><div class="wrap"><img class="hlogo" src="images/logo.jpg" alt="תהדר"><h1>' + esc(CONFIG.name) + '</h1><p>' + esc(CONFIG.tagline) + '</p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🥖 חלות</span><span class="badge">🏷️ קופונים</span></div>' + heroContact() + '</div></header>';
     h += '<nav class="cats"><div class="row">' + MENU.map(function (c, i) { return '<button class="chip" data-cat="' + c.id + '"' + (i === 0 ? ' aria-current="true"' : '') + '>' + esc(c.name) + '</button>'; }).join('') + '</div></nav><main class="wrap">';
     MENU.forEach(function (c) {
       h += '<section class="cat" id="cat-' + c.id + '"><h2>' + esc(c.name) + '</h2><div class="cardlist">';
