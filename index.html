@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>סלטים ושניצלים – הזמנה אונליין</title>
+<title>תהדר – סלטים לשבת, אוכל מוכן, חלות</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="תהדר">
 <meta name="theme-color" content="#2f7d4f">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Secular+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Rubik:wght@500;700;800&family=Secular+One&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #fbf6ec; --card: #ffffff; --ink: #2b2a26; --muted: #7a7466; --line: #eadfca;
@@ -33,25 +34,33 @@ nav.cats .row::-webkit-scrollbar { display: none; }
 .chip { border: 1.5px solid var(--line); background: var(--card); border-radius: 99px; padding: 8px 18px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .chip[aria-current="true"] { background: var(--green); border-color: var(--green); color: var(--green-ink); }
 section.cat { padding-top: 14px; scroll-margin-top: 70px; }
-section.cat h2 { font-family: 'Secular One', 'Heebo', sans-serif; font-weight: 400; font-size: 1.45rem; margin: 6px 0 10px; }
-.item { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow); display: flex; gap: 12px; align-items: flex-start; }
-.item .info { flex: 1; min-width: 0; }
-.item h3 { margin: 0; font-size: 1.05rem; font-weight: 800; }
-.item .desc { color: var(--muted); font-size: .9rem; margin: 2px 0 6px; }
-.item .price { font-weight: 800; color: var(--green); }
-.opts { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; }
-.opt { border: 1.5px solid var(--line); background: transparent; border-radius: 10px; padding: 4px 10px; cursor: pointer; font-size: .88rem; }
-.opt[aria-pressed="true"] { border-color: var(--orange); background: var(--orange-soft); font-weight: 700; }
-.addbtn { background: var(--orange); color: #2b1a00; border: 0; border-radius: 12px; padding: 9px 16px; font-weight: 800; cursor: pointer; white-space: nowrap; align-self: center; }
-.stepper { display: inline-flex; align-items: center; gap: 4px; align-self: center; background: var(--orange-soft); border-radius: 12px; padding: 3px; }
-.stepper button { width: 34px; height: 34px; border: 0; border-radius: 10px; background: var(--card); font-size: 1.2rem; font-weight: 800; cursor: pointer; }
+section.cat h2 { font-family: 'Rubik', 'Heebo', sans-serif; font-weight: 800; font-size: 1.6rem; margin: 6px 0 10px; }
+.cardlist { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 0 16px; }
+.item { display: flex; gap: 14px; align-items: stretch; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.item:last-child { border-bottom: 0; }
+.item .pic { flex: none; width: 112px; height: 112px; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, var(--orange-soft), color-mix(in srgb, var(--green) 18%, var(--card))); display: flex; align-items: center; justify-content: center; font-size: 3.2rem; }
+.item .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.item .info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.item h3 { margin: 0; font-family: 'Rubik', 'Heebo', sans-serif; font-weight: 800; font-size: 1.2rem; line-height: 1.25; }
+.item .desc { font-size: .95rem; margin: 4px 0 0; }
+.item .per { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+.item .bottom { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto; padding-top: 10px; }
+.item .price { font-family: 'Rubik', 'Heebo', sans-serif; font-weight: 500; font-size: 1.45rem; color: var(--ink); }
+.item .price small { font-size: .9rem; font-weight: 500; margin-inline-end: 2px; }
+.opts { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 0; }
+.opt { border: 1.5px solid var(--ink); background: transparent; border-radius: 99px; padding: 5px 14px; cursor: pointer; font-size: .9rem; }
+.opt[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 700; }
+.pill { border-radius: 99px; padding: 11px 22px; font-weight: 700; cursor: pointer; white-space: nowrap; border: 1.5px solid var(--ink); background: transparent; }
+.pill.dark { background: #3b1d12; border-color: #3b1d12; color: #fff; }
+.stepper { display: inline-flex; align-items: center; gap: 4px; background: var(--orange-soft); border-radius: 99px; padding: 3px; }
+.stepper button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--card); font-size: 1.2rem; font-weight: 800; cursor: pointer; }
 .stepper span { min-width: 26px; text-align: center; font-weight: 800; }
 #cartbar { position: fixed; inset: auto 0 0 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 35%); pointer-events: none; }
 #cartbar button { pointer-events: auto; display: flex; width: 100%; max-width: 720px; margin: 0 auto; justify-content: space-between; align-items: center; background: var(--green); color: var(--green-ink); border: 0; border-radius: 16px; padding: 15px 18px; font-weight: 800; font-size: 1.05rem; box-shadow: var(--shadow); cursor: pointer; }
 #cartbar[hidden] { display: none; }
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 60; display: flex; align-items: flex-end; justify-content: center; }
 .sheet { background: var(--bg); width: 100%; max-width: 720px; max-height: 92vh; overflow: auto; border-radius: 24px 24px 0 0; padding: 18px 16px calc(20px + env(safe-area-inset-bottom)); }
-.sheet h2 { font-family: 'Secular One', 'Heebo', sans-serif; font-weight: 400; margin: 0 0 4px; font-size: 1.5rem; }
+.sheet h2 { font-family: 'Rubik', 'Heebo', sans-serif; font-weight: 400; margin: 0 0 4px; font-size: 1.5rem; }
 .sheet .close { float: left; border: 0; background: var(--card); width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; }
 .line { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
 .line .nm { flex: 1; min-width: 0; font-weight: 700; }
@@ -106,32 +115,47 @@ footer a { color: inherit; }
 
   /* =====================  הגדרות — כאן משנים  ===================== */
   var CONFIG = {
-    name: 'סלטים ושניצלים',                 // שם העסק
-    tagline: 'הזמנה אונליין · טרי · מוכן לאיסוף',
+    name: 'תהדר',                           // שם העסק
+    tagline: 'סלטים לשבת · אוכל מוכן · חלות',
     whatsapp: '',                            // מספר לקבלת הזמנות בוואטסאפ, בפורמט בינלאומי בלי + (למשל 972501234567). ריק = בלי כפתור
     pickupNote: 'התשלום מתבצע בעת האיסוף.',
     pickupSlots: ['כמה שיותר מהר', '12:00', '12:30', '13:00', '13:30', '14:00', '17:00', '18:00', '19:00'],
     ownerEmails: ['chenkeynan@gmail.com', 'edenkeynan@gmail.com', 'yaakov414@gmail.com'],   // מי מורשה למסך הניהול (גם בכללי Firebase!)
     firebase: { apiKey: 'AIzaSyAhWX7jdMHYMHAyIab0_j18dJ6i7CJNuZs', authDomain: 'tidhar-dfc18.firebaseapp.com', projectId: 'tidhar-dfc18', storageBucket: 'tidhar-dfc18.firebasestorage.app', messagingSenderId: '1002257905072', appId: '1:1002257905072:web:a43f0010fbb8b67d461275' }, // הגדרות Firebase של הפרויקט Tidhar
   };
+  var SZ = [{ n: 'קטן', d: 0, g: 250 }, { n: 'גדול', d: 12, g: 500 }];   // גדלי מיכל לסלטים (מחירי הדגמה — לעדכן)
   var MENU = [
-    { id: 'salads', name: 'סלטים', items: [
-      { id: 's1', name: 'סלט ירקות קצוץ', desc: 'עגבנייה, מלפפון, בצל, פטרוזיליה, לימון', price: 28, opts: [{ n: 'קטן', d: 0 }, { n: 'גדול', d: 10 }] },
-      { id: 's2', name: 'סלט יווני', desc: 'פטה, זיתים, בצל סגול, עגבנייה', price: 34, opts: [{ n: 'קטן', d: 0 }, { n: 'גדול', d: 10 }] },
-      { id: 's3', name: 'סלט קיסר', desc: 'חסה, קרוטונים, פרמזן, רוטב קיסר', price: 36, opts: [{ n: 'קטן', d: 0 }, { n: 'גדול', d: 10 }] },
-      { id: 's4', name: 'סלט כרוב סגול', desc: 'כרוב, גזר, תפוח, רוטב חרדל-דבש', price: 26 }
+    { id: 'challah', name: 'חלות', emoji: '🥖', items: [
+      { id: 'c1', name: 'חלה שומשום', desc: 'חלה קלועה, מבריקה, מכוסה שומשום', price: 25, g: 500, img: 'images/challah.jpg' }
     ] },
-    { id: 'schnitzel', name: 'שניצלים ומנות', items: [
-      { id: 'n1', name: 'שניצל קלאסי', desc: '200 גרם, פירורי לחם זהובים', price: 48 },
-      { id: 'n2', name: 'שניצל קורנפלקס', desc: 'עטוף פריכות קורנפלקס', price: 52 },
-      { id: 'n3', name: 'מנת שניצל + 2 תוספות', desc: 'שניצל קלאסי ושתי תוספות לבחירה', price: 62 },
-      { id: 'n4', name: 'שניצלוני ילדים', desc: '6 יחידות עם צ׳יפס', price: 38 }
+    { id: 'salads', name: 'סלטים', emoji: '🥗', items: [
+      { id: 's1', name: 'בטטה בשומשום', desc: 'קוביות בטטה אפויות ומבריקות עם שומשום', price: 18, img: 'images/sweet-potato.jpg', opts: SZ },
+      { id: 's2', name: 'גזר בכוסברה', desc: 'גזר מבושל בתיבול חריף-שום וכוסברה טרייה', price: 16, img: 'images/carrots.jpg', opts: SZ },
+      { id: 's3', name: 'סלק בכוסברה', desc: 'קוביות סלק רכות עם עשבי תיבול', price: 16, img: 'images/beets.jpg', opts: SZ },
+      { id: 's4', name: 'חצילים קלויים בעגבנייה', desc: 'חציל קלוי, פלפל אדום, עגבנייה וכוסברה', price: 18, img: 'images/eggplant.jpg', opts: SZ },
+      { id: 's5', name: 'כרוב ותירס בשמיר', desc: 'כרוב לבן, תירס ושמיר ברוטב קליל', price: 16, img: 'images/cabbage-corn.jpg', opts: SZ },
+      { id: 's6', name: 'כרוב לבן', desc: 'כרוב קצוץ בלימון, שמן זית ופלפל שחור', price: 14, img: 'images/cabbage.jpg', opts: SZ },
+      { id: 's7', name: 'כרוב סגול ביוגורט', desc: 'כרוב סגול פריך ברוטב יוגורט', price: 16, img: 'images/red-cabbage.jpg', opts: SZ },
+      { id: 's8', name: 'שומר וסלרי', desc: 'שומר וסלרי פריכים עם שמן זית ופלפל', price: 16, img: 'images/fennel.jpg', opts: SZ }
     ] },
-    { id: 'sides', name: 'תוספות', items: [
-      { id: 'd1', name: 'אורז לבן', desc: '', price: 14 },
-      { id: 'd2', name: 'צ׳יפס', desc: '', price: 16 },
-      { id: 'd3', name: 'פירה תפוחי אדמה', desc: '', price: 16 },
-      { id: 'd4', name: 'ירקות מוקפצים', desc: '', price: 18 }
+    { id: 'peppers', name: 'פלפלים', emoji: '🫑', items: [
+      { id: 'p1', name: 'פלפלים חריפים קלויים', desc: 'פלפלים ירוקים ואדומים קלויים בשמן זית ושום', price: 18, img: 'images/hot-peppers.jpg', opts: SZ },
+      { id: 'p2', name: 'פלפלים קלויים', desc: 'פלפלים צהובים ואדומים קלויים ומתובלים', price: 18, img: 'images/roasted-peppers.jpg', opts: SZ }
+    ] },
+    { id: 'spreads', name: 'ממרחים ורטבים', emoji: '🫓', items: [
+      { id: 'm1', name: 'חומוס', desc: 'חומוס חלק עם גרגירי חומוס ושמן זית', price: 16, img: 'images/hummus.jpg', opts: SZ },
+      { id: 'm2', name: 'טחינה ירוקה', desc: 'ממרח עשבי תיבול קרמי', price: 16, img: 'images/green-sauce.jpg', opts: SZ },
+      { id: 'm3', name: 'סחוג אדום', desc: 'ממרח פלפלים חריף', price: 14, img: 'images/red-spread.jpg', opts: SZ }
+    ] },
+    { id: 'ready', name: 'אוכל מוכן', emoji: '🍗', items: [
+      { id: 'n1', name: 'שניצל קלאסי', desc: 'פירורי לחם זהובים', price: 48, g: 200, img: '' },
+      { id: 'n2', name: 'שניצל קורנפלקס', desc: 'עטוף פריכות קורנפלקס', price: 52, g: 220, img: '' },
+      { id: 'n3', name: 'מנת שניצל + 2 תוספות', desc: 'שניצל קלאסי ושתי תוספות לבחירה', price: 62, img: '' },
+      { id: 'k1', name: 'קציצות ברוטב עגבניות', desc: 'קציצות בשר ברוטב עגבניות ופלפלים אדומים', price: 42, g: 400, img: 'images/meatballs.jpg' },
+      { id: 'k2', name: 'מרק ירקות', desc: 'מרק ירקות ביתי עם תפוח אדמה, סלרי ושמיר', price: 24, g: 400, img: 'images/soup.jpg' },
+      { id: 'd1', name: 'אורז לבן', desc: 'אורז רך ומאודה', price: 14, g: 200, img: 'images/rice.jpg' },
+      { id: 'd3', name: 'פתיתים', desc: 'פתיתים מוזהבים בתיבול פפריקה', price: 14, g: 200, img: 'images/couscous.jpg' },
+      { id: 'd2', name: 'צ׳יפס', desc: 'פריך מבחוץ ורך מבפנים', price: 16, g: 250, img: '' }
     ] }
   ];
   var DEMO_COUPONS = [
@@ -206,22 +230,26 @@ footer a { color: inherit; }
 
   /* =====================  תצוגת תפריט  ===================== */
   var selOpt = {};   // itemId -> option index (default 0)
+  var openOpt = {};  // itemId -> האם פאנל האפשרויות פתוח
   function renderMenu() {
-    var h = '<header class="hero"><div class="wrap"><h1>' + esc(CONFIG.name) + '</h1><p>' + esc(CONFIG.tagline) + '</p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🍗 שניצל חם</span><span class="badge">🏷️ קופונים</span></div></div></header>';
+    var h = '<header class="hero"><div class="wrap"><h1>' + esc(CONFIG.name) + '</h1><p>' + esc(CONFIG.tagline) + '</p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🥖 חלות</span><span class="badge">🏷️ קופונים</span></div></div></header>';
     h += '<nav class="cats"><div class="row">' + MENU.map(function (c, i) { return '<button class="chip" data-cat="' + c.id + '"' + (i === 0 ? ' aria-current="true"' : '') + '>' + esc(c.name) + '</button>'; }).join('') + '</div></nav><main class="wrap">';
     MENU.forEach(function (c) {
-      h += '<section class="cat" id="cat-' + c.id + '"><h2>' + esc(c.name) + '</h2>';
+      h += '<section class="cat" id="cat-' + c.id + '"><h2>' + esc(c.name) + '</h2><div class="cardlist">';
       c.items.forEach(function (it) {
-        var o = selOpt[it.id] == null ? 0 : selOpt[it.id];
-        var key = cKey(it.id, it.opts ? o : null), q = cart[key] ? cart[key].qty : 0;
-        var price = it.price + (it.opts ? it.opts[o].d : 0);
-        h += '<div class="item" data-item="' + it.id + '"><div class="info"><h3>' + esc(it.name) + '</h3>' + (it.desc ? '<div class="desc">' + esc(it.desc) + '</div>' : '');
-        if (it.opts) h += '<div class="opts" role="group" aria-label="גודל">' + it.opts.map(function (op, i) { return '<button class="opt" data-opt="' + i + '" aria-pressed="' + (i === o) + '">' + esc(op.n) + '</button>'; }).join('') + '</div>';
-        h += '<div class="price">' + money(price) + '</div></div>';
-        h += q ? '<div class="stepper"><button data-minus aria-label="הפחת">−</button><span>' + q + '</span><button data-plus aria-label="הוסף">+</button></div>' : '<button class="addbtn" data-plus>הוסף</button>';
-        h += '</div>';
+        var hasOpts = !!it.opts, o = selOpt[it.id] == null ? 0 : selOpt[it.id], open = hasOpts && (openOpt[it.id] || selOpt[it.id] != null);
+        var key = cKey(it.id, hasOpts ? o : null), q = cart[key] ? cart[key].qty : 0;
+        var price = it.price + (hasOpts ? it.opts[o].d : 0), grams = hasOpts ? it.opts[o].g : it.g;
+        h += '<div class="item" data-item="' + it.id + '"><div class="pic">' + (it.img ? '<img src="' + esc(it.img) + '" alt="' + esc(it.name) + '" loading="lazy">' : '<span aria-hidden="true">' + (c.emoji || '🍽️') + '</span>') + '</div><div class="info"><h3>' + esc(it.name) + '</h3>' + (it.desc ? '<div class="desc">' + esc(it.desc) + '</div>' : '');
+        if (grams) h += '<div class="per">' + grams + ' גרם · מחיר ל-100 גרם ₪' + (Math.round(price / grams * 1000) / 10) + '</div>';
+        if (open) h += '<div class="opts" role="group" aria-label="אפשרויות">' + it.opts.map(function (op, i) { return '<button class="opt" data-opt="' + i + '" aria-pressed="' + (i === o) + '">' + esc(op.n) + (op.d ? ' (+₪' + op.d + ')' : '') + '</button>'; }).join('') + '</div>';
+        h += '<div class="bottom"><div class="price"><small>₪</small>' + price + '</div>';
+        if (hasOpts && !open) h += '<button class="pill" data-showopts>אפשרויות</button>';
+        else if (q) h += '<div class="stepper"><button data-minus aria-label="הפחת">−</button><span>' + q + '</span><button data-plus aria-label="הוסף">+</button></div>';
+        else h += '<button class="pill dark" data-plus>הוספה לסל</button>';
+        h += '</div></div></div>';
       });
-      h += '</section>';
+      h += '</div></section>';
     });
     h += '<footer>' + esc(CONFIG.pickupNote) + '<br><a href="#admin">ניהול</a></footer></main>';
     $('#app').innerHTML = h;
@@ -312,7 +340,7 @@ footer a { color: inherit; }
     if (CONFIG.whatsapp) h += '<a class="btn alt big" style="display:block;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/' + esc(CONFIG.whatsapp) + '?text=' + encodeURIComponent(waText(o)) + '">שלח גם בוואטסאפ</a>';
     if (store.mode === 'local') h += '<div class="note">מצב הדגמה: ההזמנה נשמרה רק במכשיר הזה.</div>';
     h += '<button class="btn ghost big" id="dclose">סגור</button></div></div></div>';
-    cart = {}; applied = null; selOpt = {};
+    cart = {}; applied = null; selOpt = {}; openOpt = {};
     $('#modal').innerHTML = h; $('#dclose').onclick = function () { closeModal(); renderMenu(); };
   }
   function renderMenuKeep() { var y = window.scrollY; renderMenu(); window.scrollTo(0, y); }
@@ -378,6 +406,7 @@ footer a { color: inherit; }
     var chip = e.target.closest('.chip'); if (chip) { var s = $('#cat-' + chip.dataset.cat); if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     var item = e.target.closest('.item'); if (!item) return;
     var id = item.dataset.item, it = findItem(id), o = selOpt[id] == null ? 0 : selOpt[id];
+    if (e.target.closest('[data-showopts]')) { openOpt[id] = true; renderMenuKeep(); return; }
     var op = e.target.closest('.opt'); if (op) { selOpt[id] = Number(op.dataset.opt); renderMenuKeep(); return; }
     if (e.target.closest('[data-plus]')) { change(id, it.opts ? o : null, 1); renderMenuKeep(); }
     else if (e.target.closest('[data-minus]')) { change(id, it.opts ? o : null, -1); renderMenuKeep(); }
