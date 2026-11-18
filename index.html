@@ -176,6 +176,31 @@ section.cat h2::before { content: ''; position: absolute; inset: 0; background: 
 .admin h1 { font-family: 'Heebo', sans-serif; font-weight: 800; color: var(--green); }
 #sidetab .sp, #sidetab .sh { background: var(--green); }
 footer { color: var(--ink); padding-bottom: 70px; }
+
+body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300' fill='none' stroke='%236b4423' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' opacity='.11'%3E%3Cg transform='translate(70 76)'%3E%3Cpath d='M-30 0H30C30 24 14 38 0 38C-14 38 -30 24 -30 0Z'/%3E%3Cpath d='M-16 -2C-22 -16 -10 -22 -6 -10M0 -2C-4 -20 8 -26 10 -10M14 -2C12 -14 24 -16 24 -4'/%3E%3Ccircle cx='-4' cy='-12' r='5'/%3E%3C/g%3E%3Cg transform='translate(226 66) rotate(-35)'%3E%3Cellipse cx='0' cy='0' rx='19' ry='25'/%3E%3Cpath d='M0 25V50'/%3E%3Ccircle cx='-6' cy='54' r='5'/%3E%3Ccircle cx='6' cy='54' r='5'/%3E%3Cpath d='M-9 -10C-4 -16 4 -16 9 -10'/%3E%3C/g%3E%3Cg transform='translate(76 226) rotate(-8)'%3E%3Crect x='-44' y='-18' width='88' height='36' rx='18'/%3E%3Cpath d='M-26 -17C-18 -4 -18 4 -26 17M-8 -18C0 -4 0 4 -8 18M10 -18C18 -4 18 4 10 18M28 -16C34 -4 34 4 28 16'/%3E%3Ccircle cx='-34' cy='-5' r='1'/%3E%3Ccircle cx='-14' cy='6' r='1'/%3E%3Ccircle cx='4' cy='-6' r='1'/%3E%3Ccircle cx='20' cy='5' r='1'/%3E%3C/g%3E%3Cg transform='translate(224 226) rotate(12)'%3E%3Cpath d='M-36 0C-18 -22 14 -22 28 0C14 22 -18 22 -36 0Z'/%3E%3Cpath d='M28 0L44 -14V14Z'/%3E%3Ccircle cx='-20' cy='-4' r='2.5'/%3E%3Cpath d='M-4 -12C2 -4 2 4 -4 12'/%3E%3C/g%3E%3Cg%3E%3Cpath d='M150 140C158 128 170 130 172 140C164 150 154 148 150 140Z'/%3E%3Cpath d='M270 150C276 142 284 144 284 150C278 158 272 156 270 150Z'/%3E%3Cpath d='M20 150C26 142 34 144 34 150C28 158 22 156 20 150Z'/%3E%3Cpath d='M140 280C148 268 160 270 162 280C154 290 144 288 140 280Z'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 300px 300px, radial-gradient(ellipse at 50% 0, #fdf0dd, #fbead4 60%) fixed; }
+.kosher { position: absolute; left: 14px; top: 96px; width: 58px; height: 58px; z-index: 6; filter: drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+.newbar { margin: 4px auto 8px; background: var(--gold); color: #fff; font-weight: 800; padding: 7px 16px; border-radius: 99px; font-size: .95rem; box-shadow: 0 3px 10px rgba(0,0,0,.18); }
+.newbar a { color: #fff; text-decoration: underline; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+.facts span { background: rgba(255,248,234,.85); border: 1.5px solid var(--gold); border-radius: 99px; padding: 5px 14px; font-weight: 700; font-size: .88rem; color: var(--green); }
+.dirs { text-align: right; margin-top: 10px; padding: 12px 14px; background: rgba(255,248,234,.85); border: 1.5px solid var(--gold); border-radius: 16px; font-size: .92rem; line-height: 1.6; }
+.dirs b { color: var(--green); display: block; }
+.dirs a { color: var(--green); font-weight: 800; }
+.catnote { margin: 0 0 4px; font-size: .88rem; color: var(--muted); text-align: center; }
+.rwrap { filter: drop-shadow(0 4px 8px rgba(60,40,10,.28)); margin: 14px 4px 16px; }
+.receipt { background: #fffdf6; color: #2a2a20; padding: 30px 18px 32px; font-size: .95rem; -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 18px 51% repeat-x, conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 18px 51% repeat-x; mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 18px 51% repeat-x, conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 18px 51% repeat-x; }
+.receipt .rlogo { display: block; width: 74px; height: 74px; border-radius: 50%; margin: 0 auto 4px; }
+.receipt .rbsd { text-align: center; font-size: .72rem; opacity: .7; }
+.receipt .rtitle { text-align: center; font-weight: 800; font-size: 1.05rem; margin-top: 4px; }
+.receipt .rmeta { text-align: center; font-size: .82rem; color: var(--muted); }
+.receipt .rsep { border-top: 2px dashed #cdbd9c; margin: 10px 0; }
+.receipt .rrow, .receipt .ritem, .receipt .rtotal { display: flex; justify-content: space-between; gap: 10px; padding: 2px 0; }
+.receipt .ritem small { color: var(--muted); }
+.receipt .ritem b, .receipt .rrow b { font-variant-numeric: tabular-nums; }
+.receipt .rdisc { color: var(--ok); }
+.receipt .rtotal { font-size: 1.25rem; font-weight: 800; border-top: 2px solid #2a2a20; margin-top: 6px; padding-top: 8px; }
+.receipt .rnote { margin-top: 8px; font-size: .85rem; background: #f6ecd6; border-radius: 8px; padding: 6px 8px; }
+.receipt .rfoot { text-align: center; font-size: .85rem; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -195,44 +220,61 @@ footer { color: var(--ink); padding-bottom: 70px; }
     phone: '0544905565',                     // טלפון ליצירת קשר
     address: { street: 'הענבים 2', apt: 'דירה 31', city: 'אשדוד' },   // כתובת האיסוף 
     whatsapp: '972544905565',                            // מספר לקבלת הזמנות בוואטסאפ, בפורמט בינלאומי בלי + (למשל 972501234567). ריק = בלי כפתור
+    floor: '',                               // קומה (למשל 3) – מופיעה בהוראות ההגעה. ריק = לא מוצגת
+    arrival: '',                             // הוראות הגעה חופשיות (למשל: כניסה מהחזית, עולים במדרגות לקומה ...)
     pickupNote: 'התשלום מתבצע בעת האיסוף.',
     pickupSlots: ['כמה שיותר מהר', '12:00', '12:30', '13:00', '13:30', '14:00', '17:00', '18:00', '19:00'],
     ownerEmails: ['chenkeynan@gmail.com', 'edenkeynan@gmail.com', 'yaakov414@gmail.com'],   // מי מורשה למסך הניהול (גם בכללי Firebase!)
     firebase: { apiKey: 'AIzaSyAhWX7jdMHYMHAyIab0_j18dJ6i7CJNuZs', authDomain: 'tidhar-dfc18.firebaseapp.com', projectId: 'tidhar-dfc18', storageBucket: 'tidhar-dfc18.firebasestorage.app', messagingSenderId: '1002257905072', appId: '1:1002257905072:web:a43f0010fbb8b67d461275' }, // הגדרות Firebase של הפרויקט Tidhar
   };
-  var SZ = [{ n: 'קטן', d: 0, g: 250 }, { n: 'גדול', d: 12, g: 500 }];   // גדלי מיכל לסלטים (מחירי הדגמה — לעדכן)
+  function sal(id, name, desc, p250, p500, img) { return { id: id, name: name, desc: desc, price: p250, img: img || '', opts: [{ n: 'קופסת 250', d: 0, g: 250 }, { n: 'קופסת 500', d: p500 - p250, g: 500 }] }; }
+  function sid(id, name, desc, p500, pL, img) { return { id: id, name: name, desc: desc, price: p500, img: img || '', opts: [{ n: 'קופסת 500', d: 0 }, { n: 'קופסת ליטר', d: pL - p500 }] }; }
   var MENU = [
-    { id: 'challah', name: 'חלות', emoji: '🥖', items: [
-      { id: 'c1', name: 'חלה שומשום', desc: 'חלה קלועה, מבריקה, מכוסה שומשום', price: 25, g: 500, img: 'images/challah.jpg' }
-    ] },
     { id: 'salads', name: 'סלטים', emoji: '🥗', items: [
-      { id: 's1', name: 'בטטה בשומשום', desc: 'קוביות בטטה אפויות ומבריקות עם שומשום', price: 18, img: 'images/sweet-potato.jpg', opts: SZ },
-      { id: 's2', name: 'גזר בכוסברה', desc: 'גזר מבושל בתיבול חריף-שום וכוסברה טרייה', price: 16, img: 'images/carrots.jpg', opts: SZ },
-      { id: 's3', name: 'סלק בכוסברה', desc: 'קוביות סלק רכות עם עשבי תיבול', price: 16, img: 'images/beets.jpg', opts: SZ },
-      { id: 's4', name: 'חצילים קלויים בעגבנייה', desc: 'חציל קלוי, פלפל אדום, עגבנייה וכוסברה', price: 18, img: 'images/eggplant.jpg', opts: SZ },
-      { id: 's5', name: 'כרוב ותירס בשמיר', desc: 'כרוב לבן, תירס ושמיר ברוטב קליל', price: 16, img: 'images/cabbage-corn.jpg', opts: SZ },
-      { id: 's6', name: 'כרוב לבן', desc: 'כרוב קצוץ בלימון, שמן זית ופלפל שחור', price: 14, img: 'images/cabbage.jpg', opts: SZ },
-      { id: 's7', name: 'כרוב סגול ביוגורט', desc: 'כרוב סגול פריך ברוטב יוגורט', price: 16, img: 'images/red-cabbage.jpg', opts: SZ },
-      { id: 's8', name: 'שומר וסלרי', desc: 'שומר וסלרי פריכים עם שמן זית ופלפל', price: 16, img: 'images/fennel.jpg', opts: SZ }
+      sal('s1', 'חומוס ביתי', 'חומוס חלק עם גרגירי חומוס ושמן זית', 16, 30, 'images/hummus.jpg'),
+      sal('s2', 'מטבוחה', 'עגבניות ופלפלים מבושלים בתיבול חריף', 18, 34, 'images/red-spread.jpg'),
+      sal('s3', 'טחינה ירוקה', 'ממרח עשבי תיבול קרמי', 18, 34, 'images/green-sauce.jpg'),
+      sal('s4', 'כרוב לבן', 'כרוב קצוץ בלימון, שמן זית ופלפל שחור', 16, 30, 'images/cabbage.jpg'),
+      sal('s5', 'כרוב סגול', 'כרוב סגול פריך ברוטב יוגורט', 16, 30, 'images/red-cabbage.jpg'),
+      sal('s6', 'כרוב עם תירס', 'כרוב לבן, תירס ושמיר ברוטב קליל', 16, 30, 'images/cabbage-corn.jpg'),
+      sal('s7', 'שומר', 'שומר וסלרי פריכים עם שמן זית ופלפל', 16, 30, 'images/fennel.jpg'),
+      sal('s8', 'בטטה', 'קוביות בטטה אפויות ומבריקות עם שומשום', 18, 34, 'images/sweet-potato.jpg'),
+      sal('s9', 'זעלוק', 'חציל קלוי, פלפל אדום, עגבנייה וכוסברה', 16, 30, 'images/eggplant.jpg'),
+      sal('s10', 'סלק', 'קוביות סלק רכות עם עשבי תיבול', 16, 30, 'images/beets.jpg'),
+      sal('s11', 'גזר מרוקאי', 'גזר מבושל בתיבול חריף-שום וכוסברה טרייה', 16, 30, 'images/carrots.jpg'),
+      sal('s12', 'גזר חי', 'גזר מגורר טרי ומתובל', 16, 30, ''),
+      sal('s13', 'פלפל חריף', 'פלפלים ירוקים ואדומים קלויים בשמן זית ושום', 18, 34, 'images/hot-peppers.jpg'),
+      sal('s14', 'פלפלים קלויים', 'פלפלים צהובים ואדומים קלויים ומתובלים', 18, 34, 'images/roasted-peppers.jpg'),
+      sal('s15', 'חציל בטחינה', 'חציל קלוי בטחינה גולמית', 16, 30, ''),
+      sal('s16', 'חציל במיונז', 'חציל קלוי במיונז ביתי', 16, 30, ''),
+      sal('s17', 'טחינה', 'טחינה גולמית ביתית', 16, 30, '')
     ] },
-    { id: 'peppers', name: 'פלפלים', emoji: '🫑', items: [
-      { id: 'p1', name: 'פלפלים חריפים קלויים', desc: 'פלפלים ירוקים ואדומים קלויים בשמן זית ושום', price: 18, img: 'images/hot-peppers.jpg', opts: SZ },
-      { id: 'p2', name: 'פלפלים קלויים', desc: 'פלפלים צהובים ואדומים קלויים ומתובלים', price: 18, img: 'images/roasted-peppers.jpg', opts: SZ }
+    { id: 'sides', name: 'תוספות', emoji: '🍚', note: 'תוספות בקופסת 500 או בקופסת ליטר', items: [
+      sid('d1', 'אורז לבן', 'אורז רך ומאודה', 16, 32, 'images/rice.jpg'),
+      sid('d2', 'אורז צהוב', 'אורז מתובל בכורכום', 16, 32, ''),
+      sid('d3', 'קוסקוס עבודת יד', 'קוסקוס מפורר ביד, רך ומאודה', 20, 40, ''),
+      sid('d4', 'תפודים', 'תפוחי אדמה מוזהבים ופריכים', 20, 40, ''),
+      sid('d5', 'פירה', 'פירה תפוחי אדמה חלק וקרמי', 25, 50, ''),
+      sid('d6', 'אנטיפסטי', 'ירקות קלויים בשמן זית ועשבי תיבול', 25, 50, ''),
+      sid('d7', 'אפונה', 'אפונה מבושלת בתיבול ביתי', 16, 32, ''),
+      sid('d8', 'שעועית', 'שעועית ברוטב עגבניות', 16, 32, ''),
+      sid('d9', 'זיתים מרוקאים', 'זיתים בתיבול מרוקאי', 25, 50, ''),
+      sid('d10', 'מרק לקוסקוס', 'מרק ירקות ביתי עם תפוח אדמה, סלרי ושמיר', 20, 40, 'images/soup.jpg'),
+      sid('d11', 'פתיתים', 'פתיתים מוזהבים בתיבול פפריקה', 18, 35, 'images/couscous.jpg'),
+      sid('d12', 'פסטה', 'פסטה רכה ומתובלת', 18, 35, '')
     ] },
-    { id: 'spreads', name: 'ממרחים ורטבים', emoji: '🫓', items: [
-      { id: 'm1', name: 'חומוס', desc: 'חומוס חלק עם גרגירי חומוס ושמן זית', price: 16, img: 'images/hummus.jpg', opts: SZ },
-      { id: 'm2', name: 'טחינה ירוקה', desc: 'ממרח עשבי תיבול קרמי', price: 16, img: 'images/green-sauce.jpg', opts: SZ },
-      { id: 'm3', name: 'סחוג אדום', desc: 'ממרח פלפלים חריף', price: 14, img: 'images/red-spread.jpg', opts: SZ }
+    { id: 'mains', name: 'עיקריות', emoji: '🍗', note: 'העיקריות נמכרות לפי יחידה אחת', items: [
+      { id: 'm1', name: 'שניצל', desc: 'שניצל פריך וזהוב', price: 16, img: '' },
+      { id: 'm2', name: 'צלי כתף', desc: 'צלי כתף רך בתבשיל', price: 30, img: '' },
+      { id: 'm3', name: 'עוף בתנור', desc: 'עוף אפוי בתנור בתיבול ביתי', price: 25, img: '' },
+      { id: 'm4', name: 'דג מושט', desc: 'דג מושט בתיבול ביתי', price: 20, img: '' },
+      { id: 'm5', name: 'דג סלומון', desc: 'פילה סלומון בתיבול עדין', price: 30, img: '' },
+      { id: 'm6', name: 'קציצות בשר', desc: 'קציצות בשר ברוטב עגבניות ופלפלים', price: 9, img: 'images/meatballs.jpg' },
+      { id: 'm7', name: 'סטייק פרגית', desc: 'סטייק פרגית עסיסי', price: 18, img: '' }
     ] },
-    { id: 'ready', name: 'אוכל מוכן', emoji: '🍗', items: [
-      { id: 'n1', name: 'שניצל קלאסי', desc: 'פירורי לחם זהובים', price: 48, g: 200, img: '' },
-      { id: 'n2', name: 'שניצל קורנפלקס', desc: 'עטוף פריכות קורנפלקס', price: 52, g: 220, img: '' },
-      { id: 'n3', name: 'מנת שניצל + 2 תוספות', desc: 'שניצל קלאסי ושתי תוספות לבחירה', price: 62, img: '' },
-      { id: 'k1', name: 'קציצות ברוטב עגבניות', desc: 'קציצות בשר ברוטב עגבניות ופלפלים אדומים', price: 42, g: 400, img: 'images/meatballs.jpg' },
-      { id: 'k2', name: 'מרק ירקות', desc: 'מרק ירקות ביתי עם תפוח אדמה, סלרי ושמיר', price: 24, g: 400, img: 'images/soup.jpg' },
-      { id: 'd1', name: 'אורז לבן', desc: 'אורז רך ומאודה', price: 14, g: 200, img: 'images/rice.jpg' },
-      { id: 'd3', name: 'פתיתים', desc: 'פתיתים מוזהבים בתיבול פפריקה', price: 14, g: 200, img: 'images/couscous.jpg' },
-      { id: 'd2', name: 'צ׳יפס', desc: 'פריך מבחוץ ורך מבפנים', price: 16, g: 250, img: '' }
+    { id: 'challah', name: 'חלות', emoji: '🥖', items: [
+      { id: 'c1', name: 'חלה ביתית', desc: 'חלה קלועה, מבריקה, מכוסה שומשום', price: 16, img: 'images/challah.jpg' },
+      { id: 'c2', name: 'לחמניה', desc: 'לחמניה רכה לסעודה', price: 6, img: '' }
     ] }
   ];
   var DEMO_COUPONS = [
@@ -276,6 +318,7 @@ footer { color: var(--ink); padding-bottom: 70px; }
         mode: 'firebase',
         saveOrder: function (o) { var d = Object.assign({}, o); d.ts = firebase.firestore.FieldValue.serverTimestamp(); return O.doc(o.id).set(d); },
         watchOrders: function (cb) { O.orderBy('ts', 'desc').limit(200).onSnapshot(function (s) { cb(s.docs.map(function (d) { var x = d.data(); x.id = d.id; x.tsd = x.ts && x.ts.toDate ? x.ts.toDate().getTime() : Date.now(); return x; })); }, function (e) { cb(null, e); }); },
+        watchNew: function (cb) { return O.where('status', '==', 'new').onSnapshot(function (sn) { cb(sn.size); }, function () { cb(0); }); },
         setStatus: function (id, st) { return O.doc(id).update({ status: st }); },
         getCoupon: function (code) { return C.doc(code).get().then(function (d) { return d.exists ? d.data() : null; }); },
         watchCoupons: function (cb) { C.onSnapshot(function (s) { cb(s.docs.map(function (d) { return d.data(); })); }, function (e) { cb(null, e); }); },
@@ -309,10 +352,10 @@ footer { color: var(--ink); padding-bottom: 70px; }
   var selOpt = {};   // itemId -> option index (default 0)
   var openOpt = {};  // itemId -> האם פאנל האפשרויות פתוח
   function renderMenu() {
-    var h = '<header class="hero"><span class="bsd">בס"ד</span><div class="wrap"><h1 class="sr">' + esc(CONFIG.name) + '</h1><img class="hlogo" src="images/logo.jpg" alt="תהדר"><p class="hand">טעם של בית <span>♥</span></p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🥖 חלות</span><span class="badge">🏷️ קופונים</span></div>' + heroContact() + '</div></header>';
+    var h = '<header class="hero"><span class="bsd">בס"ד</span>' + KOSHER + '<div class="wrap"><h1 class="sr">' + esc(CONFIG.name) + '</h1><img class="hlogo" src="images/logo.jpg" alt="תהדר">' + newBarHtml() + '<p class="hand">טעם של בית <span>♥</span></p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🥖 חלות</span><span class="badge">🏷️ קופונים</span></div>' + heroContact() + '</div></header>';
     h += '<nav class="cats"><div class="row">' + MENU.map(function (c, i) { return '<button class="chip" data-cat="' + c.id + '"' + (i === 0 ? ' aria-current="true"' : '') + '>' + esc(c.name) + '</button>'; }).join('') + '</div></nav><main class="wrap">';
     MENU.forEach(function (c) {
-      h += '<section class="cat" id="cat-' + c.id + '"><h2>' + esc(c.name) + '</h2><div class="cardlist">';
+      h += '<section class="cat" id="cat-' + c.id + '"><h2>' + esc(c.name) + '</h2><div class="cardlist">' + (c.note ? '<p class="catnote">' + esc(c.note) + '</p>' : '');
       c.items.forEach(function (it) {
         var hasOpts = !!it.opts, o = selOpt[it.id] == null ? 0 : selOpt[it.id], open = hasOpts && (openOpt[it.id] || selOpt[it.id] != null);
         var key = cKey(it.id, hasOpts ? o : null), q = cart[key] ? cart[key].qty : 0;
@@ -332,6 +375,15 @@ footer { color: var(--ink); padding-bottom: 70px; }
     $('#app').innerHTML = h;
     updateBar();
   }
+
+  var KOSHER = '<span class="kosher" role="img" aria-label="כשר"><svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#6b4423"/><circle cx="50" cy="50" r="43.5" fill="none" stroke="#fbead4" stroke-width="2"/><rect x="4" y="36" width="92" height="28" fill="#4b2f14"/><line x1="4" y1="36" x2="96" y2="36" stroke="#fbead4" stroke-width="2.5"/><line x1="4" y1="64" x2="96" y2="64" stroke="#fbead4" stroke-width="2.5"/><text x="50" y="58" text-anchor="middle" font-family="Heebo, Arial, sans-serif" font-weight="800" font-size="25" fill="#fbead4">כשר</text></svg></span>';
+  var newCount = 0;
+  function newBarHtml() { return newCount > 0 ? '<div class="newbar" id="newbar">🔔 יש לך ' + (newCount === 1 ? 'הזמנה חדשה אחת' : newCount + ' הזמנות חדשות') + ' <a href="#admin">(צפה)</a></div>' : ''; }
+  function paintNewBar() {
+    var old = $('#newbar'), logo = $('header.hero .hlogo');
+    if (old) old.remove();
+    if (newCount > 0 && logo) logo.insertAdjacentHTML('afterend', newBarHtml());
+  }
   var WA_ICON = '<svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true" style="display:block"><path fill="#fff" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
   var WAZE_ICON = '<img src="data:image/png;base64,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" alt="" width="32" height="33" style="display:block;border-radius:9px">';
   function sideIcons() {
@@ -343,8 +395,10 @@ footer { color: var(--ink); padding-bottom: 70px; }
     return h;
   }
   function heroContact() {
-    var a = CONFIG.address, q = encodeURIComponent(a.street + ', ' + a.city), h = '<div class="hc">';
-    h += '<div class="map"><iframe id="hmapframe" title="מפה" src="https://maps.google.com/maps?q=' + q + '&hl=he&t=m&z=17&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div></div>';
+    var a = CONFIG.address, q = encodeURIComponent(a.street + ', ' + a.city);
+    var h = '<div class="hc"><div class="facts"><span>🕛 ניתן להזמין עד יום ה׳ בשעה 12:00</span><span>🅿️ חנייה בשפע</span></div>';
+    h += '<div class="map"><iframe id="hmapframe" title="מפה" src="https://maps.google.com/maps?q=' + q + '&hl=he&t=m&z=17&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>';
+    h += '<div class="dirs"><b>📍 הוראות הגעה</b><div>' + esc(a.street) + ', ' + esc(a.city) + ' · ' + esc(a.apt) + (CONFIG.floor ? ' · קומה ' + esc(CONFIG.floor) : '') + '</div>' + (CONFIG.arrival ? '<div>' + esc(CONFIG.arrival) + '</div>' : '') + '<a href="https://waze.com/ul?q=' + q + '" target="_blank" rel="noopener">ניווט ב-Waze ›</a></div></div>';
     return h;
   }
   function mountSideTab() {
@@ -443,11 +497,23 @@ footer { color: var(--ink); padding-bottom: 70px; }
     t += 'סה״כ: ' + money(o.total) + (o.note ? '\nהערה: ' + o.note : '');
     return t;
   }
+  function receiptHtml(o) {
+    var d = new Date(o.tsd || Date.now()), when = d.toLocaleDateString('he-IL') + ' · ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    var r = '<div class="rwrap"><div class="receipt"><img class="rlogo" src="images/logo.jpg" alt="תהדר"><div class="rbsd">בס"ד</div><div class="rtitle">קבלה · הזמנה #' + esc(o.id) + '</div><div class="rmeta">' + esc(when) + '</div><div class="rsep"></div>';
+    r += '<div class="rrow"><span>שם</span><b>' + esc(o.name) + '</b></div><div class="rrow"><span>טלפון</span><b dir="ltr">' + esc(o.phone) + '</b></div><div class="rrow"><span>איסוף</span><b>' + esc(o.pickup) + '</b></div><div class="rsep"></div>';
+    o.items.forEach(function (i) { r += '<div class="ritem"><span>' + i.qty + '× ' + esc(i.name) + (i.opt ? ' <small>(' + esc(i.opt) + ')</small>' : '') + '</span><b>' + money(i.price * i.qty) + '</b></div>'; });
+    r += '<div class="rsep"></div><div class="rrow"><span>סכום ביניים</span><b>' + money(o.subtotal) + '</b></div>';
+    if (o.discount > 0) r += '<div class="rrow rdisc"><span>קופון ' + esc(o.coupon) + '</span><b>−' + money(o.discount) + '</b></div>';
+    r += '<div class="rtotal"><span>סה״כ לתשלום</span><b>' + money(o.total) + '</b></div>';
+    if (o.note) r += '<div class="rnote">הערה: ' + esc(o.note) + '</div>';
+    r += '<div class="rsep"></div><div class="rfoot">' + esc(CONFIG.pickupNote) + '<br>תודה שבחרתם בתהדר ♥<br><small>מומלץ לשמור צילום מסך של הקבלה</small></div></div></div>';
+    return r;
+  }
   function done(o) {
-    var h = '<div class="overlay"><div class="sheet"><div class="done"><img class="chef" src="images/chef.png" alt="" width="130"><h2>ההזמנה התקבלה!</h2><p>מספר הזמנה:</p><code>' + esc(o.id) + '</code><p>סה״כ ' + money(o.total) + ' · ' + esc(CONFIG.pickupNote) + '</p>';
-    if (CONFIG.whatsapp) h += '<a class="btn alt big" style="display:block;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/' + esc(CONFIG.whatsapp) + '?text=' + encodeURIComponent(waText(o)) + '">שלח גם בוואטסאפ</a>';
+    var h = '<div class="overlay"><div class="sheet"><div class="done"><img class="chef" src="images/chef.png" alt="" width="96"><h2>ההזמנה התקבלה!</h2></div>' + receiptHtml(o);
+    if (CONFIG.whatsapp) h += '<a class="btn alt big" style="display:block;text-decoration:none;text-align:center" target="_blank" rel="noopener" href="https://wa.me/' + esc(CONFIG.whatsapp) + '?text=' + encodeURIComponent(waText(o)) + '">שלח גם בוואטסאפ</a>';
     if (store.mode === 'local') h += '<div class="note">מצב הדגמה: ההזמנה נשמרה רק במכשיר הזה.</div>';
-    h += '<button class="btn ghost big" id="dclose">סגור</button></div></div></div>';
+    h += '<button class="btn ghost big" id="dclose">סגור</button></div></div>';
     cart = {}; applied = null; selOpt = {}; openOpt = {};
     $('#modal').innerHTML = h; $('#dclose').onclick = function () { closeModal(); renderMenu(); };
   }
@@ -525,7 +591,18 @@ footer { color: var(--ink); padding-bottom: 70px; }
   window.addEventListener('hashchange', route);
   var init = CONFIG.firebase ? fbStore().catch(function () { return localStore(); }) : Promise.resolve(localStore());
   mountSideTab();
-  init.then(function (s) { store = s; route(); });
+  init.then(function (s) {
+    store = s; route();
+    if (s.mode === 'firebase' && fb && fb.auth) {
+      var unsub = null;
+      fb.auth.onAuthStateChanged(function (u) {
+        if (unsub) { unsub(); unsub = null; }
+        if (u && u.emailVerified && CONFIG.ownerEmails.indexOf((u.email || '').toLowerCase()) >= 0) {
+          unsub = s.watchNew(function (n) { newCount = n; paintNewBar(); });
+        } else { newCount = 0; paintNewBar(); }
+      });
+    }
+  });
   window.__salads = { cart: function () { return cart; }, store: function () { return store; } };
 })();
 </script>
