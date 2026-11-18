@@ -222,6 +222,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     whatsapp: '972544905565',                            // מספר לקבלת הזמנות בוואטסאפ, בפורמט בינלאומי בלי + (למשל 972501234567). ריק = בלי כפתור
     floor: '',                               // קומה (למשל 3) – מופיעה בהוראות ההגעה. ריק = לא מוצגת
     arrival: '',                             // הוראות הגעה חופשיות (למשל: כניסה מהחזית, עולים במדרגות לקומה ...)
+    appCheckKey: '6LckwSUuAAAAAHZIEXTCBqEMjDKgu_jpBN9tj0VC',                         // מפתח reCAPTCHA (Site key) להגנת App Check. ריק = כבוי
     pickupNote: 'התשלום מתבצע בעת האיסוף.',
     pickupSlots: ['כמה שיותר מהר', '12:00', '12:30', '13:00', '13:30', '14:00', '17:00', '18:00', '19:00'],
     ownerEmails: ['chenkeynan@gmail.com', 'edenkeynan@gmail.com', 'yaakov414@gmail.com'],   // מי מורשה למסך הניהול (גם בכללי Firebase!)
@@ -311,8 +312,9 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   function loadScript(src) { return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
   function fbStore() {
     var base = 'https://www.gstatic.com/firebasejs/10.8.0/firebase-';
-    return loadScript(base + 'app-compat.js').then(function () { return loadScript(base + 'firestore-compat.js'); }).then(function () { return loadScript(base + 'auth-compat.js'); }).then(function () {
-      firebase.initializeApp(CONFIG.firebase); var db = firebase.firestore(); fb = { db: db, auth: firebase.auth() };
+    return loadScript(base + 'app-compat.js').then(function () { return loadScript(base + 'firestore-compat.js'); }).then(function () { return loadScript(base + 'auth-compat.js'); }).then(function () { return CONFIG.appCheckKey ? loadScript(base + 'app-check-compat.js') : 0; }).then(function () {
+      firebase.initializeApp(CONFIG.firebase);
+      if (CONFIG.appCheckKey) { try { var AC = firebase.appCheck, prov = AC.ReCaptchaEnterpriseProvider ? new AC.ReCaptchaEnterpriseProvider(CONFIG.appCheckKey) : CONFIG.appCheckKey; firebase.appCheck().activate(prov, true); } catch (e) {} } var db = firebase.firestore(); fb = { db: db, auth: firebase.auth() };
       var O = db.collection('orders'), C = db.collection('coupons');
       return {
         mode: 'firebase',
