@@ -97,6 +97,12 @@ footer a { color: inherit; }
 .admin a { color: var(--green); font-weight: 700; }
 .admin h1 { font-family: 'Secular One', sans-serif; font-weight: 400; }
 .tabs { display: flex; gap: 8px; margin: 12px 0; }
+.wrap.admin { padding-top: calc(var(--lf) * 1.15); }
+.admin .tabs { overflow-x: auto; scrollbar-width: none; padding: 2px 0 4px; }
+.admin .tabs::-webkit-scrollbar { display: none; }
+.admin .tabs .chip { flex: none; }
+.soon { text-align: center; padding: 36px 12px; background: var(--card); border: 1px dashed var(--gold); border-radius: 16px; }
+.soon b { display: block; font-size: 1.2rem; margin-bottom: 6px; }
 .ord { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
 .ord header { display: flex; justify-content: space-between; gap: 8px; font-weight: 800; }
 .ord ul { margin: 6px 0; padding: 0 18px 0 0; }
@@ -610,23 +616,26 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   var STAT = { 'new': 'חדשה', prep: 'בהכנה', ready: 'מוכנה', done: 'נמסרה' }, NEXT = { 'new': 'prep', prep: 'ready', ready: 'done' };
   function adminBody() {
     var box = $('#adb') || $('#adm');
-    box.innerHTML = '<div class="tabs"><button class="btn" id="t1">הזמנות</button><button class="btn ghost" id="t2">קופונים</button></div><div id="ap"></div>';
-    var tab = 1, orders = [], coupons = [];
+    var TABS = [['orders', 'הזמנות'], ['pantry', 'מזווה'], ['recipes', 'מתכונים'], ['coupons', 'קופונים']];
+    box.innerHTML = '<div class="tabs" role="tablist">' + TABS.map(function (t) { return '<button class="chip" role="tab" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div><div id="ap"></div>';
+    var tab = 'orders', orders = [], coupons = [];
     function paint() {
       var p = $('#ap'); if (!p) return;
-      $('#t1').className = 'btn' + (tab === 1 ? '' : ' ghost'); $('#t2').className = 'btn' + (tab === 2 ? '' : ' ghost');
-      if (tab === 1) {
+      Array.prototype.forEach.call(box.querySelectorAll('.tabs .chip'), function (c) { var on = c.dataset.tab === tab; if (on) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current'); c.setAttribute('aria-selected', String(on)); });
+      if (tab === 'orders') {
         if (!orders.length) { p.innerHTML = '<p>אין הזמנות עדיין.</p>'; return; }
         p.innerHTML = orders.map(function (o) {
           var tm = o.tsd ? new Date(o.tsd).toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' }) : '';
           return '<div class="ord"><header><span>#' + esc(o.id) + ' · ' + esc(o.name) + '</span><span class="st ' + esc(o.status) + '">' + esc(STAT[o.status] || o.status) + '</span></header><div>📞 <a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a> · ⏰ ' + esc(o.pickup) + ' · ' + esc(tm) + '</div>' + (o.delivery ? '<div>🚚 <b>משלוח</b>: ' + esc(o.address) + ' · דמי משלוח ' + money(o.fee) + '</div>' : '<div>🏠 איסוף עצמי</div>') + '<ul>' + o.items.map(function (i) { return '<li>' + i.qty + '× ' + esc(i.name) + (i.opt ? ' (' + esc(i.opt) + ')' : '') + '</li>'; }).join('') + '</ul>' + (o.note ? '<div>📝 ' + esc(o.note) + '</div>' : '') + '<div><b>' + money(o.total) + '</b>' + (o.coupon ? ' · קופון ' + esc(o.coupon) + ' (−' + money(o.discount) + ')' : '') + '</div>' + (NEXT[o.status] ? '<button class="btn alt" data-adv="' + esc(o.id) + '" data-to="' + NEXT[o.status] + '" style="margin-top:8px">סמן: ' + STAT[NEXT[o.status]] + '</button>' : '') + '</div>';
         }).join('');
-      } else {
+      } else if (tab === 'coupons') {
         p.innerHTML = '<table class="tbl"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th>תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td>' + esc(c.expires || '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table>' +
           '<h3>קופון חדש</h3><div class="grid2"><label class="field"><span>קוד</span><input id="nc" type="text" maxlength="20" style="text-transform:uppercase"></label><label class="field"><span>סוג</span><select id="nt"><option value="percent">אחוזים</option><option value="fixed">סכום קבוע (₪)</option></select></label><label class="field"><span>ערך</span><input id="nv" type="number" min="1" max="1000"></label><label class="field"><span>מינימום הזמנה (₪)</span><input id="nm" type="number" min="0" value="0"></label><label class="field"><span>תוקף עד (אופציונלי)</span><input id="ne" type="date"></label></div><button class="btn" id="nadd">הוסף קופון</button><div class="msg err" id="nerr"></div>';
+      } else {
+        p.innerHTML = '<div class="soon"><b>' + (tab === 'pantry' ? '🥫 מזווה' : '📖 מתכונים') + '</b>הלשונית הזו עדיין בבנייה.</div>';
       }
     }
-    $('#t1').onclick = function () { tab = 1; paint(); }; $('#t2').onclick = function () { tab = 2; paint(); };
+    box.querySelector('.tabs').addEventListener('click', function (e) { var c = e.target.closest('[data-tab]'); if (!c) return; tab = c.dataset.tab; paint(); });
     $('#ap').addEventListener('click', function (e) {
       var a = e.target.closest('[data-adv]'); if (a) { store.setStatus(a.dataset.adv, a.dataset.to).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }); return; }
       var d = e.target.closest('[data-del]'); if (d) { store.deleteCoupon(d.dataset.del).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } }); return; }
