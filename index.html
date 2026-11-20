@@ -419,6 +419,9 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
       saveOrder: function (o) { var a = lsGet('salads.orders', []); a.unshift(o); lsSet('salads.orders', a); var p = lsGet('salads.pulse', []); p.unshift({ t: Date.now(), city: o.city || '' }); lsSet('salads.pulse', p.slice(0, 20)); return Promise.resolve(); },
       getPulse: function () { return Promise.resolve(lsGet('salads.pulse', [])); },
       getPromo: function () { return Promise.resolve(lsGet('salads.promo', null)); },
+      watchRecipes: function (cb) { cb(lsGet('salads.recipes', []).sort(function (a, b) { return (a.ord || 0) - (b.ord || 0); })); },
+      saveRecipe: function (r) { var a = lsGet('salads.recipes', []).filter(function (x) { return x.id !== r.id; }); a.push(JSON.parse(JSON.stringify(r))); lsSet('salads.recipes', a); return Promise.resolve(); },
+      deleteRecipe: function (id) { lsSet('salads.recipes', lsGet('salads.recipes', []).filter(function (x) { return x.id !== id; })); return Promise.resolve(); },
       savePromo: function (p) { lsSet('salads.promo', p); return Promise.resolve(); },
       watchOrders: function (cb) { cb(lsGet('salads.orders', [])); },
       deleteOrder: function (id) { lsSet('salads.orders', lsGet('salads.orders', []).filter(function (o) { return o.id !== id; })); return Promise.resolve(); },
@@ -435,11 +438,14 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     return loadScript(base + 'app-compat.js').then(function () { return loadScript(base + 'firestore-compat.js'); }).then(function () { return loadScript(base + 'auth-compat.js'); }).then(function () { return CONFIG.appCheckKey ? loadScript(base + 'app-check-compat.js') : 0; }).then(function () {
       firebase.initializeApp(CONFIG.firebase);
       if (CONFIG.appCheckKey) { try { var AC = firebase.appCheck, prov = AC.ReCaptchaEnterpriseProvider ? new AC.ReCaptchaEnterpriseProvider(CONFIG.appCheckKey) : CONFIG.appCheckKey; firebase.appCheck().activate(prov, true); } catch (e) {} } var db = firebase.firestore(); fb = { db: db, auth: firebase.auth() };
-      var O = db.collection('orders'), C = db.collection('coupons'), P = db.collection('pulse'), ST = db.collection('settings');
+      var O = db.collection('orders'), C = db.collection('coupons'), P = db.collection('pulse'), ST = db.collection('settings'), RC = db.collection('recipes');
       return {
         mode: 'firebase',
         saveOrder: function (o) { var d = Object.assign({}, o); d.ts = firebase.firestore.FieldValue.serverTimestamp(); return O.doc(o.id).set(d).then(function () { try { var pd = { ts: firebase.firestore.FieldValue.serverTimestamp() }; if (o.city) pd.city = o.city; P.doc(o.id).set(pd).catch(function () { }); } catch (e) { } }); },
         getPulse: function () { return P.orderBy('ts', 'desc').limit(20).get().then(function (s) { return s.docs.map(function (d) { var x = d.data(), t = x.ts; return { t: t && t.toMillis ? t.toMillis() : 0, city: typeof x.city === 'string' ? x.city.slice(0, 20) : '' }; }).filter(function (x) { return x.t; }); }).catch(function () { return []; }); },
+        watchRecipes: function (cb) { RC.onSnapshot(function (s) { cb(s.docs.map(function (d) { return d.data(); }).sort(function (a, b) { return (a.ord || 0) - (b.ord || 0); })); }, function () { cb(null); }); },
+        saveRecipe: function (r) { var d = JSON.parse(JSON.stringify(r)); return RC.doc(r.id).set(d); },
+        deleteRecipe: function (id) { return RC.doc(id).delete(); },
         getPromo: function () { return ST.doc('promo').get().then(function (d) { return d.exists ? d.data() : null; }).catch(function () { return null; }); },
         savePromo: function (p) { return ST.doc('promo').set(p); },
         watchOrders: function (cb) { O.orderBy('ts', 'desc').limit(200).onSnapshot(function (s) { cb(s.docs.map(function (d) { var x = d.data(); x.id = d.id; x.tsd = x.ts && x.ts.toDate ? x.ts.toDate().getTime() : Date.now(); return x; })); }, function (e) { cb(null, e); }); },
@@ -845,17 +851,28 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   /* =====================  ניהול  ===================== */
   /* =====================  מתכונים (מוצגים בניהול ← מתכונים)  =====================
      לכל מתכון: name = שם, ingredients = מערך שורות מרכיבים, steps = מערך שלבי הכנה */
-  var RECIPES = [{"name": "חלות של שישי (ענת אלישע)", "ingredients": ["1 ק״ג קמח לחם/חלה/כוסמין לבן/לבן", "כף וחצי שמרים", "4 כפות סוכר", "1/4 כוס שמן זית", "1/4 כוס שמן קנולה", "500-550 מ״ל מים (קמח לבן 500 מ״ל יספיקו)", "כף מלח", "למריחה:", "חלמון ביצה, כף מים, כפית סוכר/סילאן", "לקישוט:", "שומשום/פרג"], "steps": ["בקערת המיקסר מניחים קמח, סוכר ושמרים ומערבבים.", "מוסיפים מים ולשים כ-2-3 דקות. מוסיפים מלח ולאחר מכן את השמן.", "לשים במשך 8 דקות רצופות במהירות בינונית.", "יוצרים כדור מהבצק ומעבירים לקערה משומנת.", "משמנים גם את הבצק קלות, מכסים ומתפיחים כשעה (בחורף יותר).", "מחלקים לכדורים במשקל לפי הצורך: חלה גדולה משלוש רצועות – 200 גרם כל כדור; חלה מארבע רצועות – 120-140 גרם כל כדור; לחמניות – 80-100 גרם כל כדור.", "מכסים במגבת מטבח נקייה ומתפיחים עוד כ-20 דקות.", "פותחים כל כדור ויוצרים רצועות.", "קולעים לצורה הרצויה ומניחים בתבנית מרופדת בנייר אפייה.", "מכסים ומתפיחים עוד כ-25-30 דקות או עד הכפלת נפח של החלות.", "מחממים תנור ל-200 מעלות (חום סטטי).", "טורפים חלמון ביצה עם כפית סוכר/סילאן וכף מים.", "מורחים את החלות ומקשטים בשומשום/פרג.", "אופים עד הזהבה עמוקה.", "מצננים על רשת."]}, {"name": "סלט גזר מרוקאי (אפרת סיאצ'י | מתכונים ב-10 דקות)", "ingredients": ["6 גזרים בינוניים קלופים", "שליש כוס עלי כוסברה קצוצים (אפשר להמיר בפטרוזיליה)", "4-5 כפות מים", "תיבול:", "5 כפות שמן זית (2 לבישול הגזר, 1 לתיבול, 2 לסיום)", "3 שיני שום כתושות", "כפית פפריקה מתוקה", "חצי כפית כמון", "חצי כפית מלח", "פלפל שחור לפי הטעם", "כף מיץ לימון"], "steps": ["חותכים את הגזרים לעיגולים. מחממים מחבת רחבה עם 2 כפות שמן ומוסיפים את פרוסות הגזר. מכסים ומבשלים על אש בינונית-נמוכה במשך 10 דקות, מוסיפים 4-5 כפות מים וממשיכים לבשל עם מכסה עד שהגזרים מתרככים אבל לא לגמרי.", "מוסיפים שום קצוץ ומערבבים כדקה. מוסיפים כף שמן, פפריקה, כמון, מלח, פלפל שחור ומיץ לימון. מערבבים כדקה לספיגת הטעמים. מפזרים עלי כוסברה קצוצים ו-2 כפות שמן זית, מערבבים כמה שניות ומסירים מהאש."]}, {"name": "סלט חצילים במיונז (מרינה צ'ארונוב | מילון האוכל של ישראל FoodsDictionary)", "ingredients": ["ל-6 מנות (233 גרם למנה, תלוי בגודל המנה):", "4 חצילים בינוניים (סה״כ 1.32 ק״ג)", "3 כפות מיונז (סה״כ 45 גרם)", "3 כפות מיץ לימון", "1/2 כפית שטוחה מלח", "1/3 כפית שטוחה פלפל שחור"], "steps": ["שוטפים את החצילים השלמים ומכניסים לאפייה בתנור בחום של 220 מעלות למשך 35-45 דקות.", "לאחר שהחצילים מעט מתקררים, מקלפים את הקליפה, מוציאים את ״בשר החציל״ בעזרת מזלג ומרסקים.", "מוסיפים את המיונז, מיץ הלימון, המלח והפלפל השחור, מערבבים היטב וזהו – מוכן!"], "note": "ניתן גם לקלות את החצילים על אש גלויה. המיונז, מיץ הלימון והתבלינים במתכון לפי הטעם האישי."}, {"name": "שעועית ירוקה מוקפצת עם שומשום (חן במטבח)", "ingredients": ["½ קילו שעועית ירוקה טרייה (500 גרם)", "כ-3 כפות שמן", "2 שיני שום כתושות", "1 כף סויה", "1 כף סילאן", "כ-¼ כפית שמן שומשום", "כ-2 כפות שומשום לבן", "כ-2 כפות שומשום שחור", "כ-½ עד 1 כוס מים (תלוי בגודל המחבת)", "מלח, פלפל שחור גרוס"], "steps": ["חותכים מהשעועית את הקצה שהיה מחובר לצמח.", "במחבת גדולה קולים את השומשום הלבן על אש בינונית עד שמשחים מעט, בזהירות שלא יישרף. מוציאים לצלוחית.", "באותה מחבת שמים את השעועית הירוקה, מוסיפים מים וכ-1 כפית מלח, מדליקים אש גבוהה ומביאים לרתיחה. מנמיכים לאש נמוכה, מכסים ומבשלים כ-8 דקות או עד שהשעועית מתחילה להתרכך אבל עדיין קצת קשה. שימו לב: לא לבשל יותר מדי, אחרת השעועית תאבד את הצבע הירוק היפה שלה ואת הפריכות שלה. זה יכול להשתנות בין סוגי המחבתות, ולכן חשוב לבשל רק עד שהיא מתחילה טיפה להתרכך (יכול להיות שזה ייקח גם פחות מ-8 דקות).", "מסירים את המכסה ומגבירים לאש גבוהה. אם יש נוזלים במחבת, נותנים להם להתאדות.", "מוסיפים שמן, מזיזים מעט הצידה את השעועית ומוסיפים את השום הכתוש. מטגנים את השום כדקה ומערבבים יחד עם השעועית.", "מוסיפים סויה, סילאן, שמן שומשום, מעט מלח (לא הרבה כי הסויה מלוחה) ופלפל שחור גרוס. מערבבים כדקה, או עד שכמעט לא נשאר רוטב במחבת.", "מוסיפים את השומשום הלבן והשחור, מערבבים ומכבים את האש.", "מעבירים לצלחת הגשה."]}, {"name": "מרק קוסקוס (עדן רייוני)", "ingredients": ["2 כפות מרק עוף", "כפית מלח", "חצי כף פלפל שחור", "2 כפות פפריקה מתוקה", "חצי כף לא גדושה כורכום", "קוסקוס:", "דלעת", "כרוב", "חומוס", "תפוח אדמה", "גזר", "קישוא", "שמיר", "כרפס", "כוסברה", "פטרוזיליה", "בצל"], "steps": []}, {"name": "סלט זעלוק מרוקאי (צ'ט)", "ingredients": ["2 חצילים גדולים (עדיף בלאדי)", "3 עגבניות אדומות ובשלות (או 4-5 עגבניות תמר)", "2 פלפלים אדומים (גמבה / שושקה)", "1 פלפל ירוק חריף (לא חובה)", "4-5 שיני שום קצוצות או כתושות", "¼ כוס שמן זית", "1 כפית פפריקה מתוקה", "1 כפית כמון טחון", "מלח ופלפל שחור לפי הטעם", "מיץ מחצי לימון טרי (אפשר גם כפית לימון כבוש)", "חצי כוס כוסברה קצוצה", "מעט אריסה ביתית (לאוהבי החריף)"], "steps": ["קליית הירקות: מחממים תנור ל-200–250 מעלות (או קולים על אש גלויה). מחוררים את החצילים, הפלפלים והעגבניות במזלג, משמנים מעט ואופים כשעה עד שהירקות רכים ושרופים מבחוץ.", "צינון וקילוף: מצננים מעט, מקלפים את החצילים והפלפלים, וקוצצים את כל הירקות לחתיכות קטנות. מומלץ לסנן נוזלים מהחצילים כרבע שעה.", "בישול: מחממים שמן זית במחבת רחבה, מוסיפים את השום ומטגנים כדקה (שלא יישרף). מוסיפים פפריקה, כמון ואריסה ומערבבים לכמה שניות.", "איחוד וצמצום: מוסיפים למחבת את העגבניות, החצילים והפלפלים הקצוצים. מבשלים על אש בינונית-גבוהה 10-15 דקות תוך כדי מעיכה קלה וערבוב, עד שהנוזלים מתאדים והמרקם סמיך.", "תיבול סופי: מסירים מהאש, מוסיפים מיץ לימון, כוסברה ומלח לפי הטעם, ומערבבים היטב."]}, {"name": "שניצל (עדן רייוני)", "ingredients": ["מיונז", "חרדל", "שום כתוש", "פלפל שחור", "ביצה"], "steps": []}, {"name": "קציצות בשר ברוטב עגבניות (יוכי אפוליון | אינסטגרם)", "ingredients": ["לרוטב:", "1 בצל", "1 גמבה (ברצועות)", "4-5 שיני שום פרוסות", "כפית סוכר", "כפית מלח", "חצי כפית פלפל", "כפית אבקת מרק", "חצי כפית כמון", "חצי כפית בהרט", "3 כפות פפריקה", "פחית עגבניות מרוסקות (Mutti)", "3 כוסות מים רותחים", "לקציצות:", "חצי קילו בשר טחון", "1 בצל מגורד", "חופן כוסברה קצוצה דק", "חצי כוס פירורי לחם", "כף שמן", "ביצה", "כפית מלח", "חצי כפית פלפל שחור", "כפית גדושה אבקת מרק", "כפית ראס אל חנות", "כפית אבקת שום גבישי / רגיל", "כף פפריקה מתוקה"], "steps": ["בסיר רחב מטגנים את הבצל מעט, מוסיפים רצועות מגמבה אחת ומטגנים מעט. מוסיפים את השום הפרוס ואת התבלינים: סוכר, מלח, פלפל, אבקת מרק, כמון, בהרט ופפריקה.", "פותחים את התבלינים יחד בשמן, ומוסיפים את העגבניות המרוסקות ו-3 כוסות מים רותחים.", "מבשלים כ-10 דקות, ובינתיים מכינים את הקציצות.", "בקערה מניחים את הבשר הטחון, הבצל המגורד, הכוסברה, פירורי הלחם, השמן והביצה. מוסיפים את התבלינים: מלח, פלפל שחור, אבקת מרק, ראס אל חנות, אבקת שום ופפריקה מתוקה.", "מערבבים היטב ומכדררים קציצות.", "מכניסים את הקציצות לרוטב ומבשלים 40 דקות על אש נמוכה.", "מזיזים את הסיר מצד לצד בעדינות מדי פעם, כדי שהקציצות לא ידבקו.", "זהו, מוכן! בתיאבון 🍅"]}, {"name": "סלט סלק מבושל (לאה ממן)", "ingredients": ["4 סלקים בינוניים", "חצי צרור כוסברה קצוצה", "4 שיני שום כתושות", "כף שטוחה מלח", "כף סוכר", "כף שטוחה כמון", "מיץ מחצי לימון", "2 כפות חומץ", "3 כפות שמן"], "steps": ["מבשלים את הסלקים בסיר מלא במים עד התרככות מלאה.", "מקלפים וחותכים אותם לצורה הרצויה.", "בקערה מניחים כוסברה קצוצה ושום.", "מוסיפים את התבלינים, את מיץ הלימון, החומץ והשמן.", "מערבבים ושופכים את הסלק החתוך.", "מערבבים היטב ומכניסים לקופסה אטומה במקרר."]}];
+  var RECIPES = [], rcEdit = null;   // המתכונים נטענים מ-Firestore (הרשאת בעלים בלבד) – לא נמצאים בקוד האתר
+  function rcForm(r) {
+    var L = function (x) { return (Array.isArray(x) ? x : []).join('\n'); };
+    return '<div class="rc"><h4 class="rl" style="margin-top:0">' + (r.id ? 'עריכת מתכון' : 'מתכון חדש') + '</h4>' +
+      '<label class="field"><span>שם המתכון</span><input id="rcname" type="text" maxlength="120" value="' + esc(r.name || '') + '"></label>' +
+      '<label class="field"><span>מרכיבים (שורה לכל מרכיב; שורה שמסתיימת ב-: היא כותרת משנה)</span><textarea id="rcing" rows="8">' + esc(L(r.ingredients)) + '</textarea></label>' +
+      '<label class="field"><span>אופן ההכנה (שורה לכל שלב)</span><textarea id="rcsteps" rows="8">' + esc(L(r.steps)) + '</textarea></label>' +
+      '<label class="field"><span>הערה (אופציונלי)</span><input id="rcnote" type="text" maxlength="300" value="' + esc(r.note || '') + '"></label>' +
+      '<input type="hidden" id="rcid" value="' + esc(r.id || '') + '"><button class="btn" id="rcsave">שמור מתכון</button> <button class="btn ghost" id="rccancel">ביטול</button><div class="msg err" id="rcerr"></div></div>';
+  }
   function recipesHtml() {
-    if (!RECIPES.length) return '<div class="soon"><b>📖 מתכונים</b>עדיין לא נוספו מתכונים.</div>';
+    var bar = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="btn" id="rcnew">➕ מתכון חדש</button><label class="btn alt" style="cursor:pointer;margin:0">📥 ייבוא מקובץ<input type="file" id="rcfile" accept=".json,application/json" hidden></label></div>';
+    if (rcEdit) return bar + rcForm(rcEdit);
+    if (!RECIPES.length) return bar + '<div class="soon"><b>📖 מתכונים</b>עדיין לא נוספו מתכונים.</div>';
     var L = function (x) { return Array.isArray(x) ? x : String(x || '').split('\n').filter(Boolean); };
-    return RECIPES.map(function (r) {
+    return bar + RECIPES.map(function (r) {
       var ing = L(r.ingredients), st = L(r.steps);
-      return '<details class="rc"' + (RECIPES.length === 1 ? ' open' : '') + '><summary class="rn">' + esc(r.name) + '</summary>' +
+      return '<details class="rc"><summary class="rn">' + esc(r.name) + '</summary>' +
         (ing.length ? '<h4 class="rl">מרכיבים</h4><ul class="rt">' + ing.map(function (t) { return /:$/.test(t) ? '<li class="rs">' + esc(t) + '</li>' : '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '') +
         (st.length ? '<h4 class="rl">אופן ההכנה</h4><ol class="rt">' + st.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' : '') +
         (r.note ? '<p class="rt rnote">' + esc(r.note) + '</p>' : '') +
-        '</details>';
+        '<div style="margin-top:12px;display:flex;gap:8px"><button class="btn alt" data-rcedit="' + esc(r.id) + '">עריכה</button><button class="btn ghost" data-rcdel="' + esc(r.id) + '">מחיקה</button></div></details>';
     }).join('');
   }
   function renderAdmin() {
@@ -916,6 +933,18 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
       var a = e.target.closest('[data-adv]'); if (a) { store.setStatus(a.dataset.adv, a.dataset.to).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }); return; }
       var dz = e.target.closest('[data-delord]'); if (dz) { if (!confirm('למחוק את ההזמנה הזו לצמיתות?')) return; store.deleteOrder(dz.dataset.delord).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }).catch(function () { alert('המחיקה נכשלה'); }); return; }
       var d = e.target.closest('[data-del]'); if (d) { store.deleteCoupon(d.dataset.del).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } }); return; }
+      if (e.target.id === 'rcnew') { rcEdit = {}; paint(); return; }
+      if (e.target.id === 'rccancel') { rcEdit = null; paint(); return; }
+      var re_ = e.target.closest('[data-rcedit]'); if (re_) { rcEdit = RECIPES.filter(function (x) { return x.id === re_.dataset.rcedit; })[0] || {}; paint(); return; }
+      var rd_ = e.target.closest('[data-rcdel]'); if (rd_) { if (!confirm('למחוק את המתכון?')) return; store.deleteRecipe(rd_.dataset.rcdel).then(function () { if (store.mode === 'local') loadRecipes(); }); return; }
+      if (e.target.id === 'rcsave') {
+        var nm = $('#rcname').value.trim(), lines_ = function (v) { return v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); };
+        if (!nm) { $('#rcerr').textContent = 'חסר שם למתכון'; return; }
+        var old = RECIPES.filter(function (x) { return x.id === $('#rcid').value; })[0], rec = { id: $('#rcid').value || ('r' + Date.now()), name: nm, ingredients: lines_($('#rcing').value), steps: lines_($('#rcsteps').value), ord: old && old.ord ? old.ord : Date.now() };
+        var nt = $('#rcnote').value.trim(); if (nt) rec.note = nt;
+        store.saveRecipe(rec).then(function () { rcEdit = null; if (store.mode === 'local') loadRecipes(); else paint(); }).catch(function () { $('#rcerr').textContent = 'השמירה נכשלה'; });
+        return;
+      }
       if (e.target.id === 'psave') { var pl = Array.prototype.map.call(document.querySelectorAll('.ptext'), function (x) { return x.value.trim().slice(0, 80); }).slice(0, 5), pp = { text: pl.filter(Boolean)[0] || '', lines: pl, on: $('#pon').checked }; store.savePromo(pp).then(function () { promo = pp; $('#pmsg').textContent = 'נשמר ✓'; }).catch(function () { $('#pmsg').textContent = 'השמירה נכשלה'; }); return; }
       if (e.target.id === 'nadd') {
         var code = ($('#nc').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, ''), v = Number($('#nv').value), t = $('#nt').value, er = $('#nerr');
@@ -924,6 +953,19 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
         store.saveCoupon({ code: code, type: t, value: v, min: Number($('#nm').value) || 0, expires: $('#ne').value || '', active: true }).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } });
       }
     });
+    $('#ap').addEventListener('change', function (e) {
+      if (e.target.id !== 'rcfile' || !e.target.files[0]) return;
+      var fr = new FileReader();
+      fr.onload = function () {
+        try {
+          var arr = JSON.parse(fr.result); if (!Array.isArray(arr)) throw 0;
+          Promise.all(arr.map(function (r, k) { return store.saveRecipe({ id: String(r.id || 'r' + Date.now() + k).replace(/[^\w-]/g, ''), name: String(r.name || '').slice(0, 120), ingredients: (r.ingredients || []).map(String), steps: (r.steps || []).map(String), note: r.note ? String(r.note).slice(0, 300) : undefined, ord: r.ord || (Date.now() + k) }); })).then(function () { alert('יובאו ' + arr.length + ' מתכונים'); if (store.mode === 'local') loadRecipes(); });
+        } catch (x) { alert('קובץ לא תקין'); }
+      };
+      fr.readAsText(e.target.files[0]); e.target.value = '';
+    });
+    function loadRecipes() { store.watchRecipes(function (r) { if (r) { RECIPES = r; if (tab === 'recipes') paint(); } }); }
+    loadRecipes();
     store.watchOrders(function (o, err) { if (err) { $('#ap').innerHTML = '<p>אין הרשאה לקרוא הזמנות.</p>'; return; } orders = o; paint(); });
     store.watchCoupons(function (c) { if (c) { coupons = c; paint(); } });
     store.getPromo().then(function (p) { if (p) { promo = p; if (tab === 'coupons') paint(); } });
