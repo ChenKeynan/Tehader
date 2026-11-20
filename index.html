@@ -242,6 +242,12 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 .item .price small { font-size: .95rem; }
 .item .psub { font-size: .8rem; color: var(--muted); font-weight: 500; margin-top: 1px; }
 .item .plus { flex: none; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #ecdcb8; color: #4a3519; font-size: 1.6rem; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0 0 2px; }
+/* שלוש שורות הסלוגן – כתב יד כמו בתפריט */
+.tag { text-align: center; margin: 4px auto 8px; color: #2a2420; font-family: 'Gveret Levin', 'Secular One', cursive; line-height: 1.15; }
+.tag .t1 { font-size: 2.4rem; transform: rotate(-3deg); }
+.tag .t2 { font-size: 1.65rem; margin-top: 6px; transform: rotate(-2deg); }
+.tag .t3 { font-size: 1.5rem; margin-top: 2px; transform: rotate(-2deg); }
+.tag .tsw { display: block; width: 210px; max-width: 70vw; height: auto; margin: -4px auto 0; fill: #2a2420; }
 </style>
 </head>
 <body>
@@ -395,11 +401,31 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   function cKey(id, opt) { return id + '|' + (opt == null ? '' : opt); }
 
   /* =====================  תצוגת תפריט  ===================== */
+  var activeCat = MENU[0].id, spyLock = 0;   // הקטגוריה המסומנת בסרגל
+  function setActive(id) {
+    activeCat = id;
+    var row = document.querySelector('nav.cats .row'); if (!row) return;
+    Array.prototype.forEach.call(row.querySelectorAll('.chip'), function (c) {
+      if (c.dataset.cat === id) {
+        c.setAttribute('aria-current', 'true');
+        var r = row.getBoundingClientRect(), b = c.getBoundingClientRect();
+        if (b.left < r.left + 8 || b.right > r.right - 8) row.scrollBy({ left: (b.left + b.width / 2) - (r.left + r.width / 2), behavior: 'smooth' });
+      } else c.removeAttribute('aria-current');
+    });
+  }
+  function spy() {
+    if (Date.now() < spyLock) return;
+    var secs = document.querySelectorAll('section.cat'); if (!secs.length) return;
+    var cur = secs[0].id;
+    Array.prototype.forEach.call(secs, function (sc) { if (sc.getBoundingClientRect().top <= 100) cur = sc.id; });
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = secs[secs.length - 1].id;
+    cur = cur.replace('cat-', ''); if (cur !== activeCat) setActive(cur);
+  }
   var selOpt = {};   // itemId -> option index (default 0)
   var openOpt = {};  // itemId -> האם פאנל האפשרויות פתוח
   function renderMenu() {
-    var h = '<header class="hero"><span class="bsd">בס"ד</span>' + KOSHER + '<div class="wrap"><h1 class="sr">' + esc(CONFIG.name) + '</h1><img class="hlogo" src="images/logo.png" alt="תהדר">' + newBarHtml() + '<p class="hand">טעם של בית <span>♥</span></p><div class="badges"><span class="badge">🥗 סלטים טריים</span><span class="badge">🥖 חלות</span><span class="badge">🏷️ קופונים</span></div>' + heroContact() + '</div></header>';
-    h += '<nav class="cats"><div class="row">' + MENU.map(function (c, i) { return '<button class="chip" data-cat="' + c.id + '"' + (i === 0 ? ' aria-current="true"' : '') + '>' + esc(c.name) + '</button>'; }).join('') + '</div></nav><main class="wrap">';
+    var h = '<header class="hero"><span class="bsd">בס"ד</span>' + KOSHER + '<div class="wrap"><h1 class="sr">' + esc(CONFIG.name) + '</h1><img class="hlogo" src="images/logo.png" alt="תהדר">' + newBarHtml() + tagHtml() + '</div></header>';
+    h += '<nav class="cats"><div class="row">' + MENU.map(function (c, i) { return '<button class="chip" data-cat="' + c.id + '"' + (c.id === activeCat ? ' aria-current="true"' : '') + '>' + esc(c.name) + '</button>'; }).join('') + '</div></nav><main class="wrap">';
     MENU.forEach(function (c) {
       h += '<section class="cat" id="cat-' + c.id + '"><h2>' + esc(c.name) + '</h2><div class="cardlist">' + (c.note ? '<p class="catnote">' + esc(c.note) + '</p>' : '');
       c.items.forEach(function (it) {
@@ -447,11 +473,10 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     h += '<a class="ic maps" href="https://www.google.com/maps/search/?api=1&query=' + q + '" target="_blank" rel="noopener" aria-label="פתח במפה" title="פתח במפה">' + G_MAP + '</a>';
     return h;
   }
-  function heroContact() {
-    var a = CONFIG.address, q = encodeURIComponent(a.street + ', ' + a.city);
-    var h = '<div class="hc"><div class="facts"><span>🕛 ניתן להזמין עד יום ה׳ בשעה 12:00</span><span>🅿️ חנייה בשפע</span></div>';
-    h += '</div>';
-    return h;
+  function tagHtml() {
+    return '<div class="tag"><div class="t1">טעם של בית</div>' +
+      '<svg class="tsw" viewBox="0 0 220 46" aria-hidden="true"><path d="M6 17 Q110 36 214 7 Q110 46 6 17Z"/><path d="M133 31 C117 21 115 7 125 5 C130 4 133 8 133 11 C133 8 137 4 142 5 C152 7 150 21 133 31Z"/></svg>' +
+      '<div class="t2">חומרי גלם איכותיים</div><div class="t3">חנייה בשפע</div></div>';
   }
   function openMap() {
     var a = CONFIG.address, q = encodeURIComponent(a.street + ', ' + a.city);
@@ -608,7 +633,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     cart = {}; applied = null; selOpt = {}; openOpt = {}; mode = 'pickup';
     $('#modal').innerHTML = h; $('#dclose').onclick = function () { closeModal(); renderMenu(); };
   }
-  function renderMenuKeep() { var y = window.scrollY; renderMenu(); window.scrollTo(0, y); }
+  function renderMenuKeep() { var y = window.scrollY; renderMenu(); window.scrollTo(0, y); spy(); }
 
   /* =====================  ניהול  ===================== */
   function renderAdmin() {
@@ -671,7 +696,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 
   /* =====================  אתחול  ===================== */
   document.addEventListener('click', function (e) {
-    var chip = e.target.closest('.chip'); if (chip) { var s = $('#cat-' + chip.dataset.cat); if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    var chip = e.target.closest('.chip[data-cat]'); if (chip) { var s = $('#cat-' + chip.dataset.cat); setActive(chip.dataset.cat); spyLock = Date.now() + 1000; if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     var item = e.target.closest('.item'); if (!item) return;
     var pimg = e.target.closest('.pic img'); if (pimg) { openLb(pimg); return; }
     var id = item.dataset.item, it = findItem(id), o = selOpt[id] == null ? 0 : selOpt[id];
@@ -681,8 +706,9 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     else if (e.target.closest('[data-minus]')) { change(id, it.opts ? o : null, -1); renderMenuKeep(); }
   });
   $('#cartBtn').onclick = openCheckout;
+  window.addEventListener('scroll', spy, { passive: true });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (!closeLb()) closeModal(); } });
-  function route() { var st = $('#sidetab'); if (st) st.style.display = location.hash === '#admin' ? 'none' : ''; if (location.hash === '#admin') renderAdmin(); else { closeModal(); renderMenu(); } }
+  function route() { var st = $('#sidetab'); if (st) st.style.display = location.hash === '#admin' ? 'none' : ''; if (location.hash === '#admin') renderAdmin(); else { closeModal(); renderMenu(); spy(); } }
   window.addEventListener('hashchange', route);
   var init = CONFIG.firebase ? fbStore().catch(function () { return localStore(); }) : Promise.resolve(localStore());
   mountSideTab();
