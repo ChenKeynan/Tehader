@@ -308,7 +308,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 .rc { background: var(--card); border: 1px solid color-mix(in srgb, var(--gold) 75%, transparent); border-radius: 12px; padding: 14px 16px; margin: 0 0 12px; }
 .rc summary { list-style: none; cursor: pointer; }
 .rc summary::-webkit-details-marker { display: none; }
-.rn { font-size: 1.7rem; font-weight: 800; line-height: 1.2; color: var(--ink); }
+.rn { font-size: calc(1.7rem - 1pt); font-weight: 800; line-height: 1.2; color: var(--ink); }
 .rn::after { content: ' ▾'; font-size: 1rem; color: var(--gold); }
 .rc[open] .rn::after { content: ' ▴'; }
 .rl { font-size: 1.15rem; font-weight: 700; margin: 14px 0 4px; color: var(--green); }
@@ -928,7 +928,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
         else p.innerHTML = '<div class="soon"><b>' + (tab === 'pantry' ? '🥫 מזווה' : '🧾 BOM') + '</b>הלשונית הזו עדיין בבנייה.</div>';
       }
     }
-    box.querySelector('.tabs').addEventListener('click', function (e) { var c = e.target.closest('[data-tab]'); if (!c) return; tab = c.dataset.tab; paint(); });
+    box.querySelector('.tabs').addEventListener('click', function (e) { var c = e.target.closest('[data-tab]'); if (!c) return; tab = c.dataset.tab; paint(); try { box.querySelector('.tabs').scrollIntoView({ block: 'start' }); } catch (x) { } });
     $('#ap').addEventListener('click', function (e) {
       var a = e.target.closest('[data-adv]'); if (a) { store.setStatus(a.dataset.adv, a.dataset.to).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }); return; }
       var dz = e.target.closest('[data-delord]'); if (dz) { if (!confirm('למחוק את ההזמנה הזו לצמיתות?')) return; store.deleteOrder(dz.dataset.delord).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }).catch(function () { alert('המחיקה נכשלה'); }); return; }
@@ -964,6 +964,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
       };
       fr.readAsText(e.target.files[0]); e.target.value = '';
     });
+    $('#ap').addEventListener('toggle', function (e) { var d = e.target; if (d && d.classList && d.classList.contains('rc') && d.open) { var sm = d.querySelector('summary'); if (sm) sm.scrollIntoView({ block: 'start', behavior: 'smooth' }); } }, true);
     function loadRecipes() { store.watchRecipes(function (r) { if (r) { RECIPES = r; if (tab === 'recipes') paint(); } }); }
     loadRecipes();
     store.watchOrders(function (o, err) { if (err) { $('#ap').innerHTML = '<p>אין הרשאה לקרוא הזמנות.</p>'; return; } orders = o; paint(); });
