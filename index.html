@@ -146,6 +146,10 @@ footer a { color: inherit; }
 .hkc .fl { transform-box: fill-box; transform-origin: 50% 100%; animation: flk 1.6s ease-in-out infinite; }
 .hkc .fl:nth-child(2n) { animation-delay: -.5s; } .hkc .fl:nth-child(3n) { animation-delay: -1s; }
 @media (prefers-reduced-motion: reduce) { .hkc .fl { animation: none; } }
+#pulse { position: absolute; right: 0; bottom: 2px; width: 100%; height: 34px; overflow: hidden; pointer-events: none; display: flex; justify-content: flex-start; align-items: flex-end; }
+#pulse .pt { background: #24613f; color: #fff; font-weight: 700; font-size: .85rem; line-height: 1.2; padding: 7px 14px 7px 16px; border-radius: 18px 0 0 18px; box-shadow: 0 3px 10px rgba(0,0,0,.2); white-space: nowrap; transform: translateX(110%); transition: transform .35s ease; max-width: 94%; overflow: hidden; text-overflow: ellipsis; }
+#pulse .pt.on { transform: none; }
+@media (prefers-reduced-motion: reduce) { #pulse .pt { transition: none; } }
 .ord .hr { display: flex; align-items: center; gap: 8px; }
 .wabtn { display: inline-block; text-decoration: none; margin-top: 8px; background: #25d366; color: #fff; }
 .trash { border: 0; background: #eceae6; color: #6f6f6f; width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
@@ -395,7 +399,10 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   function localStore() {
     return {
       mode: 'local',
-      saveOrder: function (o) { var a = lsGet('salads.orders', []); a.unshift(o); lsSet('salads.orders', a); return Promise.resolve(); },
+      saveOrder: function (o) { var a = lsGet('salads.orders', []); a.unshift(o); lsSet('salads.orders', a); var p = lsGet('salads.pulse', []); p.unshift({ t: Date.now(), city: o.city || '' }); lsSet('salads.pulse', p.slice(0, 20)); return Promise.resolve(); },
+      getPulse: function () { return Promise.resolve(lsGet('salads.pulse', [])); },
+      getPromo: function () { return Promise.resolve(lsGet('salads.promo', null)); },
+      savePromo: function (p) { lsSet('salads.promo', p); return Promise.resolve(); },
       watchOrders: function (cb) { cb(lsGet('salads.orders', [])); },
       deleteOrder: function (id) { lsSet('salads.orders', lsGet('salads.orders', []).filter(function (o) { return o.id !== id; })); return Promise.resolve(); },
       setStatus: function (id, st) { var a = lsGet('salads.orders', []); a.forEach(function (o) { if (o.id === id) o.status = st; }); lsSet('salads.orders', a); return Promise.resolve(); },
@@ -411,10 +418,13 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     return loadScript(base + 'app-compat.js').then(function () { return loadScript(base + 'firestore-compat.js'); }).then(function () { return loadScript(base + 'auth-compat.js'); }).then(function () { return CONFIG.appCheckKey ? loadScript(base + 'app-check-compat.js') : 0; }).then(function () {
       firebase.initializeApp(CONFIG.firebase);
       if (CONFIG.appCheckKey) { try { var AC = firebase.appCheck, prov = AC.ReCaptchaEnterpriseProvider ? new AC.ReCaptchaEnterpriseProvider(CONFIG.appCheckKey) : CONFIG.appCheckKey; firebase.appCheck().activate(prov, true); } catch (e) {} } var db = firebase.firestore(); fb = { db: db, auth: firebase.auth() };
-      var O = db.collection('orders'), C = db.collection('coupons');
+      var O = db.collection('orders'), C = db.collection('coupons'), P = db.collection('pulse'), ST = db.collection('settings');
       return {
         mode: 'firebase',
-        saveOrder: function (o) { var d = Object.assign({}, o); d.ts = firebase.firestore.FieldValue.serverTimestamp(); return O.doc(o.id).set(d); },
+        saveOrder: function (o) { var d = Object.assign({}, o); d.ts = firebase.firestore.FieldValue.serverTimestamp(); return O.doc(o.id).set(d).then(function () { try { var pd = { ts: firebase.firestore.FieldValue.serverTimestamp() }; if (o.city) pd.city = o.city; P.doc(o.id).set(pd).catch(function () { }); } catch (e) { } }); },
+        getPulse: function () { return P.orderBy('ts', 'desc').limit(20).get().then(function (s) { return s.docs.map(function (d) { var x = d.data(), t = x.ts; return { t: t && t.toMillis ? t.toMillis() : 0, city: typeof x.city === 'string' ? x.city.slice(0, 20) : '' }; }).filter(function (x) { return x.t; }); }).catch(function () { return []; }); },
+        getPromo: function () { return ST.doc('promo').get().then(function (d) { return d.exists ? d.data() : null; }).catch(function () { return null; }); },
+        savePromo: function (p) { return ST.doc('promo').set(p); },
         watchOrders: function (cb) { O.orderBy('ts', 'desc').limit(200).onSnapshot(function (s) { cb(s.docs.map(function (d) { var x = d.data(); x.id = d.id; x.tsd = x.ts && x.ts.toDate ? x.ts.toDate().getTime() : Date.now(); return x; })); }, function (e) { cb(null, e); }); },
         watchNew: function (cb) { return O.where('status', '==', 'new').onSnapshot(function (sn) { cb(sn.size); }, function () { cb(0); }); },
         setStatus: function (id, st) { return O.doc(id).update({ status: st }); },
@@ -473,7 +483,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   var selOpt = {};   // itemId -> option index (default 0)
   var openOpt = {};  // itemId -> האם פאנל האפשרויות פתוח
   function renderMenu() {
-    var h = '<header class="hero"><span class="bsd">בס"ד</span>' + KOSHER + '<div class="wrap"><h1 class="sr">' + esc(CONFIG.name) + '</h1><img class="hlogo" src="images/logo.png" alt="תהדר">' + newBarHtml() + tagHtml() + '</div></header>';
+    var h = '<header class="hero"><span class="bsd">בס"ד</span>' + KOSHER + '<div class="wrap"><h1 class="sr">' + esc(CONFIG.name) + '</h1><img class="hlogo" src="images/logo.png" alt="תהדר">' + newBarHtml() + tagHtml() + '</div><div id="pulse" aria-live="polite"><div class="pt" id="pt"></div></div></header>';
     h += '<nav class="cats"><div class="row">' + MENU.map(function (c, i) { return '<button class="chip" data-cat="' + c.id + '"' + (c.id === activeCat ? ' aria-current="true"' : '') + '>' + esc(c.name) + '</button>'; }).join('') + '</div></nav><main class="wrap">';
     MENU.forEach(function (c) {
       h += '<section class="cat" id="cat-' + c.id + '"><h2>' + esc(c.name) + '</h2><div class="cardlist">' + (c.note ? '<p class="catnote">' + esc(c.note) + '</p>' : '');
@@ -566,6 +576,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     var h = '<div class="overlay" id="ov"><div class="sheet" role="dialog" aria-modal="true" aria-label="קופה"><button class="close" id="xclose" aria-label="סגור">✕</button><h2>הקופה</h2><div id="clines"></div><div class="coupon"><label for="cin">יש לך קוד קופון?</label><div class="row"><input id="cin" type="text" autocomplete="off" autocapitalize="characters" placeholder="הכנס קוד קופון"><button class="btn alt" id="capply" type="button">החל</button></div><div class="msg" id="cmsg" role="status"></div></div><div id="csum"></div>' +
       deliveryHtml() + '<label class="field"><span>שם מלא</span><input id="fname" type="text" autocomplete="name" maxlength="60"></label>' +
       '<label class="field"><span>טלפון</span><input id="fphone" type="tel" autocomplete="tel" inputmode="tel" maxlength="16" placeholder="050-0000000"></label>' +
+      '<label class="field"><span>עיר (אופציונלי – תוצג בלשונית באתר, בלי שם)</span><input id="fcity" type="text" list="fcities" maxlength="20" autocomplete="address-level2" placeholder="למשל: אשדוד"><datalist id="fcities"><option value="אשדוד"><option value="גן יבנה"><option value="אשקלון"><option value="ראשון לציון"><option value="יבנה"><option value="קרית מלאכי"><option value="גדרה"><option value="רחובות"><option value="נס ציונה"><option value="באר שבע"><option value="תל אביב"></datalist></label>' +
       '<label class="field"><span id="fpicklbl">מתי לאסוף?</span><input id="fpick" class="pickbtn" type="text" readonly placeholder="📅 בחרו תאריך ושעה"></label>' +
       '<label class="field"><span>הערות להזמנה (אופציונלי)</span><textarea id="fnote" rows="2" maxlength="200"></textarea></label>' +
       '<div class="note" id="fnotebox">' + esc(CONFIG.pickupNote) + '</div><div class="msg err" id="ferr" role="alert"></div><button class="btn big" id="fsend" type="button">שלח הזמנה</button></div></div>';
@@ -725,6 +736,44 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
       var c = e.target.closest('#hkcode'); if (c) { try { navigator.clipboard.writeText('HANUKAH'); } catch (x) { } c.innerHTML = 'הקוד הועתק ✓ <b>HANUKAH</b>'; }
     });
   }
+
+  /* =====================  לשונית שיווק נעה  ===================== */
+  var promoData = { pulse: [], text: '' }, promoIdx = 0;
+  function heb(n, one, many) { return n === 1 ? one : n + ' ' + many; }
+  function cutoffMsg() {
+    var now = new Date(), t = new Date(now); t.setDate(now.getDate() + ((4 - now.getDay() + 7) % 7)); t.setHours(12, 0, 0, 0);
+    if (t <= now) t.setDate(t.getDate() + 7);
+    var ms = t - now; if (ms > 72 * 3600e3) return '';
+    var h = Math.floor(ms / 3600e3), m = Math.floor(ms % 3600e3 / 60e3), d = Math.floor(h / 24), left;
+    if (d >= 1) { var hh = h - d * 24; left = (d === 1 ? 'יום' : d === 2 ? 'יומיים' : d + ' ימים') + (hh ? ' ו-' + hh + ' שעות' : ''); }
+    else left = h ? h + ' שעות' + (m ? ' ו-' + m + ' דקות' : '') : m + ' דקות';
+    return '⏳ ההזמנות לשבת נסגרות ביום חמישי ב-12:00 · נותרו ' + left;
+  }
+  function promoMsgs() {
+    var out = [], c = cutoffMsg(); if (c) out.push(c);
+    if (promoData.text) out.push('🥖 ' + promoData.text);
+    var now = Date.now(), p = promoData.pulse.filter(function (x) { return now - x.t < 24 * 3600e3; });
+    if (p.length) {
+      var min = Math.max(0, Math.round((now - p[0].t) / 60e3));
+      if (min < 180) out.push('🛍️ הזמנה חדשה נקלטה ' + (min < 2 ? 'לפני רגע' : min < 60 ? 'לפני ' + min + ' דקות' : 'לפני ' + heb(Math.round(min / 60), 'שעה', 'שעות')) + (p[0].city ? ' מ' + p[0].city : ''));
+      if (p.length >= 3) out.push('🔥 ' + p.length + ' הזמנות נקלטו ב-24 השעות האחרונות');
+    }
+    return out;
+  }
+  function loadPromo() {
+    store.getPulse().then(function (a) { promoData.pulse = a || []; }).catch(function () { });
+    store.getPromo().then(function (p) { promoData.text = p && p.on && p.text ? String(p.text).slice(0, 80) : ''; }).catch(function () { });
+  }
+  function startPromo() {
+    loadPromo(); setInterval(loadPromo, 5 * 60e3);
+    function tick() {
+      var el = $('#pt'); if (!el || location.hash === '#admin' || document.getElementById('hk') || document.getElementById('pkov')) return;
+      var m = promoMsgs(); if (!m.length) return;
+      el.textContent = m[promoIdx++ % m.length]; el.classList.add('on');
+      setTimeout(function () { el.classList.remove('on'); }, 1500);
+    }
+    setTimeout(function () { tick(); setInterval(tick, 8000); }, 4500);
+  }
   function validPhone(p) { var d = p.replace(/[^\d+]/g, '').replace(/^\+972/, '0').replace(/^972/, '0'); return /^0\d{8,9}$/.test(d) ? d : null; }
   function send() {
     var name = $('#fname').value.trim(), phone = validPhone($('#fphone').value), err = $('#ferr');
@@ -736,6 +785,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     err.textContent = '';
     var sub = subtotal(), disc = discount(), id = rid();
     var order = { id: id, name: name, phone: phone, pickup: $('#fpick').value, note: $('#fnote').value.trim(), items: lines().map(function (l) { var it = findItem(l.id); return { name: it.name, opt: l.opt != null && it.opts ? it.opts[l.opt].n : '', qty: l.qty, price: linePrice(l) }; }), subtotal: sub, coupon: applied && disc > 0 ? applied.code : '', discount: disc, total: Math.max(0, sub - disc) + (del ? fee() : 0), status: 'new', tsd: Date.now() };
+    var city = ($('#fcity').value || '').trim().replace(/\s+/g, ' ').slice(0, 20); if (city) order.city = city;
     if (del) { order.delivery = true; order.address = addr; order.fee = fee(); }
     var b = $('#fsend'); b.disabled = true; b.textContent = 'שולח…';
     store.saveOrder(order).then(function () { done(order); }).catch(function () { b.disabled = false; b.textContent = 'שלח הזמנה'; err.textContent = 'השליחה נכשלה. בדוק חיבור ונסה שוב.'; });
@@ -806,7 +856,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     var box = $('#adb') || $('#adm');
     var TABS = [['orders', 'הזמנות'], ['coupons', 'קופונים'], ['pantry', 'מזווה'], ['recipes', 'מתכונים'], ['bom', 'BOM']];
     box.innerHTML = '<div class="tabs" role="tablist">' + TABS.map(function (t) { return '<button class="chip" role="tab" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div><div id="ap"></div>';
-    var tab = 'orders', orders = [], coupons = [];
+    var tab = 'orders', orders = [], coupons = [], promo = {};
     function paint() {
       var p = $('#ap'); if (!p) return;
       Array.prototype.forEach.call(box.querySelectorAll('.tabs .chip'), function (c) { var on = c.dataset.tab === tab; if (on) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current'); c.setAttribute('aria-selected', String(on)); });
@@ -818,7 +868,8 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
         }).join('');
       } else if (tab === 'coupons') {
         p.innerHTML = '<table class="tbl"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th>תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td>' + esc(c.expires || '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table>' +
-          '<h3>קופון חדש</h3><div class="grid2"><label class="field"><span>קוד</span><input id="nc" type="text" maxlength="20" style="text-transform:uppercase"></label><label class="field"><span>סוג</span><select id="nt"><option value="percent">אחוזים</option><option value="fixed">סכום קבוע (₪)</option></select></label><label class="field"><span>ערך</span><input id="nv" type="number" min="1" max="1000"></label><label class="field"><span>מינימום הזמנה (₪)</span><input id="nm" type="number" min="0" value="0"></label><label class="field"><span>תוקף עד (אופציונלי)</span><input id="ne" type="date"></label></div><button class="btn" id="nadd">הוסף קופון</button><div class="msg err" id="nerr"></div>';
+          '<h3>קופון חדש</h3><div class="grid2"><label class="field"><span>קוד</span><input id="nc" type="text" maxlength="20" style="text-transform:uppercase"></label><label class="field"><span>סוג</span><select id="nt"><option value="percent">אחוזים</option><option value="fixed">סכום קבוע (₪)</option></select></label><label class="field"><span>ערך</span><input id="nv" type="number" min="1" max="1000"></label><label class="field"><span>מינימום הזמנה (₪)</span><input id="nm" type="number" min="0" value="0"></label><label class="field"><span>תוקף עד (אופציונלי)</span><input id="ne" type="date"></label></div><button class="btn" id="nadd">הוסף קופון</button><div class="msg err" id="nerr"></div>' +
+          '<h3>הודעת מלאי / מבצע (בלשונית באתר)</h3><label class="field"><span>טקסט, למשל: נשארו 6 חלות להיום</span><input id="ptext" type="text" maxlength="80" value="' + esc(promo.text || '') + '"></label><label class="field" style="display:flex;gap:8px;align-items:center"><input id="pon" type="checkbox"' + (promo.on ? ' checked' : '') + '><span style="margin:0">להציג באתר</span></label><button class="btn alt" id="psave">שמור הודעה</button><div class="msg" id="pmsg"></div>';
       } else {
         p.innerHTML = '<div class="soon"><b>' + (tab === 'pantry' ? '🥫 מזווה' : tab === 'bom' ? '🧾 BOM' : '📖 מתכונים') + '</b>הלשונית הזו עדיין בבנייה.</div>';
       }
@@ -828,6 +879,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
       var a = e.target.closest('[data-adv]'); if (a) { store.setStatus(a.dataset.adv, a.dataset.to).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }); return; }
       var dz = e.target.closest('[data-delord]'); if (dz) { if (!confirm('למחוק את ההזמנה הזו לצמיתות?')) return; store.deleteOrder(dz.dataset.delord).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }).catch(function () { alert('המחיקה נכשלה'); }); return; }
       var d = e.target.closest('[data-del]'); if (d) { store.deleteCoupon(d.dataset.del).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } }); return; }
+      if (e.target.id === 'psave') { var pp = { text: $('#ptext').value.trim().slice(0, 80), on: $('#pon').checked }; store.savePromo(pp).then(function () { promo = pp; $('#pmsg').textContent = 'נשמר ✓'; }).catch(function () { $('#pmsg').textContent = 'השמירה נכשלה'; }); return; }
       if (e.target.id === 'nadd') {
         var code = ($('#nc').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, ''), v = Number($('#nv').value), t = $('#nt').value, er = $('#nerr');
         if (code.length < 3) { er.textContent = 'קוד קצר מדי (לפחות 3 תווים באנגלית/מספרים)'; return; }
@@ -837,6 +889,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
     });
     store.watchOrders(function (o, err) { if (err) { $('#ap').innerHTML = '<p>אין הרשאה לקרוא הזמנות.</p>'; return; } orders = o; paint(); });
     store.watchCoupons(function (c) { if (c) { coupons = c; paint(); } });
+    store.getPromo().then(function (p) { if (p) { promo = p; if (tab === 'coupons') paint(); } });
   }
 
   /* =====================  אתחול  ===================== */
@@ -858,7 +911,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   var init = CONFIG.firebase ? fbStore().catch(function () { return localStore(); }) : Promise.resolve(localStore());
   mountSideTab();
   init.then(function (s) {
-    store = s; route(); setTimeout(hanukahPopup, 3000);
+    store = s; route(); setTimeout(hanukahPopup, 3000); startPromo();
     if (s.mode === 'firebase' && fb && fb.auth) {
       var unsub = null;
       fb.auth.onAuthStateChanged(function (u) {
