@@ -738,7 +738,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   }
 
   /* =====================  לשונית שיווק נעה  ===================== */
-  var promoData = { pulse: [], text: '' }, promoIdx = 0;
+  var promoData = { pulse: [], text: '', lines: [] }, promoIdx = 0;
   function heb(n, one, many) { return n === 1 ? one : n + ' ' + many; }
   function cutoffMsg() {
     var now = new Date(), t = new Date(now); t.setDate(now.getDate() + ((4 - now.getDay() + 7) % 7)); t.setHours(12, 0, 0, 0);
@@ -751,7 +751,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   }
   function promoMsgs() {
     var out = [], c = cutoffMsg(); if (c) out.push(c);
-    if (promoData.text) out.push('🥖 ' + promoData.text);
+    promoData.lines.forEach(function (t) { out.push('🥖 ' + t); });
     var now = Date.now(), p = promoData.pulse.filter(function (x) { return now - x.t < 24 * 3600e3; });
     if (p.length) {
       var min = Math.max(0, Math.round((now - p[0].t) / 60e3));
@@ -762,7 +762,11 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   }
   function loadPromo() {
     store.getPulse().then(function (a) { promoData.pulse = a || []; }).catch(function () { });
-    store.getPromo().then(function (p) { promoData.text = p && p.on && p.text ? String(p.text).slice(0, 80) : ''; }).catch(function () { });
+    store.getPromo().then(function (p) {
+      var L = [];
+      if (p && p.on) (Array.isArray(p.lines) ? p.lines : [p.text]).slice(0, 5).forEach(function (x) { x = String(x || '').trim().slice(0, 80); if (x) L.push(x); });
+      promoData.lines = L; promoData.text = L[0] || '';
+    }).catch(function () { });
   }
   function startPromo() {
     loadPromo(); setInterval(loadPromo, 5 * 60e3);
@@ -869,7 +873,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
       } else if (tab === 'coupons') {
         p.innerHTML = '<table class="tbl"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th>תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td>' + esc(c.expires || '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table>' +
           '<h3>קופון חדש</h3><div class="grid2"><label class="field"><span>קוד</span><input id="nc" type="text" maxlength="20" style="text-transform:uppercase"></label><label class="field"><span>סוג</span><select id="nt"><option value="percent">אחוזים</option><option value="fixed">סכום קבוע (₪)</option></select></label><label class="field"><span>ערך</span><input id="nv" type="number" min="1" max="1000"></label><label class="field"><span>מינימום הזמנה (₪)</span><input id="nm" type="number" min="0" value="0"></label><label class="field"><span>תוקף עד (אופציונלי)</span><input id="ne" type="date"></label></div><button class="btn" id="nadd">הוסף קופון</button><div class="msg err" id="nerr"></div>' +
-          '<h3>הודעת מלאי / מבצע (בלשונית באתר)</h3><label class="field"><span>טקסט, למשל: נשארו 6 חלות להיום</span><input id="ptext" type="text" maxlength="80" value="' + esc(promo.text || '') + '"></label><label class="field" style="display:flex;gap:8px;align-items:center"><input id="pon" type="checkbox"' + (promo.on ? ' checked' : '') + '><span style="margin:0">להציג באתר</span></label><button class="btn alt" id="psave">שמור הודעה</button><div class="msg" id="pmsg"></div>';
+          '<h3>הודעות מלאי / מבצע (בלשונית באתר)</h3><p style="margin:0 0 8px;color:var(--muted)">עד 5 שורות. כל שורה שאינה ריקה מוצגת בתורה.</p>' + [0, 1, 2, 3, 4].map(function (i) { var PL = promo.lines && promo.lines.length ? promo.lines : [promo.text || '']; return '<label class="field"><span>שורה ' + (i + 1) + (i === 0 ? ' (למשל: נשארו 6 חלות להיום)' : '') + '</span><input class="ptext" type="text" maxlength="80" value="' + esc(PL[i] || '') + '"></label>'; }).join('') + '<label class="field" style="display:flex;gap:8px;align-items:center"><input id="pon" type="checkbox"' + (promo.on ? ' checked' : '') + '><span style="margin:0">להציג באתר</span></label><button class="btn alt" id="psave">שמור הודעות</button><div class="msg" id="pmsg"></div>';
       } else {
         p.innerHTML = '<div class="soon"><b>' + (tab === 'pantry' ? '🥫 מזווה' : tab === 'bom' ? '🧾 BOM' : '📖 מתכונים') + '</b>הלשונית הזו עדיין בבנייה.</div>';
       }
@@ -879,7 +883,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
       var a = e.target.closest('[data-adv]'); if (a) { store.setStatus(a.dataset.adv, a.dataset.to).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }); return; }
       var dz = e.target.closest('[data-delord]'); if (dz) { if (!confirm('למחוק את ההזמנה הזו לצמיתות?')) return; store.deleteOrder(dz.dataset.delord).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }).catch(function () { alert('המחיקה נכשלה'); }); return; }
       var d = e.target.closest('[data-del]'); if (d) { store.deleteCoupon(d.dataset.del).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } }); return; }
-      if (e.target.id === 'psave') { var pp = { text: $('#ptext').value.trim().slice(0, 80), on: $('#pon').checked }; store.savePromo(pp).then(function () { promo = pp; $('#pmsg').textContent = 'נשמר ✓'; }).catch(function () { $('#pmsg').textContent = 'השמירה נכשלה'; }); return; }
+      if (e.target.id === 'psave') { var pl = Array.prototype.map.call(document.querySelectorAll('.ptext'), function (x) { return x.value.trim().slice(0, 80); }).slice(0, 5), pp = { text: pl.filter(Boolean)[0] || '', lines: pl, on: $('#pon').checked }; store.savePromo(pp).then(function () { promo = pp; $('#pmsg').textContent = 'נשמר ✓'; }).catch(function () { $('#pmsg').textContent = 'השמירה נכשלה'; }); return; }
       if (e.target.id === 'nadd') {
         var code = ($('#nc').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, ''), v = Number($('#nv').value), t = $('#nt').value, er = $('#nerr');
         if (code.length < 3) { er.textContent = 'קוד קצר מדי (לפחות 3 תווים באנגלית/מספרים)'; return; }
