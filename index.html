@@ -158,6 +158,8 @@ footer a { color: inherit; }
 @media (prefers-reduced-motion: reduce) { #pulse .pt { transition: none; } }
 .ord .hr { display: flex; align-items: center; gap: 8px; }
 .wabtn { display: inline-block; text-decoration: none; margin-top: 8px; background: #25d366; color: #fff; }
+.oacts { display: flex; gap: 8px; margin-top: 8px; }
+.oacts .btn { flex: 0 0 calc(50% - 4px); width: calc(50% - 4px); height: 50px; margin: 0; padding: 4px 6px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: .85rem; line-height: 1.15; box-sizing: border-box; }
 .trash { border: 0; background: #eceae6; color: #6f6f6f; width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
 .trash:hover, .trash:focus-visible { background: #dcd9d3; color: #444; }
 .ord ul { margin: 6px 0; padding: 0 18px 0 0; }
@@ -911,8 +913,9 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
   function custMsg(o) {
     var base = 'היי ' + (o.name || '') + ', ';
     if (o.status === 'ready') return base + 'ההזמנה שלך (#' + o.id + ') מוכנה לאיסוף מ' + CONFIG.name + '! 🥗' + (CONFIG.arrival ? ' ' + CONFIG.arrival + '.' : '') + ' תודה ושבת שלום!';
-    if (o.status === 'prep') return base + 'ההזמנה שלך (#' + o.id + ') התחילה להיות מוכנה אצלנו. נעדכן כשתהיה מוכנה 😊';
-    return base + 'קיבלנו את ההזמנה שלך (#' + o.id + ') ב' + CONFIG.name + '. תודה!';
+    if (o.status === 'prep') return base + 'התחלנו להכין את ההזמנה שלך. נעדכן כשתהיה מוכנה 😊';
+    if (o.status === 'done') return base + 'תודה שקנית ב' + CONFIG.name + ', נשמח לשרתך גם בעתיד 😊 תודה!';
+    return base + 'קיבלנו את ההזמנה שלך (#' + o.id + ') ב' + CONFIG.name + '. תודה שבחרת בנו!';
   }
   var TRASH = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5h6M4 7h16"/><path d="M6.2 7l.9 12a2 2 0 0 0 2 1.8h5.8a2 2 0 0 0 2-1.8l.9-12" fill="currentColor" fill-opacity=".18"/><path d="M10 11v6M14 11v6"/></svg>';
   function adminBody() {
@@ -927,7 +930,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
         if (!orders.length) { p.innerHTML = '<p>אין הזמנות עדיין.</p>'; return; }
         p.innerHTML = orders.map(function (o) {
           var tm = o.tsd ? new Date(o.tsd).toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' }) : '';
-          return '<div class="ord"><header><span>#' + esc(o.id) + ' · ' + esc(o.name) + '</span><span class="hr"><span class="st ' + esc(o.status) + '">' + esc(STAT[o.status] || o.status) + '</span><button type="button" class="trash" data-delord="' + esc(o.id) + '" aria-label="מחק הזמנה" title="מחק הזמנה">' + TRASH + '</button></span></header><div>📞 <a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a> · ⏰ ' + esc(o.pickup) + ' · ' + esc(tm) + '</div>' + (o.delivery ? '<div>🚚 <b>משלוח</b>: ' + esc(o.address) + ' · דמי משלוח ' + money(o.fee) + '</div>' : '<div>🏠 איסוף עצמי</div>') + '<ul>' + o.items.map(function (i) { return '<li>' + i.qty + '× ' + esc(i.name) + (i.opt ? ' (' + esc(i.opt) + ')' : '') + '</li>'; }).join('') + '</ul>' + (o.note ? '<div>📝 ' + esc(o.note) + '</div>' : '') + '<div><b>' + money(o.total) + '</b>' + (o.coupon ? ' · קופון ' + esc(o.coupon) + ' (−' + money(o.discount) + ')' : '') + '</div>' + (o.phone ? '<a class="btn wabtn" target="_blank" rel="noopener" href="https://wa.me/' + waPhone(o.phone) + '?text=' + encodeURIComponent(custMsg(o)) + '">💬 ' + (o.status === 'ready' ? 'עדכן לקוח: ההזמנה מוכנה' : 'שלח הודעה ללקוח') + '</a> ' : '') + (NEXT[o.status] ? '<button class="btn alt" data-adv="' + esc(o.id) + '" data-to="' + NEXT[o.status] + '" style="margin-top:8px">סמן: ' + STAT[NEXT[o.status]] + '</button>' : '') + '</div>';
+          return '<div class="ord"><header><span>#' + esc(o.id) + ' · ' + esc(o.name) + '</span><span class="hr"><span class="st ' + esc(o.status) + '">' + esc(STAT[o.status] || o.status) + '</span><button type="button" class="trash" data-delord="' + esc(o.id) + '" aria-label="מחק הזמנה" title="מחק הזמנה">' + TRASH + '</button></span></header><div>📞 <a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a> · ⏰ ' + esc(o.pickup) + ' · ' + esc(tm) + '</div>' + (o.delivery ? '<div>🚚 <b>משלוח</b>: ' + esc(o.address) + ' · דמי משלוח ' + money(o.fee) + '</div>' : '<div>🏠 איסוף עצמי</div>') + '<ul>' + o.items.map(function (i) { return '<li>' + i.qty + '× ' + esc(i.name) + (i.opt ? ' (' + esc(i.opt) + ')' : '') + '</li>'; }).join('') + '</ul>' + (o.note ? '<div>📝 ' + esc(o.note) + '</div>' : '') + '<div><b>' + money(o.total) + '</b>' + (o.coupon ? ' · קופון ' + esc(o.coupon) + ' (−' + money(o.discount) + ')' : '') + '</div>' + '<div class="oacts">' + (o.phone ? '<a class="btn wabtn" target="_blank" rel="noopener" href="https://wa.me/' + waPhone(o.phone) + '?text=' + encodeURIComponent(custMsg(o)) + '">💬 ' + (o.status === 'ready' ? 'עדכן לקוח: ההזמנה מוכנה' : 'שלח הודעה ללקוח') + '</a>' : '') + (NEXT[o.status] ? '<button class="btn alt" data-adv="' + esc(o.id) + '" data-to="' + NEXT[o.status] + '">סמן: ' + STAT[NEXT[o.status]] + '</button>' : '') + '</div></div>';
         }).join('');
       } else if (tab === 'coupons') {
         p.innerHTML = '<table class="tbl"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th>תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td>' + esc(c.expires || '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table>' +
