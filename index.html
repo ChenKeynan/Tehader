@@ -813,9 +813,34 @@ section.rcat .rc { text-align: right; }
     else left = h ? h + ' שעות' + (m ? ' ו-' + m + ' דקות' : '') : m + ' דקות';
     return '⏳ ההזמנות לשבת נסגרות ביום חמישי ב-12:00 · נותרו ' + left;
   }
+  // אימוג'י לפי מילים בהודעה (הכלל הראשון שמתאים קובע). מילים מזוהות גם עם אות שימוש בראשן (ה/ב/ל/ו/מ/כ/ש)
+  var MSG_EMO = [
+    ['🕯️🕯️', 'שבת שלום'],
+    ['🥖', 'חלה(?![א-ת])', 'חלות', 'לחמני'],
+    ['🥩', 'שניצל'],
+    ['🧆', 'קציצ'],
+    ['🍖', 'צלי(?![א-ת])', 'בשר'],
+    ['🍗', 'עוף(?![א-ת])', 'עופות', 'פרגית', 'תרנגול'],
+    ['🐟', 'דג(?![א-ת])', 'דגים', 'סלומון', 'סלמון', 'מושט'],
+    ['🍲', 'מרק(?![א-ת])'],
+    ['🍚', 'אורז', 'פתיתים', 'קוסקוס'],
+    ['🍝', 'פסטה'],
+    ['🥔', 'פירה', 'תפודים', 'תפוחי אדמה'],
+    ['🫘', 'שעועית', 'אפונה'],
+    ['🫒', 'זיתים'],
+    ['🥗', 'סלט', 'מטבוחה', 'שומר(?![א-ת])', 'חומוס', 'טחינה', 'כרוב', 'זעלוק', 'סלק(?![א-ת])', 'גזר', 'חציל', 'בטטה', 'פלפל', 'אנטיפסטי'],
+    ['🚚', 'משלוח'],
+    ['🏷️', 'מבצע', 'הנחה', 'קופון'],
+    ['🕯️🕯️', 'שבת']
+  ].map(function (r) { return { e: r[0], re: new RegExp('(^|[^א-ת])[הובלמכש]{0,2}(?:' + r.slice(1).join('|') + ')') }; });
+  function msgEmoji(t) {
+    if (/^\s*\p{Extended_Pictographic}/u.test(t)) return '';   // כבר התחיל באימוג'י שהוקלד ידנית
+    for (var i = 0; i < MSG_EMO.length; i++) if (MSG_EMO[i].re.test(t)) return MSG_EMO[i].e + ' ';
+    return '🥖 ';
+  }
   function promoMsgs() {
     var out = [], c = cutoffMsg(); if (c) out.push(c);
-    promoData.lines.forEach(function (t) { out.push('🥖 ' + t); });
+    promoData.lines.forEach(function (t) { out.push(msgEmoji(t) + t); });
     var now = Date.now(), p = promoData.pulse.filter(function (x) { return now - x.t < 24 * 3600e3; });
     if (p.length) {
       var min = Math.max(0, Math.round((now - p[0].t) / 60e3));
@@ -998,7 +1023,7 @@ section.rcat .rc { text-align: right; }
       } else if (tab === 'coupons') {
         p.innerHTML = '<table class="tbl"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th>תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td>' + esc(c.expires || '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table>' +
           '<h3>קופון חדש</h3><div class="grid2"><label class="field"><span>קוד</span><input id="nc" type="text" maxlength="20" style="text-transform:uppercase"></label><label class="field"><span>סוג</span><select id="nt"><option value="percent">אחוזים</option><option value="fixed">סכום קבוע (₪)</option></select></label><label class="field"><span>ערך</span><input id="nv" type="number" min="1" max="1000"></label><label class="field"><span>מינימום הזמנה (₪)</span><input id="nm" type="number" min="0" value="0"></label><label class="field"><span>תוקף עד (אופציונלי)</span><input id="ne" type="date"></label></div><button class="btn" id="nadd">הוסף קופון</button><div class="msg err" id="nerr"></div>' +
-          '<h3>הודעות מלאי / מבצע (בלשונית באתר)</h3><p style="margin:0 0 8px;color:var(--muted)">עד 5 שורות. כל שורה שאינה ריקה מוצגת בתורה.</p>' + [0, 1, 2, 3, 4].map(function (i) { var PL = promo.lines && promo.lines.length ? promo.lines : [promo.text || '']; return '<label class="field"><span>שורה ' + (i + 1) + (i === 0 ? ' (למשל: נשארו 6 חלות להיום)' : '') + '</span><input class="ptext" type="text" maxlength="80" value="' + esc(PL[i] || '') + '"></label>'; }).join('') + '<label class="field" style="display:flex;gap:8px;align-items:center"><input id="pon" type="checkbox"' + (promo.on ? ' checked' : '') + '><span style="margin:0">להציג באתר</span></label><button class="btn alt" id="psave">שמור הודעות</button><div class="msg" id="pmsg"></div>';
+          '<h3>הודעות מלאי / מבצע (בלשונית באתר)</h3><p style="margin:0 0 8px;color:var(--muted)">עד 5 שורות. כל שורה שאינה ריקה מוצגת בתורה. האימוג\'י נבחר אוטומטית לפי המילים בהודעה.</p>' + [0, 1, 2, 3, 4].map(function (i) { var PL = promo.lines && promo.lines.length ? promo.lines : [promo.text || '']; return '<label class="field"><span>שורה ' + (i + 1) + (i === 0 ? ' (למשל: נשארו 6 חלות להיום)' : '') + '</span><input class="ptext" type="text" maxlength="80" value="' + esc(PL[i] || '') + '"></label>'; }).join('') + '<label class="field" style="display:flex;gap:8px;align-items:center"><input id="pon" type="checkbox"' + (promo.on ? ' checked' : '') + '><span style="margin:0">להציג באתר</span></label><button class="btn alt" id="psave">שמור הודעות</button><div class="msg" id="pmsg"></div>';
       } else {
         if (tab === 'recipes') p.innerHTML = recipesHtml();
         else p.innerHTML = '<div class="soon"><b>' + (tab === 'pantry' ? '🥫 מזווה' : '🧾 BOM') + '</b>הלשונית הזו עדיין בבנייה.</div>';
