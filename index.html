@@ -171,6 +171,8 @@ footer a { color: inherit; }
 .oacts .btn { flex: 0 0 calc(50% - 4px); width: calc(50% - 4px); height: 50px; margin: 0; padding: 4px 6px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: .85rem; line-height: 1.15; box-sizing: border-box; }
 .trash { border: 0; background: #eceae6; color: #6f6f6f; width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
 .trash:hover, .trash:focus-visible { background: #dcd9d3; color: #444; }
+.ord .ot { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ord .ot bdi { text-align: left; white-space: nowrap; }
 .ord ul { margin: 6px 0; padding: 0 18px 0 0; }
 .st { display: inline-block; border-radius: 99px; padding: 2px 10px; font-size: .8rem; font-weight: 800; background: var(--orange-soft); }
 .st.done { background: #d9f0e1; color: #1e5b36; } .st.ready { background: #dbeafe; color: #1e3a8a; }
@@ -493,6 +495,19 @@ section.rcat .rc { text-align: right; }
   function $(s, r) { return (r || document).querySelector(s); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function dmy(d) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : String(d || ''); }   // תאריך תוקף: YYYY-MM-DD ← DD/MM/YYYY
+  // תאריך ושעה בפורמט DD/MM/YYYY + שני רווחים + HH:MM, מוצג משמאל לימין: התאריך משמאל והשעה מימינו (לניהול הזמנות)
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function hmdmy(d) { return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear() + '\u00a0\u00a0' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+  // שעת האיסוף/המשלוח נשמרת כטקסט (למשל "א׳ · 22/11 · 16:00"); השנה נגזרת מתאריך ההזמנה
+  function pickWhen(pk, created) {
+    var dm = /(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/.exec(pk || ''), tm = /(\d{1,2}):(\d{2})/.exec(pk || '');
+    if (!dm || !tm) return null;
+    var c = new Date(created || Date.now()), y = dm[3] ? Number(dm[3]) : c.getFullYear();
+    if (y < 100) y += 2000;
+    var d = new Date(y, Number(dm[2]) - 1, Number(dm[1]), Number(tm[1]), Number(tm[2]));
+    if (!dm[3] && d.getTime() < c.getTime() - 7 * 86400000) d = new Date(y + 1, Number(dm[2]) - 1, Number(dm[1]), Number(tm[1]), Number(tm[2]));
+    return hmdmy(d);
+  }
   function money(n) { return '₪' + (Math.round(n * 100) / 100).toString(); }
   function lsGet(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -1200,8 +1215,8 @@ section.rcat .rc { text-align: right; }
       if (tab === 'orders') {
         if (!orders.length) { p.innerHTML = '<p>אין הזמנות עדיין.</p>'; return; }
         p.innerHTML = orders.map(function (o) {
-          var tm = o.tsd ? new Date(o.tsd).toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' }) : '';
-          return '<div class="ord"><header><span>#' + esc(o.id) + ' · ' + esc(o.name) + '</span><span class="hr"><span class="st ' + esc(o.status) + '">' + esc(STAT[o.status] || o.status) + '</span><button type="button" class="trash" data-delord="' + esc(o.id) + '" aria-label="מחק הזמנה" title="מחק הזמנה">' + TRASH + '</button></span></header><div>📞 <a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a> · ⏰ ' + esc(o.pickup) + ' · ' + esc(tm) + '</div>' + (o.delivery ? '<div>🚚 <b>משלוח</b>: ' + esc(o.address) + ' · דמי משלוח ' + money(o.fee) + '</div>' : '<div>🏠 איסוף עצמי</div>') + '<ul>' + o.items.map(function (i) { return '<li>' + i.qty + '× ' + esc(i.name) + (i.opt ? ' (' + esc(i.opt) + ')' : '') + '</li>'; }).join('') + '</ul>' + (o.note ? '<div>📝 ' + esc(o.note) + '</div>' : '') + '<div><b>' + money(o.total) + '</b>' + (o.coupon ? ' · קופון ' + esc(o.coupon) + ' (−' + money(o.discount) + ')' : '') + '</div>' + '<div class="oacts">' + (o.phone ? '<a class="btn wabtn" target="_blank" rel="noopener" href="https://wa.me/' + waPhone(o.phone) + '?text=' + encodeURIComponent(custMsg(o)) + '">💬 ' + (o.status === 'ready' ? 'עדכן לקוח: ההזמנה מוכנה' : 'שלח הודעה ללקוח') + '</a>' : '') + (NEXT[o.status] ? '<button class="btn alt" data-adv="' + esc(o.id) + '" data-to="' + NEXT[o.status] + '">סמן: ' + STAT[NEXT[o.status]] + '</button>' : '') + '</div></div>';
+          var tm = o.tsd ? hmdmy(new Date(o.tsd)) : '', pw = pickWhen(o.pickup, o.tsd) || o.pickup || '';
+          return '<div class="ord"><header><span>#' + esc(o.id) + ' · ' + esc(o.name) + '</span><span class="hr"><span class="st ' + esc(o.status) + '">' + esc(STAT[o.status] || o.status) + '</span><button type="button" class="trash" data-delord="' + esc(o.id) + '" aria-label="מחק הזמנה" title="מחק הזמנה">' + TRASH + '</button></span></header><div>📞 <a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a></div><div class="ot"><span>תאריך ושעת הזמנה:</span><bdi dir="ltr">' + esc(tm) + '</bdi></div><div class="ot"><span>' + (o.delivery ? 'תאריך ושעת משלוח מבוקשת:' : 'תאריך ושעת איסוף מבוקשת:') + '</span><bdi dir="ltr">' + esc(pw) + '</bdi></div>' + (o.delivery ? '<div>🚚 <b>משלוח</b>: ' + esc(o.address) + ' · דמי משלוח ' + money(o.fee) + '</div>' : '<div>🏠 איסוף עצמי</div>') + '<ul>' + o.items.map(function (i) { return '<li>' + i.qty + '× ' + esc(i.name) + (i.opt ? ' (' + esc(i.opt) + ')' : '') + '</li>'; }).join('') + '</ul>' + (o.note ? '<div>📝 ' + esc(o.note) + '</div>' : '') + '<div><b>' + money(o.total) + '</b>' + (o.coupon ? ' · קופון ' + esc(o.coupon) + ' (−' + money(o.discount) + ')' : '') + '</div>' + '<div class="oacts">' + (o.phone ? '<a class="btn wabtn" target="_blank" rel="noopener" href="https://wa.me/' + waPhone(o.phone) + '?text=' + encodeURIComponent(custMsg(o)) + '">💬 ' + (o.status === 'ready' ? 'עדכן לקוח: ההזמנה מוכנה' : 'שלח הודעה ללקוח') + '</a>' : '') + (NEXT[o.status] ? '<button class="btn alt" data-adv="' + esc(o.id) + '" data-to="' + NEXT[o.status] + '">סמן: ' + STAT[NEXT[o.status]] + '</button>' : '') + '</div></div>';
         }).join('');
       } else if (tab === 'coupons') {
         p.innerHTML = '<div class="tblwrap"><table class="tbl cpt"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th class="nw">תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td class="nw">' + esc(c.expires ? dmy(c.expires) : '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table></div>' +
