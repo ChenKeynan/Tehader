@@ -397,6 +397,7 @@ section.rcat .rc { text-align: right; }
 .pr .pn { flex: 1; min-width: 0; font-weight: 800; overflow-wrap: anywhere; }
 .pr .pb { flex: 0 0 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 10px; }
 .pr .pm { font-size: .85rem; color: var(--muted); white-space: nowrap; }
+.pr .pm select { width: auto; display: inline-block; font: inherit; font-size: .85rem; border: 1.5px solid var(--gold); border-radius: 8px; padding: 2px 4px; background: #fff; color: var(--ink); }
 .pr .pstep { display: inline-flex; align-items: center; gap: 4px; }
 .pr .pstep button { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--green); background: transparent; color: var(--green); font-size: 1.2rem; font-weight: 800; line-height: 1; cursor: pointer; padding: 0; }
 .pr .pstep input { width: 48px; text-align: center; font: inherit; font-weight: 800; border: 1.5px solid var(--gold); border-radius: 8px; padding: 4px 2px; background: #fff; -moz-appearance: textfield; }
@@ -1195,17 +1196,18 @@ section.rcat .rc { text-align: right; }
   /* =====================  מזווה (מוצג בניהול ← מזווה)  ===================== */
   var PN_CATS = [['spices', 'תבלינים'], ['meat', 'בשר, עופות ודגים'], ['veg', 'ירקות'], ['frozen', 'קפואים']], pnActive = 'spices', pnLock = 0;
   function pnMark() { Array.prototype.forEach.call(document.querySelectorAll('#pnnav .chip'), function (c) { if (c.dataset.pcat === pnActive) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current'); }); }
-  var PANTRY = [], pnForm = null, pnImg = '';
+  var PANTRY = [], pnForm = null, pnImg = '', PN_UNITS = ['גרם', 'יחידה', 'שקית', 'ק"ג', 'חבילה', 'מגשית', 'צרור'];
+  function pnUnitSel(cur, attr) { return '<select ' + attr + ' aria-label="יחידת מידה">' + PN_UNITS.map(function (u) { return '<option' + (u === cur ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select>'; }
   function pnRec(it) { return Math.max(0, (Number(it.min) || 0) - (Number(it.stock) || 0)); }
   function pnRow(it) {
     return '<div class="pr" data-pid="' + esc(it.id) + '">' + (it.img ? '<img class="pi" alt="" src="' + esc(it.img) + '">' : '<span class="pi" aria-hidden="true">📦</span>') +
       '<span class="pn">' + esc(it.name) + '</span><button type="button" class="pdel" data-pdel="' + esc(it.id) + '" aria-label="מחק פריט">✕</button>' +
-      '<div class="pb"><span class="pm">מלאי מינימום: <b>' + (Number(it.min) || 0) + '</b></span>' +
+      '<div class="pb"><span class="pm">מלאי מינימום: <b>' + (Number(it.min) || 0) + '</b> ' + pnUnitSel(it.unit || 'יחידה', 'data-punit') + '</span>' +
       '<span class="pstep"><button type="button" data-pstep="1" aria-label="הוסף">+</button><input type="number" min="0" inputmode="numeric" data-pstock value="' + (Number(it.stock) || 0) + '" aria-label="מלאי קיים"><button type="button" data-pstep="-1" aria-label="הפחת">−</button></span>' +
       '<span class="prec" data-prec>כמות מומלצת: ' + pnRec(it) + '</span></div></div>';
   }
   function pnAddForm(c) {
-    return '<div class="rc"><label class="field"><span>שם המוצר</span><input id="pnname" type="text" maxlength="60"></label><div class="grid2"><label class="field"><span>מלאי מינימום</span><input id="pnmin" type="number" min="0" value="1"></label><label class="field"><span>מלאי קיים</span><input id="pnstock" type="number" min="0" value="0"></label></div><label class="field"><span>תמונה (אופציונלי)</span><input id="pnfile" type="file" accept="image/*"></label><input type="hidden" id="pncat" value="' + c + '"><button class="btn" id="pnsave">הוסף</button> <button class="btn ghost" id="pncancel">ביטול</button><div class="msg err" id="pnerr"></div></div>';
+    return '<div class="rc"><label class="field"><span>שם המוצר</span><input id="pnname" type="text" maxlength="60"></label><div class="grid2"><label class="field"><span>מלאי מינימום</span><input id="pnmin" type="number" min="0" value="1"></label><label class="field"><span>מלאי קיים</span><input id="pnstock" type="number" min="0" value="0"></label><label class="field"><span>יחידת מידה</span>' + pnUnitSel('יחידה', 'id="pnunit"') + '</label></div><label class="field"><span>תמונה (אופציונלי)</span><input id="pnfile" type="file" accept="image/*"></label><input type="hidden" id="pncat" value="' + c + '"><button class="btn" id="pnsave">הוסף</button> <button class="btn ghost" id="pncancel">ביטול</button><div class="msg err" id="pnerr"></div></div>';
   }
   function pantryHtml() {
     var nav = '<nav class="rcnav" id="pnnav"><div class="row">' + PN_CATS.map(function (c) { return '<button type="button" class="chip" data-pcat="' + c[0] + '"' + (c[0] === pnActive ? ' aria-current="true"' : '') + '>' + c[1] + '</button>'; }).join('') + '</div></nav>';
@@ -1278,7 +1280,7 @@ section.rcat .rc { text-align: right; }
       if (e.target.id === 'pncancel') { pnForm = null; paint(); return; }
       if (e.target.id === 'pnsave') {
         var pnm = $('#pnname').value.trim(); if (!pnm) { $('#pnerr').textContent = 'חסר שם מוצר'; return; }
-        var pit = { id: 'p' + Date.now(), name: pnm, cat: $('#pncat').value, min: Math.max(0, Number($('#pnmin').value) || 0), stock: Math.max(0, Number($('#pnstock').value) || 0), ord: Date.now() };
+        var pit = { id: 'p' + Date.now(), name: pnm, cat: $('#pncat').value, min: Math.max(0, Number($('#pnmin').value) || 0), unit: $('#pnunit').value, stock: Math.max(0, Number($('#pnstock').value) || 0), ord: Date.now() };
         if (pnImg) pit.img = pnImg;
         store.savePantry(pit).then(function () { pnForm = null; if (store.mode === 'local') loadPantry(); else { PANTRY.push(pit); paint(); } }).catch(function () { $('#pnerr').textContent = 'השמירה נכשלה'; });
         return;
@@ -1313,6 +1315,7 @@ section.rcat .rc { text-align: right; }
       store.savePantry(it);
     }
     $('#ap').addEventListener('change', function (e) {
+      if (e.target.hasAttribute && e.target.hasAttribute('data-punit')) { var ur = e.target.closest('.pr'), ui = PANTRY.filter(function (x) { return x.id === ur.dataset.pid; })[0]; if (ui) { ui.unit = e.target.value; store.savePantry(ui); } return; }
       if (e.target.hasAttribute && e.target.hasAttribute('data-pstock')) { pnStock(e.target.closest('.pr'), e.target); return; }
       if (e.target.id === 'pnfile') {
         var pfl = e.target.files[0]; pnImg = ''; if (!pfl) return;
