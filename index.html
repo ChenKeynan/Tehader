@@ -1050,7 +1050,7 @@ section.rcat .rc { text-align: right; }
   var TRASH = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5h6M4 7h16"/><path d="M6.2 7l.9 12a2 2 0 0 0 2 1.8h5.8a2 2 0 0 0 2-1.8l.9-12" fill="currentColor" fill-opacity=".18"/><path d="M10 11v6M14 11v6"/></svg>';
   function adminBody() {
     var box = $('#adb') || $('#adm');
-    var TABS = [['orders', 'הזמנות'], ['coupons', 'קופונים'], ['pantry', 'מזווה'], ['recipes', 'מתכונים'], ['bom', 'BOM']];
+    var TABS = [['orders', 'הזמנות'], ['coupons', 'קופונים'], ['promo', 'הודעות מלאי / מבצע'], ['pantry', 'מזווה'], ['recipes', 'מתכונים'], ['bom', 'BOM']];
     box.innerHTML = '<div class="tabs" role="tablist">' + TABS.map(function (t) { return '<button class="chip" role="tab" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div><div id="ap"></div>';
     var tab = 'orders', orders = [], coupons = [], promo = {};
     function paint() {
@@ -1064,8 +1064,9 @@ section.rcat .rc { text-align: right; }
         }).join('');
       } else if (tab === 'coupons') {
         p.innerHTML = '<table class="tbl"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th>תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td>' + esc(c.expires || '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table>' +
-          '<h3>קופון חדש</h3><div class="grid2"><label class="field"><span>קוד</span><input id="nc" type="text" maxlength="20" style="text-transform:uppercase"></label><label class="field"><span>סוג</span><select id="nt"><option value="percent">אחוזים</option><option value="fixed">סכום קבוע (₪)</option></select></label><label class="field"><span>ערך</span><input id="nv" type="number" min="1" max="1000"></label><label class="field"><span>מינימום הזמנה (₪)</span><input id="nm" type="number" min="0" value="0"></label><label class="field"><span>תוקף עד (אופציונלי)</span><input id="ne" type="date"></label></div><button class="btn" id="nadd">הוסף קופון</button><div class="msg err" id="nerr"></div>' +
-          '<h3>הודעות מלאי / מבצע (בלשונית באתר)</h3><p style="margin:0 0 8px;color:var(--muted)">עד 5 שורות. כל שורה שאינה ריקה מוצגת בתורה. האימוג\'י נבחר אוטומטית לפי המילים בהודעה.</p>' + [0, 1, 2, 3, 4].map(function (i) { var PL = promo.lines && promo.lines.length ? promo.lines : [promo.text || '']; return '<label class="field"><span>שורה ' + (i + 1) + (i === 0 ? ' (למשל: נשארו 6 חלות להיום)' : '') + '</span><input class="ptext" type="text" maxlength="80" value="' + esc(PL[i] || '') + '"></label>'; }).join('') + '<label class="field" style="display:flex;gap:8px;align-items:center"><input id="pon" type="checkbox"' + (promo.on ? ' checked' : '') + '><span style="margin:0">להציג באתר</span></label><button class="btn alt" id="psave">שמור הודעות</button><div class="msg" id="pmsg"></div>';
+          '<h3>קופון חדש</h3><div class="grid2"><label class="field"><span>קוד</span><input id="nc" type="text" maxlength="20" style="text-transform:uppercase"></label><label class="field"><span>סוג</span><select id="nt"><option value="percent">אחוזים</option><option value="fixed">סכום קבוע (₪)</option></select></label><label class="field"><span>ערך</span><input id="nv" type="number" min="1" max="1000"></label><label class="field"><span>מינימום הזמנה (₪)</span><input id="nm" type="number" min="0" value="0"></label><label class="field"><span>תוקף עד (אופציונלי)</span><input id="ne" type="date"></label></div><button class="btn" id="nadd">הוסף קופון</button><div class="msg err" id="nerr"></div>';
+      } else if (tab === 'promo') {
+        p.innerHTML = '<h3 style="margin-top:0">הודעות מלאי / מבצע (בלשונית באתר)</h3><p style="margin:0 0 8px;color:var(--muted)">עד 5 שורות. כל שורה שאינה ריקה מוצגת בתורה. האימוג\'י נבחר אוטומטית לפי המילים בהודעה.</p>' + [0, 1, 2, 3, 4].map(function (i) { var PL = promo.lines && promo.lines.length ? promo.lines : [promo.text || '']; return '<label class="field"><span>שורה ' + (i + 1) + (i === 0 ? ' (למשל: נשארו 6 חלות להיום)' : '') + '</span><input class="ptext" type="text" maxlength="80" value="' + esc(PL[i] || '') + '"></label>'; }).join('') + '<label class="field" style="display:flex;gap:8px;align-items:center"><input id="pon" type="checkbox"' + (promo.on ? ' checked' : '') + '><span style="margin:0">להציג באתר</span></label><button class="btn alt" id="psave">שמור הודעות</button><div class="msg" id="pmsg"></div>';
       } else {
         if (tab === 'recipes') p.innerHTML = recipesHtml();
         else p.innerHTML = '<div class="soon"><b>' + (tab === 'pantry' ? '🥫 מזווה' : '🧾 BOM') + '</b>הלשונית הזו עדיין בבנייה.</div>';
@@ -1073,7 +1074,7 @@ section.rcat .rc { text-align: right; }
     }
     box.querySelector('.tabs').addEventListener('click', function (e) { var c = e.target.closest('[data-tab]'); if (!c) return; tab = c.dataset.tab; paint(); try { box.querySelector('.tabs').scrollIntoView({ block: 'start' }); } catch (x) { } });
     $('#ap').addEventListener('click', function (e) {
-      var a = e.target.closest('[data-adv]'); if (a) { store.setStatus(a.dataset.adv, a.dataset.to).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }); return; }
+      var a = e.target.closest('[data-adv]'); if (a) { store.setStatus(a.dataset.adv, a.dataset.to).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; if (tab !== 'promo') paint(); }); } }); return; }
       var dz = e.target.closest('[data-delord]'); if (dz) { if (!confirm('למחוק את ההזמנה הזו לצמיתות?')) return; store.deleteOrder(dz.dataset.delord).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }).catch(function () { alert('המחיקה נכשלה'); }); return; }
       var d = e.target.closest('[data-del]'); if (d) { store.deleteCoupon(d.dataset.del).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } }); return; }
       var rcb = e.target.closest('[data-rcat]'); if (rcb) { rcActive = rcb.dataset.rcat; rcLock = Date.now() + 900; rcMark(); var sx = $('#rcat-' + rcActive); if (sx) sx.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
@@ -1123,8 +1124,8 @@ section.rcat .rc { text-align: right; }
     };
     window.addEventListener('scroll', window._rcSpy, { passive: true });
     store.watchOrders(function (o, err) { if (err) { $('#ap').innerHTML = '<p>אין הרשאה לקרוא הזמנות.</p>'; return; } orders = o; paint(); });
-    store.watchCoupons(function (c) { if (c) { coupons = c; paint(); } });
-    store.getPromo().then(function (p) { if (p) { promo = p; if (tab === 'coupons') paint(); } });
+    store.watchCoupons(function (c) { if (c) { coupons = c; if (tab !== 'promo') paint(); } });
+    store.getPromo().then(function (p) { if (p) { promo = p; if (tab === 'promo') paint(); } });
   }
 
   /* =====================  אתחול  ===================== */
