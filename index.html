@@ -321,6 +321,11 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 .rc { background: var(--card); border: 1px solid color-mix(in srgb, var(--gold) 75%, transparent); border-radius: 12px; padding: 14px 16px; margin: 0 0 12px; }
 .rc summary { list-style: none; cursor: pointer; }
 .rc summary::-webkit-details-marker { display: none; }
+/* כל כרטיסי המנות באותו גובה (גובה כרטיס "חומוס ביתי"; נמדד ב-fitItems). כרטיס עם בחירת גודל פתוחה רשאי לגדול */
+.item { height: var(--ih, auto); }
+.item.open { height: auto; min-height: var(--ih, 150px); }
+.item .desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item.open .desc { -webkit-line-clamp: unset; display: block; }
 /* אזור צור קשר בתחתית האתר */
 .sitefoot { background: #1c1c1a; color: #e9e4d8; text-align: center; font-family: 'Heebo', sans-serif; padding: 46px 20px calc(116px + env(safe-area-inset-bottom)); margin: 34px 0 -96px; }
 .sitefoot .sfblock { max-width: 520px; margin: 0 auto; scroll-margin-top: 90px; }
@@ -558,7 +563,7 @@ section.rcat .rc { text-align: right; }
         var hasOpts = !!it.opts, o = selOpt[it.id] == null ? 0 : selOpt[it.id], open = hasOpts && (openOpt[it.id] || selOpt[it.id] != null);
         var key = cKey(it.id, hasOpts ? o : null), q = cart[key] ? cart[key].qty : 0;
         var price = it.price + (hasOpts ? it.opts[o].d : 0), grams = hasOpts ? it.opts[o].g : it.g;
-        h += '<div class="item" data-item="' + it.id + '"><div class="pic">' + (it.img ? '<img src="' + esc(it.img) + '" alt="' + esc(it.name) + '" loading="lazy">' : '<span aria-hidden="true">' + (c.emoji || '🍽️') + '</span>') + '</div><div class="info"><h3>' + esc(it.name) + '</h3>' + (it.desc ? '<div class="desc">' + esc(it.desc) + '</div>' : '');
+        h += '<div class="item' + (open ? ' open' : '') + '" data-item="' + it.id + '"><div class="pic">' + (it.img ? '<img src="' + esc(it.img) + '" alt="' + esc(it.name) + '" loading="lazy">' : '<span aria-hidden="true">' + (c.emoji || '🍽️') + '</span>') + '</div><div class="info"><h3>' + esc(it.name) + '</h3>' + (it.desc ? '<div class="desc">' + esc(it.desc) + '</div>' : '');
         var sizeTxt = hasOpts ? it.opts.map(function (op) { return op.g; }).filter(Boolean).join(' / ') : (it.g || '');
         if (sizeTxt) h += '<div class="per">' + sizeTxt + ' גרם</div>';
         if (open) h += '<div class="opts" role="group" aria-label="אפשרויות">' + it.opts.map(function (op, i) { return '<button class="opt" data-opt="' + i + '" aria-pressed="' + (i === o) + '">' + esc(op.n) + (op.d ? ' (+₪' + op.d + ')' : '') + '</button>'; }).join('') + '</div>';
@@ -574,7 +579,32 @@ section.rcat .rc { text-align: right; }
     h += '<footer>' + esc(CONFIG.pickupNote) + '</footer></main>' + siteFooterHtml();
     $('#app').innerHTML = h;
     updateBar();
+    fitItems();
   }
+  // כל כרטיסי המנות באותו גובה: גובה כרטיס "חומוס ביתי" הוא המדד. תיאור ארוך מוקטן עד שנכנס ל-2 שורות;
+  // כרטיס שבכל זאת לא נכנס (כדי לא לחתוך כפתורים) נשאר בגובה לפי התוכן.
+  function fitItems() {
+    var root = document.documentElement, hm = document.querySelector('.item[data-item="s1"]');
+    var items = Array.prototype.slice.call(document.querySelectorAll('.item'));
+    if (!hm || !items.length) return;
+    var prev = root.style.getPropertyValue('--ih');
+    items.forEach(function (it) { it.style.height = ''; var d = it.querySelector('.desc'); if (d) d.style.fontSize = ''; });
+    root.style.removeProperty('--ih');
+    var h = hm.classList.contains('open') && parseFloat(prev) ? parseFloat(prev) : Math.ceil(hm.getBoundingClientRect().height);
+    if (!h) { if (prev) root.style.setProperty('--ih', prev); return; }
+    root.style.setProperty('--ih', h + 'px');
+    items.forEach(function (it) {
+      if (it.classList.contains('open')) return;
+      var d = it.querySelector('.desc'), inf = it.querySelector('.info');
+      if (d) { var fs = parseFloat(getComputedStyle(d).fontSize); while (d.scrollHeight > d.clientHeight + 1 && fs > 12) { fs -= 0.5; d.style.fontSize = fs + 'px'; } }
+      if (inf && inf.scrollHeight > inf.clientHeight + 1) it.style.height = 'auto';
+    });
+  }
+  var fitTimer = null;
+  window.addEventListener('resize', function () { clearTimeout(fitTimer); fitTimer = setTimeout(fitItems, 150); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitItems(); });
+  if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', function () { fitItems(); });
+  window.addEventListener('load', function () { fitItems(); });
 
   function siteFooterHtml() {
     var F = CONFIG.footer || {}, ph = String(CONFIG.phone || ''), phShown = ph.replace(/^(\d{3})(\d{7})$/, '$1-$2');
