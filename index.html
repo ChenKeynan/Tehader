@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://chenkeynan.github.io/Tehader/"><meta property="og:image" content="https://chenkeynan.github.io/Tehader/images/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Rubik:wght@500;700;800&family=Secular+One&family=Gveret+Levin&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Rubik:wght@500;700;800&family=Secular+One&family=Gveret+Levin&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #fbf6ec; --card: #ffffff; --ink: #2b2a26; --muted: #7a7466; --line: #eadfca;
@@ -31,7 +31,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 @keyframes wob { 0% { transform: rotate(0); } 25% { transform: rotate(15deg); } 50% { transform: rotate(0); } 75% { transform: rotate(-15deg); } 100% { transform: rotate(0); } }
 @media (prefers-reduced-motion: reduce) { #splash img { animation: none; } }
 .chef { display: block; height: auto; margin: 0 auto 6px; }
-#splash .chef { width: 110px; height: auto; border-radius: 0; animation: none; }
+#splash .chef { width: min(550px, 96vw); max-height: 52vh; object-fit: contain; height: auto; border-radius: 0; animation: none; }
 header.hero .hlogo { display: block; width: 104px; height: 104px; border-radius: 50%; margin: 0 auto 14px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
 header.hero { background: linear-gradient(160deg, var(--green), #1f5c39); color: #fff; padding: 28px 0 40px; border-radius: 0 0 28px 28px; }
 header.hero h1 { font-family: 'Secular One', 'Heebo', sans-serif; font-weight: 400; font-size: clamp(1.9rem, 8vw, 2.6rem); margin: 0; letter-spacing: .3px; }
@@ -68,6 +68,15 @@ section.cat h2 { font-family: 'Rubik', 'Heebo', sans-serif; font-weight: 800; fo
 #cartbar { position: fixed; inset: auto 0 0 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 35%); pointer-events: none; }
 #cartbar button { pointer-events: auto; display: flex; width: 100%; max-width: 720px; margin: 0 auto; justify-content: space-between; align-items: center; background: var(--green); color: var(--green-ink); border: 0; border-radius: 16px; padding: 15px 18px; font-weight: 800; font-size: 1.05rem; box-shadow: var(--shadow); cursor: pointer; }
 #cartbar[hidden] { display: none; }
+/* עגלה קבועה בפינה + אנימציית הוספה */
+#fcart { position: fixed; left: 10px; top: 96px; z-index: 41; width: 48px; height: 48px; border-radius: 50%; border: 0; padding: 0; background: var(--green); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,.3); cursor: pointer; }
+#fcart svg { width: 26px; height: 26px; display: block; }
+#fcart .bdg { position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 5px; box-sizing: border-box; border-radius: 11px; background: #d62828; color: #fff; font: 800 .8rem/22px 'Heebo', sans-serif; text-align: center; border: 2px solid #fff; }
+#fcart .bdg[hidden] { display: none; }
+#fcart.bump { animation: fcbump .45s ease; }
+@keyframes fcbump { 0% { transform: scale(1); } 35% { transform: scale(1.22); } 70% { transform: scale(.94); } 100% { transform: scale(1); } }
+.flyfx { position: fixed; z-index: 120; pointer-events: none; border-radius: 50%; }
+
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 60; display: flex; align-items: flex-end; justify-content: center; }
 .sheet { background: var(--bg); width: 100%; max-width: 720px; max-height: 92vh; overflow: auto; border-radius: 24px 24px 0 0; padding: 18px 16px calc(20px + env(safe-area-inset-bottom)); }
 .sheet h2 { font-family: 'Rubik', 'Heebo', sans-serif; font-weight: 400; margin: 0 0 4px; font-size: 1.5rem; }
@@ -295,6 +304,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 .item .bottom { align-items: flex-end; }
 .item .price { font-size: 1.15rem; font-weight: 800; color: var(--ink); }
 .item .price small { font-size: .95rem; }
+.item .price .ppu { font-size: .8rem; font-weight: 300; color: var(--muted); white-space: nowrap; }
 .item .psub { font-size: .8rem; color: var(--muted); font-weight: 500; margin-top: 1px; }
 .item .plus { flex: none; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #ecdcb8; color: #4a3519; font-size: 1.6rem; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0 0 2px; }
 /* שלוש שורות הסלוגן – כתב יד כמו בתפריט */
@@ -341,6 +351,7 @@ section.rcat .rc { text-align: right; }
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="branch" viewBox="0 0 170 210"><path d="M4,196 Q30,90 140,16" fill="none" stroke="#4a4a1c" stroke-width="2.2" stroke-linecap="round"/><g transform="translate(11.4,171.0) rotate(-115.7) scale(0.96)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#3d5a1e"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(11.4,171.0) rotate(-24.2) scale(0.96)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(20.4,148.9) rotate(-106.5) scale(0.92)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(20.4,148.9) rotate(-23.8) scale(0.92)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(31.4,127.6) rotate(-101.1) scale(0.88)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(31.4,127.6) rotate(-16.7) scale(0.88)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(44.4,107.1) rotate(-102.1) scale(0.84)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(44.4,107.1) rotate(-11.3) scale(0.84)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(59.5,87.3) rotate(-97.1) scale(0.80)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(59.5,87.3) rotate(-8.4) scale(0.80)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#3d5a1e"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(76.5,68.3) rotate(-95.9) scale(0.76)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(76.5,68.3) rotate(9.4) scale(0.76)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(95.7,50.1) rotate(-90.9) scale(0.72)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(95.7,50.1) rotate(14.1) scale(0.72)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#2f4a1c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(116.8,32.7) rotate(-86.5) scale(0.68)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#3d5a1e"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(116.8,32.7) rotate(7.1) scale(0.68)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#3d5a1e"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(140.0,16.0) rotate(-82.6) scale(0.64)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#8c7a2c"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(140.0,16.0) rotate(11.0) scale(0.64)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#33501b"/><path d="M2,0 L42,0" stroke="#d8d28a" stroke-opacity=".35" stroke-width="1"/></g><g transform="translate(140.0,16.0) rotate(-33.9) scale(.75)"><path d="M0,0 C10,-12 32,-13 48,0 C32,13 10,12 0,0Z" fill="#5d6a22"/></g></symbol><filter id="rough" x="-6%" y="-30%" width="112%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.45" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="8"/></filter></defs></svg><img class="lf tl" src="images/leaf-tl.png" alt="" aria-hidden="true"><img class="lf tr" src="images/leaf-tr.png" alt="" aria-hidden="true"><img class="lf bl" src="images/leaf-bl.png" alt="" aria-hidden="true"><img class="lf br" src="images/leaf-br.png" alt="" aria-hidden="true"><div id="splash"><img src="images/logo.png" alt="תהדר"><img class="chef" src="images/chef.png" alt="" width="110"></div>
 <div id="app"></div>
 <script>setTimeout(function () { var e = document.getElementById("splash"); if (!e) return; e.classList.add("out"); setTimeout(function () { e.remove(); }, 400); }, 2500);</script>
+<button id="fcart" type="button" aria-label="העגלה שלי"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 3.5h3l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.55-1.2L20.7 7.5H6.3"/><circle cx="10" cy="20" r="1.4" fill="currentColor"/><circle cx="17.5" cy="20" r="1.4" fill="currentColor"/></svg><span class="bdg" id="fbdg" hidden>0</span></button>
 <div id="cartbar" hidden><button id="cartBtn" type="button"><span id="cartCount"></span><span>לקופה ←</span><span id="cartTotal"></span></button></div>
 <div id="modal"></div>
 <script>
@@ -545,7 +556,7 @@ section.rcat .rc { text-align: right; }
         if (sizeTxt) h += '<div class="per">' + sizeTxt + ' גרם</div>';
         if (open) h += '<div class="opts" role="group" aria-label="אפשרויות">' + it.opts.map(function (op, i) { return '<button class="opt" data-opt="' + i + '" aria-pressed="' + (i === o) + '">' + esc(op.n) + (op.d ? ' (+₪' + op.d + ')' : '') + '</button>'; }).join('') + '</div>';
         var from = hasOpts && !open;
-        h += '<div class="bottom"><div><div class="price">' + (from ? 'החל מ-' : '') + '<small>₪</small>' + (from ? it.price : price) + '</div>' + (from ? '<div class="psub">לפי הגודל שנבחר</div>' : (grams ? '<div class="psub">₪' + (Math.round(price / grams * 1000) / 10) + ' ל-100 גרם</div>' : '')) + '</div>';
+        h += '<div class="bottom"><div><div class="price">' + (from ? 'החל מ-' : '') + '<small>₪</small>' + (from ? it.price : price) + (c.id === 'mains' || c.id === 'challah' ? ' <span class="ppu">(המחיר ליחידה)</span>' : '') + '</div>' + (from ? '<div class="psub">לפי הגודל שנבחר</div>' : (grams ? '<div class="psub">₪' + (Math.round(price / grams * 1000) / 10) + ' ל-100 גרם</div>' : '')) + '</div>';
         if (hasOpts && !open) h += '<button class="plus" data-showopts aria-label="בחירת גודל והוספה לסל">+</button>';
         else if (q) h += '<div class="stepper"><button data-minus aria-label="הפחת">−</button><span>' + q + '</span><button data-plus aria-label="הוסף">+</button></div>';
         else h += '<button class="plus" data-plus aria-label="הוספה לסל">+</button>';
@@ -626,6 +637,36 @@ section.rcat .rc { text-align: right; }
     bar.hidden = n === 0;
     $('#cartCount').textContent = '🛒 ' + n + (n === 1 ? ' פריט' : ' פריטים');
     $('#cartTotal').textContent = money(total());
+    if (!flying) paintBadge();
+  }
+  var flying = 0;
+  function paintBadge() { var n = count(), b = $('#fbdg'); if (!b) return; b.hidden = n === 0; b.textContent = n; }
+  function flyToCart(srcEl) {
+    var fc = $('#fcart');
+    if (!fc || !srcEl || !srcEl.getBoundingClientRect || !fc.animate || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    var a = srcEl.getBoundingClientRect(), c = fc.getBoundingClientRect();
+    var ax = a.left + a.width / 2, ay = a.top + a.height / 2, cx = c.left + c.width / 2, cy = c.top + c.height / 2;
+    var img = srcEl.closest('.item') && srcEl.closest('.item').querySelector('.pic img'), src = img && img.complete && img.naturalWidth ? img.currentSrc || img.src : '';
+    var sz = 46;
+    var pic = srcEl.closest('.item') && srcEl.closest('.item').querySelector('.pic'), pr = pic ? pic.getBoundingClientRect() : a;
+    var NS = 'http://www.w3.org/2000/svg', sv = document.createElementNS(NS, 'svg'), pg = document.createElementNS(NS, 'polygon');
+    sv.setAttribute('class', 'flyfx'); sv.style.cssText = 'left:0;top:0;width:100vw;height:100vh;border-radius:0;z-index:119;overflow:visible';
+    sv.setAttribute('width', innerWidth); sv.setAttribute('height', innerHeight);
+    pg.setAttribute('fill', '#fff6e6'); sv.appendChild(pg); document.body.appendChild(sv);
+    var base = [[pr.left, pr.top], [pr.right, pr.top]];
+    function hull(P) { P = P.slice().sort(function (u, v) { return u[0] - v[0] || u[1] - v[1]; }); function cr(o, u, v) { return (u[0] - o[0]) * (v[1] - o[1]) - (u[1] - o[1]) * (v[0] - o[0]); }
+      var lo = [], up = [], i; for (i = 0; i < P.length; i++) { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], P[i]) <= 0) lo.pop(); lo.push(P[i]); }
+      for (i = P.length - 1; i >= 0; i--) { while (up.length > 1 && cr(up[up.length - 2], up[up.length - 1], P[i]) <= 0) up.pop(); up.push(P[i]); }
+      lo.pop(); up.pop(); return lo.concat(up); }
+    flying++;
+    var T0 = performance.now(), DUR = 460, mx = pr.left + pr.width / 2, my = pr.top;
+    (function frame(now) {
+      var t = Math.min(1, (now - T0) / DUR), g = Math.min(1, t / .4), g2 = 1 - Math.pow(1 - g, 2), e = t < .4 ? 0 : Math.pow((t - .4) / .6, 1.5), op = t > .85 ? (1 - t) / .15 : 1;
+      var tip = [mx + (cx - mx) * g2, my + (cy - my) * g2];
+      var pts = base.map(function (q) { return [q[0] + (cx - q[0]) * e, q[1] + (cy - q[1]) * e]; }); pts.push(tip);
+      pg.setAttribute('points', hull(pts).map(function (q) { return q[0] + ',' + q[1]; }).join(' ')); pg.setAttribute('opacity', (.5 * op).toFixed(3));
+      if (t < 1) requestAnimationFrame(frame); else { sv.remove(); flying = Math.max(0, flying - 1); if (!flying) paintBadge(); fc.classList.remove('bump'); void fc.offsetWidth; fc.classList.add('bump'); }
+    })(T0);
   }
   function change(id, opt, delta) {
     var k = cKey(id, opt);
@@ -1093,10 +1134,11 @@ section.rcat .rc { text-align: right; }
     var id = item.dataset.item, it = findItem(id), o = selOpt[id] == null ? 0 : selOpt[id];
     if (e.target.closest('[data-showopts]')) { openOpt[id] = true; renderMenuKeep(); return; }
     var op = e.target.closest('.opt'); if (op) { selOpt[id] = Number(op.dataset.opt); renderMenuKeep(); return; }
-    if (e.target.closest('[data-plus]')) { change(id, it.opts ? o : null, 1); renderMenuKeep(); }
+    if (e.target.closest('[data-plus]')) { var pb = e.target.closest('[data-plus]'); change(id, it.opts ? o : null, 1); flyToCart(pb); renderMenuKeep(); }
     else if (e.target.closest('[data-minus]')) { change(id, it.opts ? o : null, -1); renderMenuKeep(); }
   });
   $('#cartBtn').onclick = openCheckout;
+  $('#fcart').onclick = openCheckout;
   window.addEventListener('scroll', spy, { passive: true });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (!closeLb()) closeModal(); } });
   function route() { var st = $('#sidetab'); if (st) st.style.display = location.hash === '#admin' ? 'none' : ''; if (location.hash === '#admin') renderAdmin(); else { closeModal(); renderMenu(); spy(); } }
