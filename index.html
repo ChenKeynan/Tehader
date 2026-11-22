@@ -403,6 +403,8 @@ section.rcat .rc { text-align: right; }
 .pr .prec { display: inline-block; border-radius: 99px; padding: 2px 10px; font-size: .8rem; font-weight: 800; background: #a2505b; color: #ffd54a; white-space: nowrap; }
 .pr .pdel { flex: none; background: none; border: 0; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 2px 6px; }
 .padd { margin: 4px 0 0; }
+.pg3 { grid-template-columns: 1fr 1fr 1fr; }
+.pg3 input, .pg3 select { width: 100%; min-width: 0; box-sizing: border-box; }
 
 .rn { font-size: calc(1.7rem - 1pt); font-weight: 800; line-height: 1.2; color: var(--ink); }
 .rn::after { content: ' ▾'; font-size: 1rem; color: var(--gold); }
@@ -1205,7 +1207,7 @@ section.rcat .rc { text-align: right; }
       '<span class="prec" data-prec>כמות מומלצת: ' + pnRec(it) + '</span></div></div>';
   }
   function pnAddForm(c) {
-    return '<div class="rc"><label class="field"><span>שם המוצר</span><input id="pnname" type="text" maxlength="60"></label><div class="grid2"><label class="field"><span>מלאי מינימום</span><input id="pnmin" type="number" min="0" value="1"></label><label class="field"><span>מלאי קיים</span><input id="pnstock" type="number" min="0" value="0"></label><label class="field"><span>יחידת מידה</span>' + pnUnitSel('יחידה', 'id="pnunit"') + '</label></div><label class="field"><span>תמונה (אופציונלי)</span><input id="pnfile" type="file" accept="image/*"></label><input type="hidden" id="pncat" value="' + c + '"><button class="btn" id="pnsave">הוסף</button> <button class="btn ghost" id="pncancel">ביטול</button><div class="msg err" id="pnerr"></div></div>';
+    return '<div class="rc"><label class="field"><span>שם המוצר</span><input id="pnname" type="text" maxlength="60"></label><div class="grid2 pg3"><label class="field"><span>מלאי מינימום</span><input id="pnmin" type="number" min="0" value="1"></label><label class="field"><span>יחידת מידה</span>' + pnUnitSel('יחידה', 'id="pnunit"') + '</label><label class="field"><span>מלאי קיים</span><input id="pnstock" type="number" min="0" value="0"></label></div><label class="field"><span>תמונה (אופציונלי)</span><input id="pnfile" type="file" accept="image/*"></label><input type="hidden" id="pncat" value="' + c + '"><button class="btn" id="pnsave">הוסף</button> <button class="btn ghost" id="pncancel">ביטול</button><div class="msg err" id="pnerr"></div></div>';
   }
   function pantryHtml() {
     var nav = '<nav class="rcnav" id="pnnav"><div class="row">' + PN_CATS.map(function (c) { return '<button type="button" class="chip" data-pcat="' + c[0] + '"' + (c[0] === pnActive ? ' aria-current="true"' : '') + '>' + c[1] + '</button>'; }).join('') + '</div></nav>';
