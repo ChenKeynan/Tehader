@@ -399,12 +399,12 @@ section.rcat .rc { text-align: right; }
 .pr .pmain { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .pr .ptop { display: flex; align-items: center; gap: 8px; }
 .pr .pb { display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; gap: 8px 10px; }
-.pr .pb { gap: 6px 8px; }
+.pr .pb { gap: 6px 4px; }
 .pr .stepper { gap: 2px; padding: 2px; }
 .pr .stepper button { width: 30px; height: 30px; font-size: 1.05rem; }
 .pr .stepper input { width: 28px !important; }
 .pr .pm { font-size: .8rem; color: var(--muted); white-space: nowrap; }
-.pr .pm select { width: auto; display: inline-block; font: inherit; font-size: .85rem; border: 1.5px solid var(--gold); border-radius: 8px; padding: 2px 4px; background: #fff; color: var(--ink); }
+.pr .pm select { margin-inline-start: 10px; padding: 1px 0 !important; font-size: .75rem !important; max-width: 62px; width: auto; display: inline-block; font: inherit; font-size: .85rem; border: 1.5px solid var(--gold); border-radius: 8px; padding: 2px 4px; background: #fff; color: var(--ink); }
 .field > .stepper { display: inline-flex; margin: 0; }
 .stepper input { width: 40px; border: 0; background: transparent; text-align: center; font: inherit; font-weight: 800; color: var(--ink); padding: 0; -moz-appearance: textfield; box-shadow: none; }
 .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -414,7 +414,9 @@ section.rcat .rc { text-align: right; }
 .pr .pdel { flex: none; background: none; border: 0; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 2px 6px; }
 .padd { margin: 4px 0 0; }
 .pg3 { grid-template-columns: 1fr 1fr auto; align-items: start; }
-.pg3 .field { margin: 0; }
+.pg3 .field { margin: 0; text-align: center; }
+.pg3 .field input { text-align: center; }
+.pg3 .field select { text-align-last: center; }
 .pg3 .field > span:first-child { display: block; height: 1.4em; line-height: 1.4em; margin-bottom: 4px; white-space: nowrap; }
 .pg3 input, .pg3 select { height: 42px; box-sizing: border-box; padding-top: 0; padding-bottom: 0; }
 .pg3 .stepper input { width: 30px; }
