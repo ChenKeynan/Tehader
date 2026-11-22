@@ -189,8 +189,8 @@ footer a { color: inherit; }
 #sidetab.open { transform: none; }
 @media (hover: hover) { #sidetab:hover { transform: none; } }
 #sidetab .sp { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px 12px 16px 8px; background: rgba(253,244,228,.92); border: 1.5px solid #24613f; border-left-width: 0; border-radius: 0 36px 36px 0; box-shadow: none; }
-#sidetab .sp a { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: #2a211c; border: 2.5px solid #f0e2c4; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
-#sidetab .sp a svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#sidetab .sp a { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: #2a211c; border: 2.5px solid #f0e2c4; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+#sidetab .sp a svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .mapbox { position: relative; margin-top: 10px; border-radius: 16px; overflow: hidden; height: 300px; background: #e8e4da; border: 2px solid var(--gold); }
 .mapbox iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 #sidetab .sh { align-self: center; position: relative; width: 17px; height: 128px; border: 0; padding: 0; cursor: pointer; background: #24613f; color: #fff; font-size: 1.1rem; font-weight: 800; border-radius: 0 14px 14px 0; box-shadow: 4px 2px 10px rgba(0,0,0,.2); }
@@ -326,6 +326,43 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 .item.open { height: auto; min-height: var(--ih, 150px); }
 .item .desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .item.open .desc { -webkit-line-clamp: unset; display: block; }
+/* ---- תפריט נגישות ---- */
+#a11y-root { font-family: 'Heebo', sans-serif; direction: rtl; }
+#a11y-root.a11y-gone { display: none !important; }
+#a11y-btn { position: fixed; left: 10px; top: 164px; z-index: 55; box-sizing: border-box; width: 48px; height: 48px; border-radius: 50%; border: 0; background: #1c1c1a; color: #fff; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2.5px #f0e2c4, 0 4px 14px rgba(0,0,0,.35); }
+#a11y-btn svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+#a11y-btn:focus-visible, .a11yr:focus-visible, .a11yf button:focus-visible, .a11yh button:focus-visible { outline: 3px solid #e8892b; outline-offset: 2px; }
+#a11y-panel { position: fixed; left: 12px; top: 222px; z-index: 56; width: min(340px, calc(100vw - 24px)); max-height: calc(100vh - 240px); display: flex; flex-direction: column; overflow: hidden; background: #fff6e6; border: 1.5px solid #d6b678; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.4); color: #2a2a20; }
+#a11y-panel[hidden] { display: none; }
+.a11yh { background: #1c1c1a; color: #fff; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 17px; }
+.a11yh button { background: none; border: 0; color: #fff; font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 8px; }
+.a11yb { overflow-y: auto; padding: 6px 12px 2px; }
+.a11yb h4 { margin: 10px 4px 6px; font-size: 13px; color: #6b6451; font-weight: 700; }
+.a11yr { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 8px; background: #fff; border: 1.5px solid #e6d3a6; border-radius: 12px; cursor: pointer; text-align: right; font: inherit; font-size: 15px; color: inherit; min-height: 48px; }
+.a11yr.on { border-color: #1c1c1a; box-shadow: 0 0 0 1px #1c1c1a; font-weight: 700; }
+.a11yr .ri { flex: none; width: 24px; height: 24px; display: flex; }
+.a11yr .ri svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.a11yr .rt { flex: 1; }
+.a11yr .rv { font-weight: 800; margin-inline-start: 4px; }
+.a11yr .rs { flex: none; display: flex; gap: 3px; direction: ltr; align-items: center; }
+.a11yr .seg { width: 16px; height: 8px; border-radius: 3px; background: #d9d4c7; }
+.a11yr .seg.f { background: #1c1c1a; }
+.a11yr .sw { width: 36px; height: 20px; border-radius: 10px; background: #d9d4c7; position: relative; }
+.a11yr .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s; }
+.a11yr.on .sw { background: #1c1c1a; }
+.a11yr.on .sw::after { left: 18px; }
+.a11yf { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid #e6d3a6; background: #fbead4; }
+.a11yf button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 42px; border-radius: 12px; border: 1.5px solid #1c1c1a; background: #fff; color: #1c1c1a; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.a11yf button.rs2 { background: #1c1c1a; color: #fff; }
+html[data-lh="1"] body *:not(#a11y-root):not(#a11y-root *) { line-height: 1.6 !important; }
+html[data-lh="2"] body *:not(#a11y-root):not(#a11y-root *) { line-height: 1.9 !important; }
+html[data-al="1"] body *:not(#a11y-root):not(#a11y-root *) { text-align: right !important; }
+html[data-al="2"] body *:not(#a11y-root):not(#a11y-root *) { text-align: center !important; }
+html[data-al="3"] body *:not(#a11y-root):not(#a11y-root *) { text-align: left !important; }
+html.a11y-gray { filter: grayscale(1); }
+html.a11y-noimg img { visibility: hidden !important; }
+html.a11y-noanim *, html.a11y-noanim *::before, html.a11y-noanim *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+html.a11y-links a { text-decoration: underline !important; background: #ffe74a !important; color: #000 !important; outline: 2px solid #000; }
 /* אזור צור קשר בתחתית האתר */
 .sitefoot { background: #1c1c1a; color: #e9e4d8; text-align: center; font-family: 'Heebo', sans-serif; padding: 46px 20px calc(116px + env(safe-area-inset-bottom)); margin: 34px 0 -96px; }
 .sitefoot .sfblock { max-width: 520px; margin: 0 auto; scroll-margin-top: 90px; }
@@ -600,6 +637,67 @@ section.rcat .rc { text-align: right; }
       if (inf && inf.scrollHeight > inf.clientHeight + 1) it.style.height = 'auto';
     });
   }
+
+  // ---- תפריט נגישות: אייקון צף עם אפשרויות תצוגה. ההגדרות נשמרות בדפדפן ----
+  function mountA11y() {
+    var KEY = 'tehader.a11y', ST = { fs: 0, lh: 0, al: 0, gray: 0, noimg: 0, noanim: 0, links: 0 };
+    var FS = [1, 1.1, 1.25, 1.5], AL_T = ['רגיל', 'ימין', 'מרכז', 'שמאל'], MAX = { fs: 3, lh: 2, al: 3, gray: 1, noimg: 1, noanim: 1, links: 1 };
+    try { var sv = JSON.parse(localStorage.getItem(KEY) || '{}'); Object.keys(ST).forEach(function (k) { var n = Number(sv[k]); if (n >= 0 && n <= MAX[k]) ST[k] = Math.floor(n); }); } catch (e) { }
+    var SVG = function (inner, extra) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + inner + '</svg>'; };
+    var ROWS = [
+      ['טקסט'],
+      ['fs', 'גודל טקסט', '<path d="M4 7V5h10v2M9 5v12M7 17h4M14 11h6M17 11v6M15.5 17h3"/>'],
+      ['lh', 'גובה שורה', '<path d="M9 6h11M9 12h11M9 18h11M4 5v14M2 7l2-2 2 2M2 17l2 2 2-2"/>'],
+      ['al', 'יישור טקסט', '<path d="M4 6h16M4 10h10M4 14h16M4 18h10"/>'],
+      ['gray', 'גווני אפור', '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>'],
+      ['noimg', 'הסתר תמונות', '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 17l5-4 4 3 3-2 6 4M4 3l16 18"/>'],
+      ['noanim', 'השהה אנימציות', '<circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>'],
+      ['אוריינטציה'],
+      ['links', 'הדגש קישורים', '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>']
+    ];
+    var body = ROWS.map(function (r) {
+      if (r.length === 1) return '<h4>' + r[0] + '</h4>';
+      return '<button type="button" class="a11yr" data-k="' + r[0] + '"><span class="ri">' + SVG(r[2]) + '</span><span class="rt">' + r[1] + '<span class="rv"></span></span><span class="rs"></span></button>';
+    }).join('');
+    var root = document.createElement('div'); root.id = 'a11y-root';
+    root.innerHTML = '<button type="button" id="a11y-btn" aria-label="תפריט נגישות" aria-expanded="false" aria-controls="a11y-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="2.4"/><path d="M3.5 9h17M12 9v6M12 15l-4 6.5M12 15l4 6.5"/></svg></button>' +
+      '<div id="a11y-panel" role="dialog" aria-label="נגישות" hidden><div class="a11yh"><span>נגישות</span><button type="button" class="a11yx" aria-label="סגור">✕</button></div><div class="a11yb">' + body + '</div>' +
+      '<div class="a11yf"><button type="button" data-act="hide">הסתר</button><button type="button" class="rs2" data-act="reset">אפס</button></div></div>';
+    document.body.appendChild(root);
+    try { if (sessionStorage.getItem(KEY + '.hide')) root.classList.add('a11y-gone'); } catch (e) { }
+    var btn = root.querySelector('#a11y-btn'), panel = root.querySelector('#a11y-panel'), html = document.documentElement;
+    function seg(n, f) { var h = ''; for (var i = 0; i < n; i++) h += '<i class="seg' + (i < f ? ' f' : '') + '"></i>'; return h; }
+    function paint(refit) {
+      html.style.fontSize = ST.fs ? (FS[ST.fs] * 100) + '%' : '';
+      if (ST.lh) html.setAttribute('data-lh', ST.lh); else html.removeAttribute('data-lh');
+      if (ST.al) html.setAttribute('data-al', ST.al); else html.removeAttribute('data-al');
+      html.classList.toggle('a11y-gray', !!ST.gray); html.classList.toggle('a11y-noimg', !!ST.noimg);
+      html.classList.toggle('a11y-noanim', !!ST.noanim); html.classList.toggle('a11y-links', !!ST.links);
+      Array.prototype.forEach.call(root.querySelectorAll('.a11yr'), function (b) {
+        var k = b.dataset.k, v = ST[k], rs = b.querySelector('.rs'), rv = b.querySelector('.rv');
+        b.classList.toggle('on', v > 0);
+        if (k === 'fs') { rv.textContent = FS[v] + 'x'; rs.innerHTML = seg(4, v + 1); }
+        else if (k === 'lh') { rv.textContent = ''; rs.innerHTML = seg(3, v + 1); }
+        else if (k === 'al') { rv.textContent = ' · ' + AL_T[v]; rs.innerHTML = ''; }
+        else { rv.textContent = ''; rs.innerHTML = '<span class="sw"></span>'; }
+        b.setAttribute('aria-pressed', v > 0 ? 'true' : 'false');
+      });
+      try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) { }
+      if (refit) fitItems();
+    }
+    function setOpen(o) { panel.hidden = !o; btn.setAttribute('aria-expanded', o ? 'true' : 'false'); if (o) { var x = panel.querySelector('.a11yx'); if (x) x.focus(); } else btn.focus(); }
+    btn.addEventListener('click', function () { setOpen(panel.hidden); });
+    root.addEventListener('click', function (e) {
+      var r = e.target.closest('.a11yr'), a = e.target.closest('[data-act]');
+      if (e.target.closest('.a11yx')) { setOpen(false); return; }
+      if (r) { var k = r.dataset.k; ST[k] = (ST[k] + 1) % (MAX[k] + 1); paint(true); return; }
+      if (a && a.dataset.act === 'reset') { Object.keys(ST).forEach(function (k) { ST[k] = 0; }); paint(true); return; }
+      if (a && a.dataset.act === 'hide') { root.classList.add('a11y-gone'); panel.hidden = true; try { sessionStorage.setItem(KEY + '.hide', '1'); } catch (e) { } }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) setOpen(false); });
+    document.addEventListener('click', function (e) { if (!panel.hidden && !root.contains(e.target)) { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); } });
+    paint(false);
+  }
   var fitTimer = null;
   window.addEventListener('resize', function () { clearTimeout(fitTimer); fitTimer = setTimeout(fitItems, 150); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitItems(); });
@@ -680,7 +778,7 @@ section.rcat .rc { text-align: right; }
   function paintBadge() { var n = count(), b = $('#fbdg'); if (!b) return; b.hidden = n === 0; b.textContent = n; }
   function flyToCart(srcEl) {
     var fc = $('#fcart');
-    if (!fc || !srcEl || !srcEl.getBoundingClientRect || !fc.animate || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    if (!fc || !srcEl || !srcEl.getBoundingClientRect || !fc.animate || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.classList.contains('a11y-noanim')) return;
     var a = srcEl.getBoundingClientRect(), c = fc.getBoundingClientRect();
     var ax = a.left + a.width / 2, ay = a.top + a.height / 2, cx = c.left + c.width / 2, cy = c.top + c.height / 2;
     var img = srcEl.closest('.item') && srcEl.closest('.item').querySelector('.pic img'), src = img && img.complete && img.naturalWidth ? img.currentSrc || img.src : '';
@@ -1179,10 +1277,11 @@ section.rcat .rc { text-align: right; }
   $('#fcart').onclick = openCheckout;
   window.addEventListener('scroll', spy, { passive: true });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (!closeLb()) closeModal(); } });
-  function route() { var adm = location.hash === '#admin', st = $('#sidetab'); if (st) st.style.display = adm ? 'none' : ''; var fc = $('#fcart'); if (fc) fc.style.display = adm ? 'none' : ''; if (location.hash === '#admin') renderAdmin(); else { closeModal(); renderMenu(); spy(); } }
+  function route() { var adm = location.hash === '#admin', st = $('#sidetab'); if (st) st.style.display = adm ? 'none' : ''; var fc = $('#fcart'); if (fc) fc.style.display = adm ? 'none' : ''; var ar = $('#a11y-root'); if (ar) ar.style.display = adm ? 'none' : ''; if (location.hash === '#admin') renderAdmin(); else { closeModal(); renderMenu(); spy(); } }
   window.addEventListener('hashchange', route);
   var init = CONFIG.firebase ? fbStore().catch(function () { return localStore(); }) : Promise.resolve(localStore());
   mountSideTab();
+  mountA11y();
   init.then(function (s) {
     store = s; route(); setTimeout(hanukahPopup, 3000); startPromo();
     if (s.mode === 'firebase' && fb && fb.auth) {
