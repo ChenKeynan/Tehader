@@ -1223,12 +1223,22 @@ section.rcat .rc { text-align: right; }
       '<span class="stepper"><button type="button" data-pstep="-1" aria-label="הפחת">−</button><input type="number" min="0" inputmode="numeric" data-pstock value="' + (Number(it.stock) || 0) + '" aria-label="מלאי קיים"><button type="button" data-pstep="1" aria-label="הוסף">+</button></span>' +
       '</div></div><span class="prec" data-prec>כמות מומלצת להזמנה: ' + pnRec(it) + '</span></div>';
   }
+  function pnShopText() {
+    var out = [];
+    PN_CATS.forEach(function (c) {
+      var a = PANTRY.filter(function (x) { return x.cat === c[0] && pnRec(x) > 0; });
+      if (a.length) out.push('*' + c[1] + '*\n' + a.map(function (x) { return '• ' + x.name + ' – ' + pnRec(x) + ' ' + (x.unit || 'יחידה'); }).join('\n'));
+    });
+    return out.length ? '🛒 רשימת קניות\n\n' + out.join('\n\n') : '';
+  }
   function pnAddForm(c) {
     return '<div class="rc"><label class="field"><span>שם המוצר</span><input id="pnname" type="text" maxlength="60"></label><div class="grid2 pg3"><label class="field"><span>מלאי מינימום</span><input id="pnmin" type="number" min="0" value="1"></label><label class="field"><span>יחידת מידה</span>' + pnUnitSel('יחידה', 'id="pnunit"') + '</label><div class="field"><span>מלאי קיים</span><span class="stepper"><button type="button" data-fstep="-1" aria-label="הפחת">−</button><input id="pnstock" type="number" min="0" inputmode="numeric" value="0" aria-label="מלאי קיים"><button type="button" data-fstep="1" aria-label="הוסף">+</button></span></div></div><label class="field"><span>תמונה (אופציונלי)</span><input id="pnfile" type="file" accept="image/*"></label><input type="hidden" id="pncat" value="' + c + '"><button class="btn" id="pnsave">הוסף</button> <button class="btn ghost" id="pncancel">ביטול</button><div class="msg err" id="pnerr"></div></div>';
   }
   function pantryHtml() {
     var nav = '<nav class="rcnav" id="pnnav"><div class="row">' + PN_CATS.map(function (c) { return '<button type="button" class="chip" data-pcat="' + c[0] + '"' + (c[0] === pnActive ? ' aria-current="true"' : '') + '>' + c[1] + '</button>'; }).join('') + '</div></nav>';
-    return nav + PN_CATS.map(function (c) { return '<section class="rcat" id="pcat-' + c[0] + '"><h2>' + c[1] + '</h2>' + (function () { var a = PANTRY.filter(function (x) { return x.cat === c[0]; }); return a.length ? a.map(pnRow).join('') : '<p class="rcempty">אין פריטים בקטגוריה</p>'; })() + (pnForm === c[0] ? pnAddForm(c[0]) : '<button class="btn alt padd" data-padd="' + c[0] + '">➕ פריט חדש</button>') + '</section>'; }).join('');
+    var cnt = PANTRY.filter(function (x) { return pnRec(x) > 0; }).length;
+    var wa = '<div style="margin-bottom:8px"><button type="button" class="btn" id="pnwa" style="width:100%">📲 שלח רשימת קניות' + (cnt ? ' (' + cnt + ')' : '') + '</button></div>';
+    return wa + nav + PN_CATS.map(function (c) { return '<section class="rcat" id="pcat-' + c[0] + '"><h2>' + c[1] + '</h2>' + (function () { var a = PANTRY.filter(function (x) { return x.cat === c[0]; }); return a.length ? a.map(pnRow).join('') : '<p class="rcempty">אין פריטים בקטגוריה</p>'; })() + (pnForm === c[0] ? pnAddForm(c[0]) : '<button class="btn alt padd" data-padd="' + c[0] + '">➕ פריט חדש</button>') + '</section>'; }).join('');
   }
   function renderAdmin() {
     $('#cartbar').hidden = true; closeModal();
@@ -1293,6 +1303,7 @@ section.rcat .rc { text-align: right; }
       var d = e.target.closest('[data-del]'); if (d) { store.deleteCoupon(d.dataset.del).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } }); return; }
       var rcb = e.target.closest('[data-rcat]'); if (rcb) { rcActive = rcb.dataset.rcat; rcLock = Date.now() + 900; rcMark(); var sx = $('#rcat-' + rcActive); if (sx) sx.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
       var pnb = e.target.closest('[data-pcat]'); if (pnb) { pnActive = pnb.dataset.pcat; pnLock = Date.now() + 900; pnMark(); var px = $('#pcat-' + pnActive); if (px) px.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+      if (e.target.id === 'pnwa') { var tx = pnShopText(); if (!tx) { alert('אין מה להזמין: כל המלאי מגיע למינימום'); return; } window.open('https://wa.me/?text=' + encodeURIComponent(tx), '_blank'); return; }
       var pa = e.target.closest('[data-padd]'); if (pa) { pnForm = pa.dataset.padd; pnImg = ''; paint(); var pf = $('#pnname'); if (pf) pf.focus(); return; }
       if (e.target.id === 'pncancel') { pnForm = null; paint(); return; }
       if (e.target.id === 'pnsave') {
@@ -1329,6 +1340,7 @@ section.rcat .rc { text-align: right; }
     function pnStock(row, inp) {
       var it = PANTRY.filter(function (x) { return x.id === row.dataset.pid; })[0]; if (!it) return;
       it.stock = Math.max(0, Math.floor(Number(inp.value) || 0)); inp.value = it.stock;
+      var wb = $('#pnwa'); if (wb) wb.textContent = '📲 שלח רשימת קניות' + (PANTRY.filter(function (x) { return pnRec(x) > 0; }).length ? ' (' + PANTRY.filter(function (x) { return pnRec(x) > 0; }).length + ')' : '');
       row.querySelector('[data-prec]').textContent = 'כמות מומלצת להזמנה: ' + pnRec(it);
       store.savePantry(it);
     }
