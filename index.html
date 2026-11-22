@@ -332,6 +332,11 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 #a11y-btn { position: fixed; left: 10px; top: 164px; z-index: 55; box-sizing: border-box; width: 48px; height: 48px; border-radius: 50%; border: 0; background: #1c1c1a; color: #fff; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2.5px #f0e2c4, 0 4px 14px rgba(0,0,0,.35); }
 #a11y-btn svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 #a11y-btn:focus-visible, .a11yr:focus-visible, .a11yf button:focus-visible, .a11yh button:focus-visible { outline: 3px solid #e8892b; outline-offset: 2px; }
+#a11y-root.a11y-min #a11y-btn { display: none; }
+#a11y-restore { position: fixed; left: 0; top: 164px; z-index: 55; width: 20px; height: 48px; padding: 0; border: 0; border-radius: 0 24px 24px 0; background: #1c1c1a; color: #fff; opacity: .85; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+#a11y-restore[hidden] { display: none; }
+#a11y-restore svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+#a11y-restore:focus-visible { outline: 3px solid #e8892b; outline-offset: 2px; }
 #a11y-panel { position: fixed; left: 12px; top: 222px; z-index: 56; width: min(340px, calc(100vw - 24px)); max-height: calc(100vh - 240px); display: flex; flex-direction: column; overflow: hidden; background: #fff6e6; border: 1.5px solid #d6b678; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.4); color: #2a2a20; }
 #a11y-panel[hidden] { display: none; }
 .a11yh { background: #1c1c1a; color: #fff; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 17px; }
@@ -661,11 +666,12 @@ section.rcat .rc { text-align: right; }
     }).join('');
     var root = document.createElement('div'); root.id = 'a11y-root';
     root.innerHTML = '<button type="button" id="a11y-btn" aria-label="תפריט נגישות" aria-expanded="false" aria-controls="a11y-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="2.4"/><path d="M3.5 9h17M12 9v6M12 15l-4 6.5M12 15l4 6.5"/></svg></button>' +
+      '<button type="button" id="a11y-restore" aria-label="החזר את תפריט הנגישות" title="החזר את תפריט הנגישות" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="2.4"/><path d="M3.5 9h17M12 9v6M12 15l-4 6.5M12 15l4 6.5"/></svg></button>' +
       '<div id="a11y-panel" role="dialog" aria-label="נגישות" hidden><div class="a11yh"><span>נגישות</span><button type="button" class="a11yx" aria-label="סגור">✕</button></div><div class="a11yb">' + body + '</div>' +
       '<div class="a11yf"><button type="button" data-act="hide">הסתר</button><button type="button" class="rs2" data-act="reset">אפס</button></div></div>';
     document.body.appendChild(root);
-    try { if (sessionStorage.getItem(KEY + '.hide')) root.classList.add('a11y-gone'); } catch (e) { }
-    var btn = root.querySelector('#a11y-btn'), panel = root.querySelector('#a11y-panel'), html = document.documentElement;
+    try { sessionStorage.removeItem(KEY + '.hide'); } catch (e) { }   // הסתרה כבר לא נשמרת: חוזר ברענון הבא (וגם למי שהסתיר בגרסה הקודמת)
+    var btn = root.querySelector('#a11y-btn'), restore = root.querySelector('#a11y-restore'), panel = root.querySelector('#a11y-panel'), html = document.documentElement;
     function seg(n, f) { var h = ''; for (var i = 0; i < n; i++) h += '<i class="seg' + (i < f ? ' f' : '') + '"></i>'; return h; }
     function paint(refit) {
       html.style.fontSize = ST.fs ? (FS[ST.fs] * 100) + '%' : '';
@@ -692,8 +698,9 @@ section.rcat .rc { text-align: right; }
       if (e.target.closest('.a11yx')) { setOpen(false); return; }
       if (r) { var k = r.dataset.k; ST[k] = (ST[k] + 1) % (MAX[k] + 1); paint(true); return; }
       if (a && a.dataset.act === 'reset') { Object.keys(ST).forEach(function (k) { ST[k] = 0; }); paint(true); return; }
-      if (a && a.dataset.act === 'hide') { root.classList.add('a11y-gone'); panel.hidden = true; try { sessionStorage.setItem(KEY + '.hide', '1'); } catch (e) { } }
+      if (a && a.dataset.act === 'hide') { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); root.classList.add('a11y-min'); restore.hidden = false; restore.focus(); }
     });
+    restore.addEventListener('click', function () { root.classList.remove('a11y-min'); restore.hidden = true; btn.focus(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) setOpen(false); });
     document.addEventListener('click', function (e) { if (!panel.hidden && !root.contains(e.target)) { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); } });
     paint(false);
