@@ -1223,11 +1223,13 @@ section.rcat .rc { text-align: right; }
       '<span class="stepper"><button type="button" data-pstep="-1" aria-label="הפחת">−</button><input type="number" min="0" inputmode="numeric" data-pstock value="' + (Number(it.stock) || 0) + '" aria-label="מלאי קיים"><button type="button" data-pstep="1" aria-label="הוסף">+</button></span>' +
       '</div></div><span class="prec" data-prec>כמות מומלצת להזמנה: ' + pnRec(it) + '</span></div>';
   }
+  var PN_PL = { 'יחידה': 'יחידות', 'שקית': 'שקיות', 'חבילה': 'חבילות', 'מגשית': 'מגשיות', 'צרור': 'צרורות', 'בקבוק': 'בקבוקים' };
+  function pnUnitTxt(u, n) { u = u || 'יחידה'; return n > 1 && PN_PL[u] ? PN_PL[u] : u; }
   function pnShopText() {
     var out = [];
     PN_CATS.forEach(function (c) {
       var a = PANTRY.filter(function (x) { return x.cat === c[0] && pnRec(x) > 0; });
-      if (a.length) out.push('*' + c[1] + '*\n' + a.map(function (x) { return '• ' + x.name + ' – ' + pnRec(x) + ' ' + (x.unit || 'יחידה'); }).join('\n'));
+      if (a.length) out.push('*' + c[1] + '*\n' + a.map(function (x) { return '• ' + x.name + ' – ' + pnRec(x) + ' ' + pnUnitTxt(x.unit, pnRec(x)); }).join('\n'));
     });
     return out.length ? '🛒 רשימת קניות\n\n' + out.join('\n\n') : '';
   }
