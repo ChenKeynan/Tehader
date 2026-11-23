@@ -394,7 +394,8 @@ section.rcat .rc { text-align: right; }
 .rcempty { color: var(--muted); margin: 0 0 12px; }
 
 .pr { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 10px; background: var(--card); border: 1px solid color-mix(in srgb, var(--gold) 75%, transparent); border-radius: 12px; padding: 10px 12px; margin: 0 0 10px; text-align: right; }
-.pr .pi { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: var(--orange-soft); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.pr .pi { width: 56px; height: 56px; border-radius: 10px; object-fit: contain; background: var(--orange-soft); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.pr img.pi { background: #fff; border: 1px solid #eadfc8; }
 .pr .pn { flex: 1; min-width: 0; font-weight: 800; overflow-wrap: anywhere; }
 .pr .pmain { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .pr .ptop { display: flex; align-items: center; gap: 8px; }
@@ -1215,9 +1216,23 @@ section.rcat .rc { text-align: right; }
   function pnMark() { Array.prototype.forEach.call(document.querySelectorAll('#pnnav .chip'), function (c) { if (c.dataset.pcat === pnActive) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current'); }); }
   var PANTRY = [], pnForm = null, pnImg = '', PN_UNITS = ['גרם', 'יחידה', 'שקית', 'ק"ג', 'חבילה', 'מגשית', 'צרור', 'בקבוק', 'מארז', 'מיכל'];
   function pnUnitSel(cur, attr) { return '<select ' + attr + ' aria-label="יחידת מידה">' + PN_UNITS.map(function (u) { return '<option' + (u === cur ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select>'; }
+  /* תמונות מוכנות (images/pantry/): נבחרות אוטומטית לפי מילה בשם המוצר, אם לא הועלתה תמונה לפריט */
+  var PN_PICS = [
+    [['טחינה'], 'tahina'], [['תירס'], 'tiras'], [['צלי'], 'tzli-katef'], [['כתף'], 'tzli-katef'], [['זיתים'], 'zetim'],
+    [['שום', 'קפוא'], 'shum-kafu'], [['שומשום'], 'sumsum'], [['שמן זית'], 'shemen-zayit'], [['קנולה'], 'shemen-kanola'], [['פלפל צהוב'], 'pilpel-tzahov'], [['פלפל ירוק'], 'pilpel-yarok'],
+    [['תפוחי אדמה'], 'tapuhei-adama'], [['תפוד'], 'tapudim'], [['שוקיים'], 'shokayim'], [['שוקי'], 'shokayim'], [['שעועית'], 'sheuit-kfuaa'], [['שמרים'], 'shmarim-yeveshim'], [['פתיתים'], 'ptitim'], [['תבנית'], 'tavnit-had-peami'],
+    [['סולת'], 'solet'], [['סוכר'], 'sukar'], [['סלרי'], 'selery'], [['סלק'], 'selek'], [['שמיר'], 'shamir'], [['שומר'], 'shumar'], [['שום'], 'shum'],
+    [['250', 'סלט'], 'kufsa-250-salads'], [['500', 'סלט'], 'kufsa-500-salads'], [['500', 'תבשיל'], 'kufsa-500-tavshil'], [['1000', 'תבשיל'], 'kufsa-1000-tavshil'],
+    [['מיץ לימון'], 'mitz-limon'], [['כרוב סגול'], 'kruv-sagol'], [['פלפל שחור'], 'pilpel-shahor-tahun'], [['פלפל חריף'], 'pilpel-harif'], [['פלפל אדום'], 'pilpel-adom'],
+    [['פפריקה'], 'paprika-metuka'], [['מרק'], 'marak-of-parve'], [['אפונה'], 'afuna'], [['עגבני'], 'agvanya'], [['אריס'], 'arisa'], [['בהרט'], 'baharat'], [['טחון'], 'basar-tahun'],
+    [['בטטה'], 'batata'], [['בצל'], 'bazal'], [['צ\'ילי'], 'chili'], [['צילי'], 'chili'], [['מושט'], 'dag-musht'], [['סלמון'], 'dag-salmon'], [['דלעת'], 'dlaat'], [['גזר'], 'gezer'],
+    [['חרדל'], 'hardal'], [['חציל'], 'hatzil'], [['חזה'], 'haze-of'], [['פרגי'], 'pargit'], [['חומוס'], 'humus-kafu'], [['גרגרי'], 'humus-kafu'], [['כמון'], 'kamun'], [['קמח'], 'kemah-lavan'],
+    [['קישוא'], 'kishu'], [['כרוב'], 'kruv-lavan'], [['כורכום'], 'kurkum'], [['כוסברה'], 'kusbara'], [['לימון'], 'limon'], [['מיונז'], 'mayonez'], [['מלח'], 'melah'], [['אורז'], 'orez'],
+    [['פסטה'], 'pasta'], [['פטרוזיליה'], 'petrozilya']];
+  function pnPic(name) { name = String(name || ''); for (var i = 0; i < PN_PICS.length; i++) { var k = PN_PICS[i][0], ok = true; for (var q = 0; q < k.length; q++) if (name.indexOf(k[q]) < 0) ok = false; if (ok) return 'images/pantry/' + PN_PICS[i][1] + '.jpg'; } return ''; }
   function pnRec(it) { return Math.max(0, (Number(it.min) || 0) - (Number(it.stock) || 0)); }
   function pnRow(it) {
-    return '<div class="pr" data-pid="' + esc(it.id) + '">' + (it.img ? '<img class="pi" alt="" src="' + esc(it.img) + '">' : '<span class="pi" aria-hidden="true">📦</span>') +
+    return '<div class="pr" data-pid="' + esc(it.id) + '">' + (function () { var src = it.img || pnPic(it.name); return src ? '<img class="pi" alt="" src="' + esc(src) + '" onerror="var d=document.createElement(\'span\');d.className=\'pi\';d.textContent=\'📦\';this.replaceWith(d)">' : '<span class="pi" aria-hidden="true">📦</span>'; })() +
       '<div class="pmain"><div class="ptop"><span class="pn">' + esc(it.name) + '</span><button type="button" class="pdel" data-pdel="' + esc(it.id) + '" aria-label="מחק פריט">✕</button></div>' +
       '<div class="pb"><span class="pm">מלאי מינימום: <b>' + (Number(it.min) || 0) + '</b> ' + pnUnitSel(it.unit || 'יחידה', 'data-punit') + '</span>' +
       '<span class="stepper"><button type="button" data-pstep="-1" aria-label="הפחת">−</button><input type="number" min="0" inputmode="numeric" data-pstock value="' + (Number(it.stock) || 0) + '" aria-label="מלאי קיים"><button type="button" data-pstep="1" aria-label="הוסף">+</button></span>' +
