@@ -302,6 +302,7 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 .zopt a { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
 .zopt button { padding: 9px 6px; border-radius: 10px; border: 1.5px solid var(--green); background: transparent; color: var(--green); font-weight: 800; font-family: inherit; cursor: pointer; }
 .zopt button[aria-checked="true"] { background: var(--green); color: var(--green-ink); }
+.zopt small { font-weight: 500; font-size: .78rem; color: var(--muted); }
 .zhint { grid-column: 1 / -1; font-size: .8rem; color: var(--muted); font-weight: 500; }
 .dsel small { display: block; font-weight: 500; opacity: .85; }
 /* כרטיסי מנות – כל מנה בכרטיס נפרד, תמונה צמודה לצד ימין */
@@ -474,7 +475,7 @@ section.rcat .rc { text-align: right; }
       ordersNote: "(קבלת הזמנות חדשות תתאפשר עד יום ה' בשעה 16:00)",   // מוצג מתחת לשורת יום ו'
       copy: '© תהדר'
     },
-    delivery: { enabled: true, fee: 30, zones: { 1: { fee: 30, towns: ["אשדוד", "ניר גלים", "בני דרום", "גן יבנה"] }, 2: { fee: 50, towns: ["יבנה", "גדרה", "בני עי\"ש", "בית גמליאל", "בן זכאי", "גבעת וושינגטון", "קבוצת יבנה", "כרם ביבנה", "גן הדרום", "כפר אביב", "משגב דב", "עשרת", "כפר מרדכי", "שדמה", "מישר", "קריית מלאכי", "אשקלון", "שתולים", "שדה עוזיהו", "עזריקם", "ביצרון", "נווה מבטח", "חצב", "אמונים", "עזר", "גבעתי", "בית עזרא", "חצור אשדוד", "באר טוביה", "ניצנים", "ניצן", "ניצן ב'", "באר גנים", "ניר ישראל", "הודיה", "ברכיה", "משען", "כפר סילבר"] } }, note: 'התשלום מתבצע בעת קבלת המשלוח.' },   // משלוח בתוספת תשלום. fee = דמי משלוח בש"ח. enabled: false = בלי אפשרות משלוח
+    delivery: { enabled: true, fee: 30, zones: { 1: { fee: 30, min: 70, towns: ["אשדוד", "ניר גלים", "בני דרום", "גן יבנה"] }, 2: { fee: 50, min: 150, towns: ["יבנה", "גדרה", "בני עי\"ש", "בית גמליאל", "בן זכאי", "גבעת וושינגטון", "קבוצת יבנה", "כרם ביבנה", "גן הדרום", "כפר אביב", "משגב דב", "עשרת", "כפר מרדכי", "שדמה", "מישר", "קריית מלאכי", "אשקלון", "שתולים", "שדה עוזיהו", "עזריקם", "ביצרון", "נווה מבטח", "חצב", "אמונים", "עזר", "גבעתי", "בית עזרא", "חצור אשדוד", "באר טוביה", "ניצנים", "ניצן", "ניצן ב'", "באר גנים", "ניר ישראל", "הודיה", "ברכיה", "משען", "כפר סילבר"] } }, note: 'התשלום מתבצע בעת קבלת המשלוח.' },   // משלוח בתוספת תשלום. fee = דמי משלוח בש"ח. enabled: false = בלי אפשרות משלוח
     pickupSlots: ['כמה שיותר מהר', '12:00', '12:30', '13:00', '13:30', '14:00', '17:00', '18:00', '19:00'],
     ownerEmails: ['chenkeynan@gmail.com', 'edenkeynan@gmail.com', 'yaakov414@gmail.com'],   // מי מורשה למסך הניהול (גם בכללי Firebase!)
     firebase: { apiKey: 'AIzaSyAhWX7jdMHYMHAyIab0_j18dJ6i7CJNuZs', authDomain: 'tidhar-dfc18.firebaseapp.com', projectId: 'tidhar-dfc18', storageBucket: 'tidhar-dfc18.firebasestorage.app', messagingSenderId: '1002257905072', appId: '1:1002257905072:web:a43f0010fbb8b67d461275' }, // הגדרות Firebase של הפרויקט Tidhar
@@ -636,6 +637,7 @@ section.rcat .rc { text-align: right; }
   function discount() { if (!applied) return 0; var r = evalCoupon(applied, subtotal()); return r.ok ? r.discount : 0; }
   var zone = 0;   // אזור משלוח שנבחר: 1 / 2 (0 = עדיין לא נבחר)
   function zoneFee(z) { var Z = CONFIG.delivery && CONFIG.delivery.zones && CONFIG.delivery.zones[z]; return Z ? Z.fee : 0; }
+  function zoneMin(z) { var Z = CONFIG.delivery && CONFIG.delivery.zones && CONFIG.delivery.zones[z]; return Z ? Z.min || 0 : 0; }
   function normTown(t) { return String(t || '').replace(/[\s'"`׳״’‘”“\-–]/g, ''); }
   function townZone(name) { var n = normTown(name); if (!n) return 0; var Zs = CONFIG.delivery && CONFIG.delivery.zones || {}; for (var z in Zs) if (Zs[z].towns.some(function (t) { return normTown(t) === n; })) return Number(z); return 0; }
   function sortedTowns(z) { return CONFIG.delivery.zones[z].towns.slice().sort(function (a, b) { return a.localeCompare(b, 'he'); }); }
@@ -791,7 +793,7 @@ section.rcat .rc { text-align: right; }
         (ph ? '<p><a class="sfph" dir="ltr" href="tel:' + esc(ph) + '">' + esc(phShown) + '</a></p>' : '') + (F.tagline ? '<p>' + esc(F.tagline) + '</p>' : '')) +
       blk(IC('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'), 'כתובתנו', P(F.address)) +
       blk(IC('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h2M14 14h2M8 18h2M14 18h2"/>'), 'שעות פעילות', (F.hours || []).map(function (t) { return '<p>' + esc(t) + '</p>' + (F.ordersNote && /^ו'/.test(t) ? '<p class="sfsmall">' + esc(F.ordersNote) + '</p>' : ''); }).join(''), 'hours') +
-      blk(IC('<circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M8 17.5h6l2-9.5"/><path d="M14 5.5h3.2L19 14.5"/><path d="M4 12h5l1 3.5"/>'), 'אזורי חלוקה', [1, 2].map(function (z) { return '<h3 class="sfz" id="zone' + z + '">אזור ' + z + ' · ' + money(zoneFee(z)) + '</h3><p class="sftowns">' + sortedTowns(z).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</p>'; }).join(''), 'zones') +
+      blk(IC('<circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M8 17.5h6l2-9.5"/><path d="M14 5.5h3.2L19 14.5"/><path d="M4 12h5l1 3.5"/>'), 'אזורי חלוקה', [1, 2].map(function (z) { return '<h3 class="sfz" id="zone' + z + '">אזור ' + z + ' · משלוח ' + money(zoneFee(z)) + '</h3><p class="sfsmall" style="margin:-4px 0 10px">מינימום הזמנה ' + money(zoneMin(z)) + '</p><p class="sftowns">' + sortedTowns(z).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</p>'; }).join(''), 'zones') +
       '<div class="sfrule"></div><div class="sfcopy">' + esc(F.copy || '') + '</div></div>';
   }
 
@@ -919,7 +921,7 @@ section.rcat .rc { text-align: right; }
   function zonesHtml() {
     var D = CONFIG.delivery; if (!D || !D.zones) return '';
     return '<div class="zsel" id="zsel" role="radiogroup" aria-label="אזור משלוח" hidden>' + [1, 2].map(function (z) {
-      return '<div class="zopt"><span>משלוח ל<a href="#zone' + z + '" data-zlink="' + z + '">אזור ' + z + '</a></span><button type="button" role="radio" data-zone="' + z + '" aria-checked="' + (zone === z) + '">' + (zone === z ? '✓ נבחר · ' : 'בחירה · ') + money(zoneFee(z)) + '</button></div>';
+      return '<div class="zopt"><span>משלוח ל<a href="#zone' + z + '" data-zlink="' + z + '">אזור ' + z + '</a></span><small>מינימום הזמנה ' + money(zoneMin(z)) + '</small><button type="button" role="radio" data-zone="' + z + '" aria-checked="' + (zone === z) + '">' + (zone === z ? '✓ נבחר · ' : 'בחירה · ') + money(zoneFee(z)) + '</button></div>';
     }).join('') + '<div class="zhint">לא בטוחים לאיזה אזור היישוב שלכם שייך? לחצו על "אזור 1" או "אזור 2".</div></div>';
   }
   function paintZones() {
@@ -977,6 +979,7 @@ section.rcat .rc { text-align: right; }
       else { applied = null; setMsg('הקופון הוסר: ' + r.msg, 'err'); }
     }
     if (mode === 'delivery' && CONFIG.delivery && CONFIG.delivery.enabled) s += '<div class="sum"><span>דמי משלוח' + (zone ? ' (אזור ' + zone + ')' : '') + '</span><span>' + (zone ? money(fee()) : 'בחרו אזור') + '</span></div>';
+    if (mode === 'delivery' && zone && subtotal() < zoneMin(zone)) s += '<div class="sum" style="color:#b3261e;font-weight:800"><span>מינימום הזמנה לאזור ' + zone + ': ' + money(zoneMin(zone)) + '</span><span>חסרים ' + money(zoneMin(zone) - subtotal()) + '</span></div>';
     s += '<div class="sum total"><span>סה״כ לתשלום</span><span>' + money(total()) + '</span></div>';
     $('#csum').innerHTML = s;
     var rm = $('#crem'); if (rm) rm.onclick = function () { applied = null; $('#cin').value = ''; setMsg('', ''); paintCheckout(); updateBar(); };
@@ -1154,6 +1157,7 @@ section.rcat .rc { text-align: right; }
     if (del && addr.length < 5) { err.textContent = 'נא למלא כתובת למשלוח'; $('#faddr').focus(); return; }
     if (del) { var cz = townZone($('#fcity').value); if (cz && cz !== zone) { zone = cz; paintZones(); paintCheckout(); updateBar(); err.textContent = 'היישוב שבחרתם שייך לאזור ' + cz + ' – המחיר עודכן (' + money(zoneFee(cz)) + '). נא ללחוץ שוב על שליחה.'; return; } }
     if (del && !zone) { err.textContent = 'נא לבחור אזור משלוח (אזור 1 או אזור 2)'; var zb = document.querySelector('#zsel button'); if (zb) zb.focus(); return; }
+    if (del && subtotal() < zoneMin(zone)) { err.textContent = 'מינימום הזמנה למשלוח לאזור ' + zone + ' הוא ' + money(zoneMin(zone)) + ' (חסרים ' + money(zoneMin(zone) - subtotal()) + '). אפשר להוסיף מוצרים או לבחור איסוף עצמי.'; return; }
     if (del && !($('#fcity').value || '').trim()) { err.textContent = 'נא למלא עיר / מושב / קיבוץ למשלוח'; $('#fcity').focus(); return; }
     if (!$('#fpick').value) { err.textContent = 'נא לבחור תאריך ושעה'; $('#fpick').focus(); return; }
     err.textContent = '';
