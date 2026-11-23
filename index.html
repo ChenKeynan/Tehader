@@ -296,6 +296,13 @@ body { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 .dsel { display: flex; gap: 8px; margin: 10px 0; }
 .dsel button { flex: 1; padding: 12px 8px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); font-weight: 800; font-family: inherit; cursor: pointer; }
 .dsel button[aria-pressed="true"] { background: var(--green); color: var(--green-ink); border-color: var(--green); }
+.zsel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: -2px 0 10px; }
+.zsel[hidden] { display: none; }
+.zopt { display: flex; flex-direction: column; gap: 6px; align-items: stretch; text-align: center; background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px; font-weight: 800; }
+.zopt a { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
+.zopt button { padding: 9px 6px; border-radius: 10px; border: 1.5px solid var(--green); background: transparent; color: var(--green); font-weight: 800; font-family: inherit; cursor: pointer; }
+.zopt button[aria-checked="true"] { background: var(--green); color: var(--green-ink); }
+.zhint { grid-column: 1 / -1; font-size: .8rem; color: var(--muted); font-weight: 500; }
 .dsel small { display: block; font-weight: 500; opacity: .85; }
 /* כרטיסי מנות – כל מנה בכרטיס נפרד, תמונה צמודה לצד ימין */
 .cardlist { background: transparent; border: 0; box-shadow: none; padding: 26px 0 4px; display: flex; flex-direction: column; gap: 12px; }
@@ -380,6 +387,8 @@ html.a11y-links a { text-decoration: underline !important; background: #ffe74a !
 .sitefoot h2 { font-family: 'Heebo', sans-serif; font-weight: 800; font-size: 1.5rem; margin: 0 0 14px; color: #fff; }
 .sitefoot p { margin: 0 0 12px; font-size: 1.02rem; line-height: 1.6; }
 .sitefoot .sfph { color: #fff; font-weight: 800; font-size: 1.6rem; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 6px; letter-spacing: .5px; }
+.sitefoot .sfz { font-size: 1.15rem; font-weight: 800; color: #d8b56a; margin: 18px 0 8px; scroll-margin-top: 90px; }
+.sitefoot .sftowns { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; font-size: .98rem; line-height: 1.5; margin: 0 0 6px; }
 .sitefoot p.sfsmall { font-size: .8rem; opacity: .8; margin: -6px 0 12px; line-height: 1.4; }
 .sitefoot .sfrule { height: 1px; background: rgba(255,255,255,.2); margin: 40px auto 18px; max-width: 560px; }
 .sitefoot .sfcopy { font-size: 1.05rem; }
@@ -461,11 +470,11 @@ section.rcat .rc { text-align: right; }
     footer: {   // אזור "צור קשר" בתחתית האתר
       tagline: 'אוכל מוכן לשבת',
       address: ['רחוב ענבים 2/31, אשדוד', 'איסוף עצמי בתיאום מראש (יש אפשרות למשלוחים)'],
-      hours: ["א'-ה' 9:00 - 19:00", "ו' 7:30 - 14:30", 'אזורי חלוקה: אשדוד והסביבה'],
+      hours: ["א'-ה' 9:00 - 19:00", "ו' 7:30 - 14:30"],
       ordersNote: "(קבלת הזמנות חדשות תתאפשר עד יום ה' בשעה 16:00)",   // מוצג מתחת לשורת יום ו'
       copy: '© תהדר'
     },
-    delivery: { enabled: true, fee: 25, note: 'התשלום מתבצע בעת קבלת המשלוח.' },   // משלוח בתוספת תשלום. fee = דמי משלוח בש"ח. enabled: false = בלי אפשרות משלוח
+    delivery: { enabled: true, fee: 30, zones: { 1: { fee: 30, towns: ["אשדוד", "ניר גלים", "בני דרום", "גן יבנה"] }, 2: { fee: 50, towns: ["יבנה", "גדרה", "בני עי\"ש", "בית גמליאל", "בן זכאי", "גבעת וושינגטון", "קבוצת יבנה", "כרם ביבנה", "גן הדרום", "כפר אביב", "משגב דב", "עשרת", "כפר מרדכי", "שדמה", "מישר", "קריית מלאכי", "אשקלון", "שתולים", "שדה עוזיהו", "עזריקם", "ביצרון", "נווה מבטח", "חצב", "אמונים", "עזר", "גבעתי", "בית עזרא", "חצור אשדוד", "באר טוביה", "ניצנים", "ניצן", "ניצן ב'", "באר גנים", "ניר ישראל", "הודיה", "ברכיה", "משען", "כפר סילבר"] } }, note: 'התשלום מתבצע בעת קבלת המשלוח.' },   // משלוח בתוספת תשלום. fee = דמי משלוח בש"ח. enabled: false = בלי אפשרות משלוח
     pickupSlots: ['כמה שיותר מהר', '12:00', '12:30', '13:00', '13:30', '14:00', '17:00', '18:00', '19:00'],
     ownerEmails: ['chenkeynan@gmail.com', 'edenkeynan@gmail.com', 'yaakov414@gmail.com'],   // מי מורשה למסך הניהול (גם בכללי Firebase!)
     firebase: { apiKey: 'AIzaSyAhWX7jdMHYMHAyIab0_j18dJ6i7CJNuZs', authDomain: 'tidhar-dfc18.firebaseapp.com', projectId: 'tidhar-dfc18', storageBucket: 'tidhar-dfc18.firebasestorage.app', messagingSenderId: '1002257905072', appId: '1:1002257905072:web:a43f0010fbb8b67d461275' }, // הגדרות Firebase של הפרויקט Tidhar
@@ -625,7 +634,12 @@ section.rcat .rc { text-align: right; }
     return { ok: true, discount: d };
   }
   function discount() { if (!applied) return 0; var r = evalCoupon(applied, subtotal()); return r.ok ? r.discount : 0; }
-  function fee() { return mode === 'delivery' && CONFIG.delivery && CONFIG.delivery.enabled ? CONFIG.delivery.fee : 0; }
+  var zone = 0;   // אזור משלוח שנבחר: 1 / 2 (0 = עדיין לא נבחר)
+  function zoneFee(z) { var Z = CONFIG.delivery && CONFIG.delivery.zones && CONFIG.delivery.zones[z]; return Z ? Z.fee : 0; }
+  function normTown(t) { return String(t || '').replace(/[\s'"`׳״’‘”“\-–]/g, ''); }
+  function townZone(name) { var n = normTown(name); if (!n) return 0; var Zs = CONFIG.delivery && CONFIG.delivery.zones || {}; for (var z in Zs) if (Zs[z].towns.some(function (t) { return normTown(t) === n; })) return Number(z); return 0; }
+  function sortedTowns(z) { return CONFIG.delivery.zones[z].towns.slice().sort(function (a, b) { return a.localeCompare(b, 'he'); }); }
+  function fee() { return mode === 'delivery' && CONFIG.delivery && CONFIG.delivery.enabled ? zoneFee(zone) : 0; }
   function total() { return Math.max(0, subtotal() - discount()) + fee(); }
   function cKey(id, opt) { return id + '|' + (opt == null ? '' : opt); }
 
@@ -777,6 +791,7 @@ section.rcat .rc { text-align: right; }
         (ph ? '<p><a class="sfph" dir="ltr" href="tel:' + esc(ph) + '">' + esc(phShown) + '</a></p>' : '') + (F.tagline ? '<p>' + esc(F.tagline) + '</p>' : '')) +
       blk(IC('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'), 'כתובתנו', P(F.address)) +
       blk(IC('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h2M14 14h2M8 18h2M14 18h2"/>'), 'שעות פעילות', (F.hours || []).map(function (t) { return '<p>' + esc(t) + '</p>' + (F.ordersNote && /^ו'/.test(t) ? '<p class="sfsmall">' + esc(F.ordersNote) + '</p>' : ''); }).join(''), 'hours') +
+      blk(IC('<circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M8 17.5h6l2-9.5"/><path d="M14 5.5h3.2L19 14.5"/><path d="M4 12h5l1 3.5"/>'), 'אזורי חלוקה', [1, 2].map(function (z) { return '<h3 class="sfz" id="zone' + z + '">אזור ' + z + ' · ' + money(zoneFee(z)) + '</h3><p class="sftowns">' + sortedTowns(z).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</p>'; }).join(''), 'zones') +
       '<div class="sfrule"></div><div class="sfcopy">' + esc(F.copy || '') + '</div></div>';
   }
 
@@ -879,7 +894,7 @@ section.rcat .rc { text-align: right; }
     var h = '<div class="overlay" id="ov"><div class="sheet" role="dialog" aria-modal="true" aria-label="קופה"><button class="close" id="xclose" aria-label="סגור">✕</button><h2>הקופה</h2><div id="clines"></div><div class="coupon"><label for="cin">יש לך קוד קופון?</label><div class="row"><input id="cin" type="text" autocomplete="off" autocapitalize="characters" placeholder="הכנס קוד קופון"><button class="btn alt" id="capply" type="button">החל</button></div><div class="msg" id="cmsg" role="status"></div></div><div id="csum"></div>' +
       deliveryHtml() + '<label class="field"><span>שם מלא</span><input id="fname" type="text" autocomplete="name" maxlength="60"></label>' +
       '<label class="field"><span>טלפון</span><input id="fphone" type="tel" autocomplete="tel" inputmode="tel" maxlength="16" placeholder="050-0000000"></label>' +
-      '<label class="field"><span>עיר (אופציונלי – תוצג בלשונית באתר, בלי שם)</span><input id="fcity" type="text" list="fcities" maxlength="20" autocomplete="address-level2" placeholder="למשל: אשדוד"><datalist id="fcities"><option value="אשדוד"><option value="גן יבנה"><option value="אשקלון"><option value="ראשון לציון"><option value="יבנה"><option value="קרית מלאכי"><option value="גדרה"><option value="רחובות"><option value="נס ציונה"><option value="באר שבע"><option value="תל אביב"></datalist></label>' +
+      '<label class="field"><span id="fcityl">עיר (אופציונלי – תוצג בלשונית באתר, בלי שם)</span><input id="fcity" type="text" list="fcities" maxlength="20" autocomplete="address-level2" placeholder="למשל: אשדוד"><datalist id="fcities"></datalist></label>' +
       '<label class="field"><span id="fpicklbl">מתי לאסוף?</span><input id="fpick" class="pickbtn" type="text" readonly placeholder="📅 בחרו תאריך ושעה"></label>' +
       '<label class="field"><span>הערות להזמנה (אופציונלי)</span><textarea id="fnote" rows="2" maxlength="200"></textarea></label>' +
       '<div class="note" id="fnotebox">' + esc(CONFIG.pickupNote) + '</div><div class="msg err" id="ferr" role="alert"></div><button class="btn big" id="fsend" type="button">שלח הזמנה</button></div></div>';
@@ -891,20 +906,44 @@ section.rcat .rc { text-align: right; }
     $('#cin').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); applyCode(); } });
     $('#fsend').onclick = send;
     var dsel = $('#dsel'); if (dsel) dsel.addEventListener('click', function (e) { var b = e.target.closest('button[data-mode]'); if (!b) return; mode = b.dataset.mode; applyMode(); });
+    var zsel = $('#zsel'); if (zsel) zsel.addEventListener('click', function (e) {
+      var a = e.target.closest('a[data-zlink]'); if (a) { e.preventDefault(); goZone(a.dataset.zlink); return; }
+      var b = e.target.closest('button[data-zone]'); if (!b) return; zone = Number(b.dataset.zone); paintZones(); paintCheckout(); updateBar();
+    });
+    var fc = $('#fcity'); if (fc) fc.addEventListener('input', function () { var z = townZone(fc.value); if (z && z !== zone && mode === 'delivery') { zone = z; paintZones(); paintCheckout(); updateBar(); } });
     $('#clines').addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return; var row = b.closest('[data-k]'); if (!row) return; var l = cart[row.dataset.k]; if (!l) return;
       change(l.id, l.opt, b.hasAttribute('data-plus') ? 1 : -1); paintCheckout(); updateBar(); renderMenuKeep(); if (!count()) emptyCart();
     });
   }
+  function zonesHtml() {
+    var D = CONFIG.delivery; if (!D || !D.zones) return '';
+    return '<div class="zsel" id="zsel" role="radiogroup" aria-label="אזור משלוח" hidden>' + [1, 2].map(function (z) {
+      return '<div class="zopt"><span>משלוח ל<a href="#zone' + z + '" data-zlink="' + z + '">אזור ' + z + '</a></span><button type="button" role="radio" data-zone="' + z + '" aria-checked="' + (zone === z) + '">' + (zone === z ? '✓ נבחר · ' : 'בחירה · ') + money(zoneFee(z)) + '</button></div>';
+    }).join('') + '<div class="zhint">לא בטוחים לאיזה אזור היישוב שלכם שייך? לחצו על "אזור 1" או "אזור 2".</div></div>';
+  }
+  function paintZones() {
+    var zs = $('#zsel'); if (!zs) return;
+    zs.hidden = !(mode === 'delivery');
+    Array.prototype.forEach.call(zs.querySelectorAll('button[data-zone]'), function (b) { var z = Number(b.dataset.zone); b.setAttribute('aria-checked', String(zone === z)); b.textContent = (zone === z ? '✓ נבחר · ' : 'בחירה · ') + money(zoneFee(z)); });
+  }
+  function goZone(z) {
+    closeModal();
+    setTimeout(function () { var el = document.getElementById('zone' + z) || document.getElementById('zones'); if (el) { try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); } } }, 60);
+  }
   function deliveryHtml() {
     var D = CONFIG.delivery; if (!D || !D.enabled) return '';
-    return '<div class="dsel" id="dsel"><button type="button" data-mode="pickup" aria-pressed="' + (mode === 'pickup') + '">🏠 איסוף עצמי<small>ללא עלות</small>' + (CONFIG.address ? '<small>(' + esc([CONFIG.address.street, CONFIG.address.apt, CONFIG.address.city].filter(Boolean).join(' ')) + ')</small>' : '') + '</button><button type="button" data-mode="delivery" aria-pressed="' + (mode === 'delivery') + '">🚚 משלוח<small>תוספת ' + money(D.fee) + '</small></button></div>' +
+    return '<div class="dsel" id="dsel"><button type="button" data-mode="pickup" aria-pressed="' + (mode === 'pickup') + '">🏠 איסוף עצמי<small>ללא עלות</small>' + (CONFIG.address ? '<small>(' + esc([CONFIG.address.street, CONFIG.address.apt, CONFIG.address.city].filter(Boolean).join(' ')) + ')</small>' : '') + '</button><button type="button" data-mode="delivery" aria-pressed="' + (mode === 'delivery') + '">🚚 משלוח<small>החל מ-' + money(zoneFee(1)) + '</small></button></div>' + zonesHtml() +
       '<label class="field" id="faddrw"><span>כתובת למשלוח (רחוב, מספר, דירה)</span><input id="faddr" type="text" autocomplete="street-address" maxlength="120"></label>';
   }
   function applyMode() {
     var del = mode === 'delivery' && CONFIG.delivery && CONFIG.delivery.enabled;
     Array.prototype.forEach.call(document.querySelectorAll('#dsel button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.mode === mode)); });
     var w = $('#faddrw'); if (w) w.style.display = del ? '' : 'none';
+    paintZones();
+    var dl = $('#fcities'); if (dl && !dl.firstChild && CONFIG.delivery && CONFIG.delivery.zones) dl.innerHTML = sortedTowns(1).concat(sortedTowns(2)).map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
+    var cl = $('#fcityl'); if (cl) cl.textContent = del ? 'עיר / מושב / קיבוץ (חובה)' : 'עיר (אופציונלי – תוצג בלשונית באתר, בלי שם)';
+    var ci = $('#fcity'); if (ci) { if (del) ci.setAttribute('aria-required', 'true'); else ci.removeAttribute('aria-required'); }
     var l = $('#fpicklbl'); if (l) l.textContent = del ? 'שעת משלוח רצויה' : 'מתי לאסוף?';
     var n = $('#fnotebox'); if (n) n.textContent = del ? CONFIG.delivery.note : CONFIG.pickupNote;
     paintCheckout(); updateBar();
@@ -937,7 +976,7 @@ section.rcat .rc { text-align: right; }
       if (r.ok) s += '<div class="sum disc"><span>קופון ' + esc(applied.code) + ' <button class="opt" id="crem" type="button">הסר</button></span><span>−' + money(d) + '</span></div>';
       else { applied = null; setMsg('הקופון הוסר: ' + r.msg, 'err'); }
     }
-    if (mode === 'delivery' && CONFIG.delivery && CONFIG.delivery.enabled) s += '<div class="sum"><span>דמי משלוח</span><span>' + (fee() > 0 ? money(fee()) : 'חינם') + '</span></div>';
+    if (mode === 'delivery' && CONFIG.delivery && CONFIG.delivery.enabled) s += '<div class="sum"><span>דמי משלוח' + (zone ? ' (אזור ' + zone + ')' : '') + '</span><span>' + (zone ? money(fee()) : 'בחרו אזור') + '</span></div>';
     s += '<div class="sum total"><span>סה״כ לתשלום</span><span>' + money(total()) + '</span></div>';
     $('#csum').innerHTML = s;
     var rm = $('#crem'); if (rm) rm.onclick = function () { applied = null; $('#cin').value = ''; setMsg('', ''); paintCheckout(); updateBar(); };
@@ -1113,12 +1152,15 @@ section.rcat .rc { text-align: right; }
     if (!phone) { err.textContent = 'נא למלא מספר טלפון תקין'; $('#fphone').focus(); return; }
     var del = mode === 'delivery' && CONFIG.delivery && CONFIG.delivery.enabled, addr = del ? $('#faddr').value.trim() : '';
     if (del && addr.length < 5) { err.textContent = 'נא למלא כתובת למשלוח'; $('#faddr').focus(); return; }
+    if (del) { var cz = townZone($('#fcity').value); if (cz && cz !== zone) { zone = cz; paintZones(); paintCheckout(); updateBar(); err.textContent = 'היישוב שבחרתם שייך לאזור ' + cz + ' – המחיר עודכן (' + money(zoneFee(cz)) + '). נא ללחוץ שוב על שליחה.'; return; } }
+    if (del && !zone) { err.textContent = 'נא לבחור אזור משלוח (אזור 1 או אזור 2)'; var zb = document.querySelector('#zsel button'); if (zb) zb.focus(); return; }
+    if (del && !($('#fcity').value || '').trim()) { err.textContent = 'נא למלא עיר / מושב / קיבוץ למשלוח'; $('#fcity').focus(); return; }
     if (!$('#fpick').value) { err.textContent = 'נא לבחור תאריך ושעה'; $('#fpick').focus(); return; }
     err.textContent = '';
     var sub = subtotal(), disc = discount(), id = rid();
     var order = { id: id, name: name, phone: phone, pickup: $('#fpick').value, note: $('#fnote').value.trim(), items: lines().map(function (l) { var it = findItem(l.id); return { name: it.name, opt: l.opt != null && it.opts ? it.opts[l.opt].n : '', qty: l.qty, price: linePrice(l) }; }), subtotal: sub, coupon: applied && disc > 0 ? applied.code : '', discount: disc, total: Math.max(0, sub - disc) + (del ? fee() : 0), status: 'new', tsd: Date.now() };
     var city = ($('#fcity').value || '').trim().replace(/\s+/g, ' ').slice(0, 20); if (city) order.city = city;
-    if (del) { order.delivery = true; order.address = addr; order.fee = fee(); }
+    if (del) { order.delivery = true; order.address = addr; order.fee = fee(); order.zone = zone; }
     var b = $('#fsend'); b.disabled = true; b.textContent = 'שולח…';
     // ללא מענה תוך 20 שניות (למשל חיבור חלש) לא משאירים את הלקוח תקוע על "שולח…"
     var guard = new Promise(function (_, rej) { setTimeout(function () { rej({ code: 'timeout' }); }, 20000); });
@@ -1137,7 +1179,7 @@ section.rcat .rc { text-align: right; }
     try { err.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) {}
   }
   function waText(o) {
-    var t = 'הזמנה חדשה #' + o.id + '\n' + o.name + ' · ' + o.phone + (o.delivery ? '\nמשלוח לכתובת: ' + o.address + '\nשעה רצויה: ' + o.pickup : '\nאיסוף: ' + o.pickup) + '\n';
+    var t = 'הזמנה חדשה #' + o.id + '\n' + o.name + ' · ' + o.phone + (o.delivery ? '\nמשלוח' + (o.zone ? ' לאזור ' + o.zone : '') + ' לכתובת: ' + o.address + (o.city && String(o.address).indexOf(o.city) < 0 ? ', ' + o.city : '') + '\nשעה רצויה: ' + o.pickup : '\nאיסוף: ' + o.pickup) + '\n';
     o.items.forEach(function (i) { t += '• ' + i.qty + '× ' + i.name + (i.opt ? ' (' + i.opt + ')' : '') + ' – ' + money(i.price * i.qty) + '\n'; });
     if (o.coupon) t += 'קופון ' + o.coupon + ': −' + money(o.discount) + '\n';
     if (o.delivery) t += 'דמי משלוח: ' + money(o.fee) + '\n';
@@ -1162,7 +1204,7 @@ section.rcat .rc { text-align: right; }
     if (CONFIG.whatsapp) h += '<a class="btn alt big" style="display:block;text-decoration:none;text-align:center" target="_blank" rel="noopener" href="https://wa.me/' + esc(CONFIG.whatsapp) + '?text=' + encodeURIComponent(waText(o)) + '">שלח גם בוואטסאפ</a>';
     if (store.mode === 'local') h += '<div class="note">מצב הדגמה: ההזמנה נשמרה רק במכשיר הזה.</div>';
     h += '<button class="btn ghost big" id="dclose">סגור</button></div></div>';
-    cart = {}; applied = null; selOpt = {}; openOpt = {}; mode = 'pickup';
+    cart = {}; applied = null; selOpt = {}; openOpt = {}; mode = 'pickup'; zone = 0;
     $('#modal').innerHTML = h; $('#dclose').onclick = function () { closeModal(); renderMenu(); };
   }
   function renderMenuKeep() { var y = window.scrollY; renderMenu(); window.scrollTo(0, y); spy(); }
@@ -1304,7 +1346,7 @@ section.rcat .rc { text-align: right; }
         if (!orders.length) { p.innerHTML = '<p>אין הזמנות עדיין.</p>'; return; }
         p.innerHTML = orders.map(function (o) {
           var tm = o.tsd ? hmdmy(new Date(o.tsd)) : '', pw = pickWhen(o.pickup, o.tsd) || o.pickup || '';
-          return '<div class="ord"><header><span>#' + esc(o.id) + ' · ' + esc(o.name) + '</span><span class="hr"><span class="st ' + esc(o.status) + '">' + esc(STAT[o.status] || o.status) + '</span><button type="button" class="trash" data-delord="' + esc(o.id) + '" aria-label="מחק הזמנה" title="מחק הזמנה">' + TRASH + '</button></span></header><div>📞 <a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a></div><div class="ot sm"><span>תאריך ושעת הזמנה:</span><bdi dir="ltr">' + esc(tm) + '</bdi></div><div class="ot sm"><span>' + (o.delivery ? 'תאריך ושעת משלוח מבוקשת:' : 'תאריך ושעת איסוף מבוקשת:') + '</span><bdi dir="ltr">' + esc(pw) + '</bdi></div><div class="ot"><span>שיטת משלוח:</span><bdi>' + (o.delivery ? 'משלוח (' + money(o.fee) + ')' : 'איסוף עצמי') + '</bdi></div>' + (o.delivery ? '<div>🚚 <b>כתובת: ' + esc(o.address) + '</b></div>' : '') + '<ul>' + o.items.map(function (i) { return '<li>' + i.qty + '× ' + esc(i.name) + (i.opt ? ' (' + esc(i.opt) + ')' : '') + '</li>'; }).join('') + '</ul>' + (o.coupon ? '<div><b>קופון ' + esc(o.coupon) + ' (−' + money(o.discount) + ')</b></div>' : '') + '<div class="ot"><span>סה"כ:</span><b>' + money(o.total) + '</b></div>' + (o.note ? '<div><b>הערה:</b><br><i style="text-decoration:underline">' + esc(o.note) + '</i></div>' : '') + '<div class="oacts">' + (o.phone ? '<a class="btn wabtn" target="_blank" rel="noopener" href="https://wa.me/' + waPhone(o.phone) + '?text=' + encodeURIComponent(custMsg(o)) + '">💬 ' + (o.status === 'ready' ? 'עדכן לקוח: ההזמנה מוכנה' : 'שלח הודעה ללקוח') + '</a>' : '') + (NEXT[o.status] ? '<button class="btn alt" data-adv="' + esc(o.id) + '" data-to="' + NEXT[o.status] + '">סמן: ' + STAT[NEXT[o.status]] + '</button>' : '') + '</div></div>';
+          return '<div class="ord"><header><span>#' + esc(o.id) + ' · ' + esc(o.name) + '</span><span class="hr"><span class="st ' + esc(o.status) + '">' + esc(STAT[o.status] || o.status) + '</span><button type="button" class="trash" data-delord="' + esc(o.id) + '" aria-label="מחק הזמנה" title="מחק הזמנה">' + TRASH + '</button></span></header><div>📞 <a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a></div><div class="ot sm"><span>תאריך ושעת הזמנה:</span><bdi dir="ltr">' + esc(tm) + '</bdi></div><div class="ot sm"><span>' + (o.delivery ? 'תאריך ושעת משלוח מבוקשת:' : 'תאריך ושעת איסוף מבוקשת:') + '</span><bdi dir="ltr">' + esc(pw) + '</bdi></div><div class="ot"><span>שיטת משלוח:</span><bdi>' + (o.delivery ? 'משלוח' + (o.zone ? ' לאזור ' + o.zone : '') + ' (' + money(o.fee) + ')' : 'איסוף עצמי') + '</bdi></div>' + (o.delivery ? '<div><b>כתובת: ' + esc(o.address) + (o.city && String(o.address).indexOf(o.city) < 0 ? ', ' + esc(o.city) : '') + '</b></div>' : '') + '<ul>' + o.items.map(function (i) { return '<li>' + i.qty + '× ' + esc(i.name) + (i.opt ? ' (' + esc(i.opt) + ')' : '') + '</li>'; }).join('') + '</ul>' + (o.coupon ? '<div><b>קופון ' + esc(o.coupon) + ' (−' + money(o.discount) + ')</b></div>' : '') + '<div class="ot"><span>סה"כ:</span><b>' + money(o.total) + '</b></div>' + (o.note ? '<div><b>הערה:</b><br><i style="text-decoration:underline">' + esc(o.note) + '</i></div>' : '') + '<div class="oacts">' + (o.phone ? '<a class="btn wabtn" target="_blank" rel="noopener" href="https://wa.me/' + waPhone(o.phone) + '?text=' + encodeURIComponent(custMsg(o)) + '">💬 ' + (o.status === 'ready' ? 'עדכן לקוח: ההזמנה מוכנה' : 'שלח הודעה ללקוח') + '</a>' : '') + (NEXT[o.status] ? '<button class="btn alt" data-adv="' + esc(o.id) + '" data-to="' + NEXT[o.status] + '">סמן: ' + STAT[NEXT[o.status]] + '</button>' : '') + '</div></div>';
         }).join('');
       } else if (tab === 'coupons') {
         p.innerHTML = '<div class="tblwrap"><table class="tbl cpt"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th class="nw">תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td class="nw">' + esc(c.expires ? dmy(c.expires) : '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table></div>' +
