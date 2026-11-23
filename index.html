@@ -1213,7 +1213,7 @@ section.rcat .rc { text-align: right; }
   /* =====================  מזווה (מוצג בניהול ← מזווה)  ===================== */
   var PN_CATS = [['spices', 'תבלינים'], ['meat', 'בשר, עופות ודגים'], ['veg', 'ירקות'], ['frozen', 'קפואים'], ['grocery', 'מכולת'], ['disposable', 'חד פעמי']], pnActive = 'spices', pnLock = 0;
   function pnMark() { Array.prototype.forEach.call(document.querySelectorAll('#pnnav .chip'), function (c) { if (c.dataset.pcat === pnActive) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current'); }); }
-  var PANTRY = [], pnForm = null, pnImg = '', PN_UNITS = ['גרם', 'יחידה', 'שקית', 'ק"ג', 'חבילה', 'מגשית', 'צרור', 'בקבוק'];
+  var PANTRY = [], pnForm = null, pnImg = '', PN_UNITS = ['גרם', 'יחידה', 'שקית', 'ק"ג', 'חבילה', 'מגשית', 'צרור', 'בקבוק', 'מארז', 'מיכל'];
   function pnUnitSel(cur, attr) { return '<select ' + attr + ' aria-label="יחידת מידה">' + PN_UNITS.map(function (u) { return '<option' + (u === cur ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select>'; }
   function pnRec(it) { return Math.max(0, (Number(it.min) || 0) - (Number(it.stock) || 0)); }
   function pnRow(it) {
@@ -1223,7 +1223,7 @@ section.rcat .rc { text-align: right; }
       '<span class="stepper"><button type="button" data-pstep="-1" aria-label="הפחת">−</button><input type="number" min="0" inputmode="numeric" data-pstock value="' + (Number(it.stock) || 0) + '" aria-label="מלאי קיים"><button type="button" data-pstep="1" aria-label="הוסף">+</button></span>' +
       '</div></div><span class="prec" data-prec>כמות מומלצת להזמנה: ' + pnRec(it) + '</span></div>';
   }
-  var PN_PL = { 'יחידה': 'יחידות', 'שקית': 'שקיות', 'חבילה': 'חבילות', 'מגשית': 'מגשיות', 'צרור': 'צרורות', 'בקבוק': 'בקבוקים' };
+  var PN_PL = { 'יחידה': 'יחידות', 'שקית': 'שקיות', 'חבילה': 'חבילות', 'מגשית': 'מגשיות', 'צרור': 'צרורות', 'בקבוק': 'בקבוקים', 'מארז': 'מארזים', 'מיכל': 'מיכלים' };
   function pnUnitTxt(u, n) { u = u || 'יחידה'; return n > 1 && PN_PL[u] ? PN_PL[u] : u; }
   function pnShopText() {
     var out = [];
