@@ -1211,7 +1211,7 @@ section.rcat .rc { text-align: right; }
     return bar + nav + cats.map(function (c) { return '<section class="rcat" id="rcat-' + c[0] + '"><h2>' + c[1] + '</h2>' + (groups[c[0]].length ? groups[c[0]].map(card).join('') : '<p class="rcempty">אין מתכונים בקטגוריה</p>') + '</section>'; }).join('');
   }
   /* =====================  מזווה (מוצג בניהול ← מזווה)  ===================== */
-  var PN_CATS = [['spices', 'תבלינים'], ['meat', 'בשר, עופות ודגים'], ['veg', 'ירקות'], ['frozen', 'קפואים']], pnActive = 'spices', pnLock = 0;
+  var PN_CATS = [['spices', 'תבלינים'], ['meat', 'בשר, עופות ודגים'], ['veg', 'ירקות'], ['frozen', 'קפואים'], ['grocery', 'מכולת'], ['disposable', 'חד פעמי']], pnActive = 'spices', pnLock = 0;
   function pnMark() { Array.prototype.forEach.call(document.querySelectorAll('#pnnav .chip'), function (c) { if (c.dataset.pcat === pnActive) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current'); }); }
   var PANTRY = [], pnForm = null, pnImg = '', PN_UNITS = ['גרם', 'יחידה', 'שקית', 'ק"ג', 'חבילה', 'מגשית', 'צרור', 'בקבוק'];
   function pnUnitSel(cur, attr) { return '<select ' + attr + ' aria-label="יחידת מידה">' + PN_UNITS.map(function (u) { return '<option' + (u === cur ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select>'; }
