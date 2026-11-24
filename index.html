@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://chenkeynan.github.io/Tehader/"><meta property="og:image" content="https://chenkeynan.github.io/Tehader/images/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Rubik:wght@500;700;800&family=Secular+One&family=Gveret+Levin&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Rubik:wght@500;700;800&family=Secular+One&family=Gveret+Levin&family=Amatic+SC:wght@700&family=Playpen+Sans+Hebrew:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #fbf6ec; --card: #ffffff; --ink: #2b2a26; --muted: #7a7466; --line: #eadfca;
@@ -407,10 +407,10 @@ html.a11y-noanim *, html.a11y-noanim *::before, html.a11y-noanim *::after { anim
 html.a11y-links a { text-decoration: underline !important; background: #ffe74a !important; color: #000 !important; outline: 2px solid #000; }
 /* תזכורת הכנה בניהול: במרכז המסך, בלי לנעול גלילה (הרקע נשאר לחיץ וניתן לגלילה) */
 .remwrap { position: fixed; inset: 0; z-index: 71; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none; }
-.remwrap .rembox { pointer-events: auto; position: relative; width: min(420px, 100%); background: var(--green); border: 2px solid var(--gold); border-radius: 10px; padding: 18px 20px 16px; box-shadow: 0 12px 40px rgba(0,0,0,.4); text-align: right; font-family: 'Amatic SC', 'Gveret Levin', 'Heebo', cursive; font-weight: 700; line-height: 1.15; letter-spacing: .3px; color: #ffd54a; animation: remin .2s ease-out; }
-.rembox .remx { position: absolute; top: 8px; left: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--gold); color: var(--green); font-family: 'Heebo', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; }
-.rembox .remh { font-size: 1.7rem; margin: 0 0 8px; padding-left: 36px; }
-.rembox .remt { font-size: 1.5rem; margin: 0; }
+.remwrap .rembox { pointer-events: auto; position: relative; width: min(420px, 100%); background: #ecdcb8; border: 2px solid var(--gold); border-radius: 10px; padding: 18px 20px 16px; box-shadow: 0 12px 40px rgba(0,0,0,.4); text-align: right; font-family: 'Playpen Sans Hebrew', 'Heebo', sans-serif; font-weight: 400; line-height: 1.45; color: #4a3519; animation: remin .2s ease-out; }
+.rembox .remx { position: absolute; top: 8px; left: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: #4a3519; color: #ecdcb8; font-family: 'Heebo', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.rembox .remh { font-size: 1.1rem; font-weight: 700; margin: 0 0 8px; padding-left: 36px; }
+.rembox .remt { font-size: 1rem; margin: 0; }
 @keyframes remin { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
 /* אזור צור קשר בתחתית האתר */
 .sitefoot { background: #1c1c1a; color: #e9e4d8; text-align: center; font-family: 'Heebo', sans-serif; padding: 46px 20px calc(116px + env(safe-area-inset-bottom)); margin: 34px 0 -96px; }
