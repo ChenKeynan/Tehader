@@ -72,9 +72,16 @@ section.cat h2 { font-family: 'Rubik', 'Heebo', sans-serif; font-weight: 800; fo
 .opt.optpic, .opt.optpic[aria-pressed="true"] { background: transparent; color: var(--green); border: 1px solid #a9825a; }
 .opt.optpic[aria-pressed="true"] { border-color: #6b4423; }
 .opt.optpic img { width: 100%; max-width: 100%; height: 52px; object-fit: contain; background: transparent; border-radius: 8px; }
-.opt.optpic img { transition: transform .45s cubic-bezier(.34,1.56,.64,1), margin-bottom .45s cubic-bezier(.34,1.56,.64,1), background-color .3s ease; position: relative; }
+.opt.optpic img { margin-bottom: 8px; transition: transform .45s cubic-bezier(.34,1.56,.64,1), margin-bottom .45s cubic-bezier(.34,1.56,.64,1), background-color .3s ease; position: relative; }
 .opt.optpic.zoomed { z-index: 3; }
-.opt.optpic.zoomed img { transform: scale(1.3); margin-bottom: 8px; background-color: #fff6e6; }
+.opt.optpic.zoomed img { transform: scale(1.3); background-color: #fff6e6; }
+.optcell { flex: 1 1 0; min-width: 0; max-width: 50%; display: flex; flex-direction: column; align-items: stretch; }
+.optcell .opt.optpic { max-width: none; flex: none; }
+.optcell .ocart { display: flex; justify-content: center; margin: 6px 0 0; }
+.opt.optpic .ocart .plus.mini { width: 19px; height: 19px; font-size: .95rem; padding: 0; }
+.stepper.mini { gap: 1px; padding: 1.5px; }
+.stepper.mini button { width: 18px; height: 18px; font-size: .75rem; padding: 0; line-height: 1; }
+.stepper.mini span { min-width: 13px; font-size: .72rem; }
 .opt.optpic small { font-size: .64rem; line-height: 1.2; font-weight: 600; }
 .opt.optpic[aria-pressed="true"] small { font-weight: 800; }
 .opt.optpic .optprice, .opt.optpic[aria-pressed="true"] .optprice { font-size: .85rem; font-weight: 800; }
@@ -690,8 +697,8 @@ section.rcat .rc { text-align: right; }
   function optPic(it, op) {   // תמונת מיכל + משקל משוער לכל אפשרות (סלטים: 250/500; תוספות: 500/ליטר)
     var n = String(op.n), salads = !!op.g;
     if (/250/.test(n)) return { src: 'images/opts/salads-250-v2.svg', g: 250 };
-    if (/500/.test(n)) return salads ? { src: 'images/opts/salads-500-v2.svg', g: 500 } : { src: 'images/opts/extras-500-v2.svg', g: 500 };
-    if (/ליטר/.test(n)) return { src: 'images/opts/extras-1000-v2.svg', g: 1000 };
+    if (/500/.test(n)) return salads ? { src: 'images/opts/salads-500-v2.svg', g: 500 } : { src: 'images/opts/extras-500-v3.svg', g: 500 };
+    if (/ליטר/.test(n)) return { src: 'images/opts/extras-1000-v3.svg', g: 1000 };
     return null;
   }
   function showOptPic(btn) {
@@ -705,6 +712,7 @@ section.rcat .rc { text-align: right; }
     ov.addEventListener('click', close); document.addEventListener('keydown', onKey);
     document.body.appendChild(ov); ov.querySelector('.ozx').focus();
   }
+  var zoomOpt = {};  // itemId -> אינדקס הגודל המוגדל
   var openOpt = {};  // itemId -> האם פאנל האפשרויות פתוח
   function renderMenu() {
     var h = '<header class="hero"><span class="bsd">בס"ד</span><div class="wrap"><h1 class="sr">' + esc(CONFIG.name) + '</h1><img class="hlogo" src="images/logo.png" alt="תהדר">' + newBarHtml() + tagHtml() + '</div><div id="pulse" aria-live="polite"><div class="pt" id="pt"></div></div></header>';
@@ -718,13 +726,15 @@ section.rcat .rc { text-align: right; }
         h += '<div class="item' + (open ? ' open' : '') + '" data-item="' + it.id + '"><div class="pic">' + (it.img ? '<img src="' + esc(it.img) + '" alt="' + esc(it.name) + '" loading="lazy">' : '<span aria-hidden="true">' + (c.emoji || '🍽️') + '</span>') + '</div><div class="info"><h3>' + esc(it.name) + '</h3>' + (it.desc ? '<div class="desc">' + esc(it.desc) + '</div>' : '');
         var sizeTxt = hasOpts ? it.opts.map(function (op) { return op.g; }).filter(Boolean).join(' / ') : (it.g || '');
         if (sizeTxt) h += '<div class="per">' + sizeTxt + ' גרם</div>';
-        if (open) h += '<div class="opts" role="group" aria-label="אפשרויות">' + it.opts.map(function (op, i) { var oi = optPic(it, op); if (oi) { var op100 = ((it.price + op.d) / oi.g * 100).toFixed(1); return '<button class="opt optpic" data-opt="' + i + '" aria-pressed="' + (i === o) + '" aria-label="' + esc(op.n) + '"><img src="' + oi.src + '" alt=""><small>כ-' + oi.g + ' גר\'</small><small class="optprice">' + money(it.price + op.d) + '</small><small class="p100">(' + op100 + ' ש"ח ל-100 גר\')</small></button>'; } return '<button class="opt" data-opt="' + i + '" aria-pressed="' + (i === o) + '">' + esc(op.n) + (op.d ? ' (+₪' + op.d + ')' : '') + '</button>'; }).join('') + '</div>';
+        if (open) h += '<div class="opts" role="group" aria-label="אפשרויות">' + it.opts.map(function (op, i) { var oi = optPic(it, op); if (oi) { var op100 = ((it.price + op.d) / oi.g * 100).toFixed(1); var oq = cart[cKey(it.id, i)] ? cart[cKey(it.id, i)].qty : 0, octl = '<div class="stepper mini"><button data-minus data-o="' + i + '" aria-label="הפחת">−</button><span>' + oq + '</span><button data-plus data-o="' + i + '" aria-label="הוסף">+</button></div>'; return '<div class="optcell"><div class="opt optpic' + (zoomOpt[it.id] === i ? ' zoomed' : '') + '" role="button" tabindex="0" data-opt="' + i + '" aria-pressed="' + (i === o) + '" aria-label="' + esc(op.n) + '"><img src="' + oi.src + '" alt=""><small>כ-' + oi.g + ' גר\'</small><small class="optprice">' + money(it.price + op.d) + '</small><small class="p100">(' + op100 + ' ש"ח ל-100 גר\')</small></div><div class="ocart">' + octl + '</div></div>'; } return '<button class="opt" data-opt="' + i + '" aria-pressed="' + (i === o) + '">' + esc(op.n) + (op.d ? ' (+₪' + op.d + ')' : '') + '</button>'; }).join('') + '</div>';
         var from = hasOpts && !open;
-        h += '<div class="bottom"><div><div class="price">' + (from ? 'החל מ-' : '') + '<small>₪</small>' + (from ? it.price : price) + (c.id === 'mains' || c.id === 'challah' ? ' <span class="ppu">(המחיר ליחידה)</span>' : '') + '</div>' + (from ? '<div class="psub">לפי הגודל שנבחר</div>' : (grams ? '<div class="psub">₪' + (Math.round(price / grams * 1000) / 10) + ' ל-100 גרם</div>' : '')) + '</div>';
-        if (hasOpts && !open) h += '<button class="plus" data-showopts aria-label="בחירת גודל והוספה לסל">+</button>';
+        if (!(hasOpts && open)) h += '<div class="bottom"><div><div class="price">' + (from ? 'החל מ-' : '') + '<small>₪</small>' + (from ? it.price : price) + (c.id === 'mains' || c.id === 'challah' ? ' <span class="ppu">(המחיר ליחידה)</span>' : '') + '</div>' + (from ? '<div class="psub">לפי הגודל שנבחר</div>' : (grams ? '<div class="psub">₪' + (Math.round(price / grams * 1000) / 10) + ' ל-100 גרם</div>' : '')) + '</div>';
+        if (hasOpts && open) { /* הפקדים בתוך כל משבצת גודל */ }
+        else if (hasOpts && !open) h += '<button class="plus" data-showopts aria-label="בחירת גודל והוספה לסל">+</button>';
         else if (q) h += '<div class="stepper"><button data-minus aria-label="הפחת">−</button><span>' + q + '</span><button data-plus aria-label="הוסף">+</button></div>';
         else h += '<button class="plus" data-plus aria-label="הוספה לסל">+</button>';
-        h += '</div></div></div>';
+        if (!(hasOpts && open)) h += '</div>';
+        h += '</div></div>';
       });
       h += '</div></section>';
     });
@@ -812,7 +822,8 @@ section.rcat .rc { text-align: right; }
     });
     restore.addEventListener('click', function () { root.classList.remove('a11y-min'); restore.hidden = true; btn.focus(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) setOpen(false); });
-    document.addEventListener('click', function (e) { if (!panel.hidden && !root.contains(e.target)) { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); } });
+    document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('optpic')) { e.preventDefault(); e.target.click(); } });
+  document.addEventListener('click', function (e) { if (!panel.hidden && !root.contains(e.target)) { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); } });
     paint(false);
   }
   var fitTimer = null;
@@ -1498,11 +1509,13 @@ section.rcat .rc { text-align: right; }
     var pimg = e.target.closest('.pic img'); if (pimg) { openLb(pimg); return; }
     var id = item.dataset.item, it = findItem(id), o = selOpt[id] == null ? 0 : selOpt[id];
     if (e.target.closest('[data-showopts]')) { openOpt[id] = true; renderMenuKeep(); return; }
+    var cb = e.target.closest('[data-o]');
+    if (cb && it.opts) { var oo = Number(cb.dataset.o); if (cb.hasAttribute('data-plus')) { change(id, oo, 1); flyToCart(cb); } else change(id, oo, -1); renderMenuKeep(); return; }
     var op = e.target.closest('.opt'); if (op) {
-      if (op.classList.contains('optpic') && op.getAttribute('aria-pressed') === 'true') { op.classList.toggle('zoomed'); return; }   // לחיצה על הגודל הנבחר: הגדלת התמונה
-      selOpt[id] = Number(op.dataset.opt); renderMenuKeep();
+      if (op.classList.contains('optpic') && op.getAttribute('aria-pressed') === 'true') { var on = op.classList.toggle('zoomed'); zoomOpt[id] = on ? Number(op.dataset.opt) : null; return; }   // לחיצה על הגודל הנבחר: הגדלת התמונה
+      selOpt[id] = Number(op.dataset.opt); zoomOpt[id] = null; renderMenuKeep();
       var nb = document.querySelector('.item[data-item="' + id + '"] .optpic[data-opt="' + selOpt[id] + '"]');   // אנימציית זום אין גם בבחירת גודל חדש
-      if (nb) { requestAnimationFrame(function () { requestAnimationFrame(function () { nb.classList.add('zoomed'); }); }); }
+      if (nb) { requestAnimationFrame(function () { requestAnimationFrame(function () { nb.classList.add('zoomed'); zoomOpt[id] = selOpt[id]; }); }); }
       return;
     }
     if (e.target.closest('[data-plus]')) { var pb = e.target.closest('[data-plus]'); change(id, it.opts ? o : null, 1); flyToCart(pb); renderMenuKeep(); }
