@@ -405,6 +405,13 @@ html.a11y-gray { filter: grayscale(1); }
 html.a11y-noimg img { visibility: hidden !important; }
 html.a11y-noanim *, html.a11y-noanim *::before, html.a11y-noanim *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 html.a11y-links a { text-decoration: underline !important; background: #ffe74a !important; color: #000 !important; outline: 2px solid #000; }
+/* תזכורת הכנה בניהול: במרכז המסך, בלי לנעול גלילה (הרקע נשאר לחיץ וניתן לגלילה) */
+.remwrap { position: fixed; inset: 0; z-index: 71; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none; }
+.remwrap .rembox { pointer-events: auto; position: relative; width: min(420px, 100%); background: var(--green); border: 2px solid var(--gold); border-radius: 10px; padding: 18px 20px 16px; box-shadow: 0 12px 40px rgba(0,0,0,.4); text-align: right; font-family: 'Amatic SC', 'Gveret Levin', 'Heebo', cursive; font-weight: 700; line-height: 1.15; letter-spacing: .3px; color: #ffd54a; animation: remin .2s ease-out; }
+.rembox .remx { position: absolute; top: 8px; left: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--gold); color: var(--green); font-family: 'Heebo', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.rembox .remh { font-size: 1.7rem; margin: 0 0 8px; padding-left: 36px; }
+.rembox .remt { font-size: 1.5rem; margin: 0; }
+@keyframes remin { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
 /* אזור צור קשר בתחתית האתר */
 .sitefoot { background: #1c1c1a; color: #e9e4d8; text-align: center; font-family: 'Heebo', sans-serif; padding: 46px 20px calc(116px + env(safe-area-inset-bottom)); margin: 34px 0 -96px; }
 .sitefoot .sfblock { max-width: 520px; margin: 0 auto; scroll-margin-top: 90px; }
@@ -504,6 +511,7 @@ section.rcat .rc { text-align: right; }
     },
     delivery: { enabled: true, fee: 30, zones: { 1: { fee: 30, min: 70, towns: ["אשדוד", "ניר גלים", "בני דרום", "גן יבנה"] }, 2: { fee: 50, min: 150, towns: ["יבנה", "גדרה", "בני עי\"ש", "בית גמליאל", "בן זכאי", "גבעת וושינגטון", "קבוצת יבנה", "כרם ביבנה", "גן הדרום", "כפר אביב", "משגב דב", "עשרת", "כפר מרדכי", "שדמה", "מישר", "קריית מלאכי", "אשקלון", "שתולים", "שדה עוזיהו", "עזריקם", "ביצרון", "נווה מבטח", "חצב", "אמונים", "עזר", "גבעתי", "בית עזרא", "חצור אשדוד", "באר טוביה", "ניצנים", "ניצן", "ניצן ב'", "באר גנים", "ניר ישראל", "הודיה", "ברכיה", "משען", "כפר סילבר"] } }, note: 'התשלום מתבצע בעת קבלת המשלוח.' },   // משלוח בתוספת תשלום. fee = דמי משלוח בש"ח. enabled: false = בלי אפשרות משלוח
     pickupSlots: ['כמה שיותר מהר', '12:00', '12:30', '13:00', '13:30', '14:00', '17:00', '18:00', '19:00'],
+    ownerNames: { 'chenkeynan@gmail.com': 'חן', 'edenkeynan@gmail.com': 'עדן', 'yaakov414@gmail.com': 'יעקב' },   // שם בהודעת התזכורת, לפי מי שמחובר
     ownerEmails: ['chenkeynan@gmail.com', 'edenkeynan@gmail.com', 'yaakov414@gmail.com'],   // מי מורשה למסך הניהול (גם בכללי Firebase!)
     firebase: { apiKey: 'AIzaSyAhWX7jdMHYMHAyIab0_j18dJ6i7CJNuZs', authDomain: 'tidhar-dfc18.firebaseapp.com', projectId: 'tidhar-dfc18', storageBucket: 'tidhar-dfc18.firebasestorage.app', messagingSenderId: '1002257905072', appId: '1:1002257905072:web:a43f0010fbb8b67d461275' }, // הגדרות Firebase של הפרויקט Tidhar
   };
@@ -571,15 +579,16 @@ section.rcat .rc { text-align: right; }
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function hmdmy(d) { return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear() + '\u00a0\u00a0' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
   // שעת האיסוף/המשלוח נשמרת כטקסט (למשל "א׳ · 22/11 · 16:00"); השנה נגזרת מתאריך ההזמנה
-  function pickWhen(pk, created) {
+  function pickDate(pk, created) {
     var dm = /(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/.exec(pk || ''), tm = /(\d{1,2}):(\d{2})/.exec(pk || '');
     if (!dm || !tm) return null;
     var c = new Date(created || Date.now()), y = dm[3] ? Number(dm[3]) : c.getFullYear();
     if (y < 100) y += 2000;
     var d = new Date(y, Number(dm[2]) - 1, Number(dm[1]), Number(tm[1]), Number(tm[2]));
     if (!dm[3] && d.getTime() < c.getTime() - 7 * 86400000) d = new Date(y + 1, Number(dm[2]) - 1, Number(dm[1]), Number(tm[1]), Number(tm[2]));
-    return hmdmy(d);
+    return d;
   }
+  function pickWhen(pk, created) { var d = pickDate(pk, created); return d ? hmdmy(d) : null; }
   function money(n) { return '₪' + (Math.round(n * 100) / 100).toString(); }
   function lsGet(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -1359,6 +1368,39 @@ section.rcat .rc { text-align: right; }
     var wa = '<div style="margin-bottom:8px"><button type="button" class="btn" id="pnwa" style="width:100%">📲 שלח רשימת קניות' + (cnt ? ' (' + cnt + ')' : '') + '</button></div>';
     return wa + nav + PN_CATS.map(function (c) { return '<section class="rcat" id="pcat-' + c[0] + '"><h2>' + c[1] + '</h2>' + (function () { var a = PANTRY.filter(function (x) { return x.cat === c[0]; }); return a.length ? a.map(pnRow).join('') : '<p class="rcempty">אין פריטים בקטגוריה</p>'; })() + (pnForm === c[0] ? pnAddForm(c[0]) : '<button class="btn alt padd" data-padd="' + c[0] + '">➕ פריט חדש</button>') + '</section>'; }).join('');
   }
+  // ---- תזכורות הכנה בניהול הזמנות: 24 ו-12 שעות לפני מועד המסירה, כל תזכורת פעם אחת לכל הזמנה (נשמר במכשיר) ----
+  var REM_KEY = 'tehader.reminders', remQueue = [], remBox = null;
+  function remGet() { return lsGet(REM_KEY, {}); }
+  function remSet(m) { lsSet(REM_KEY, m); }
+  function checkReminders(list) {
+    var now = Date.now(), seen = remGet(), changed = false, ids = {};
+    (list || []).forEach(function (o) {
+      ids[o.id] = 1;
+      if (o.status !== 'new') return;                       // רק הזמנה שעוד לא התחילו להכין
+      var d = pickDate(o.pickup, o.tsd); if (!d) return;
+      var left = d.getTime() - now; if (left <= 0 || left > 24 * 3600000) return;
+      var r = seen[o.id] || (seen[o.id] = {});
+      if (left <= 12 * 3600000) { if (r.h12) return; r.h12 = 1; r.h24 = 1; }   // נכנסו באיחור: רק התזכורת הרלוונטית
+      else { if (r.h24) return; r.h24 = 1; }
+      remQueue.push({ o: o, left: left }); changed = true;
+    });
+    Object.keys(seen).forEach(function (id) { if (!ids[id] && (list || []).length) { delete seen[id]; changed = true; } });
+    if (changed) remSet(seen);
+    showNextReminder();
+  }
+  function showNextReminder() {
+    if (remBox || !remQueue.length) return;
+    var r = remQueue.shift(), o = r.o, h = Math.round(r.left / 3600000);
+    var leftTxt = h >= 2 ? 'עוד ' + h + ' שעות' : (h === 1 ? 'עוד שעה' : 'עוד פחות משעה');
+    var email = ((fb && fb.auth && fb.auth.currentUser && fb.auth.currentUser.email) || '').toLowerCase(), nm = (CONFIG.ownerNames || {})[email] || '';
+    var w = document.createElement('div'); w.className = 'remwrap';
+    w.innerHTML = '<div class="rembox" role="dialog" aria-modal="false" aria-label="תזכורת הכנת הזמנה"><button type="button" class="remx" aria-label="סגור">✕</button>' +
+      '<p class="remh">היי' + (nm ? ' ' + esc(nm) : '') + ', האם התחלת להכין ל' + esc(o.name) + ' את ההזמנה שלו מס\' <bdi dir="ltr">' + esc(o.id) + '</bdi>?</p>' +
+      '<p class="remt">' + leftTxt + ' צריך למסור לו את ההזמנה.</p></div>';
+    document.body.appendChild(w); remBox = w;
+    w.querySelector('.remx').addEventListener('click', function () { w.remove(); remBox = null; showNextReminder(); });
+  }
+  function remStop() { remQueue = []; if (remBox) { remBox.remove(); remBox = null; } if (window._remTimer) { clearInterval(window._remTimer); window._remTimer = null; } }
   function renderAdmin() {
     $('#cartbar').hidden = true; closeModal();
     var root = $('#app');
@@ -1497,7 +1539,9 @@ section.rcat .rc { text-align: right; }
       var id = cur.replace(/^[rp]cat-/, ''); if (pan) { if (id !== pnActive) { pnActive = id; pnMark(); } } else if (id !== rcActive) { rcActive = id; rcMark(); }
     };
     window.addEventListener('scroll', window._rcSpy, { passive: true });
-    store.watchOrders(function (o, err) { if (err) { $('#ap').innerHTML = '<p>אין הרשאה לקרוא הזמנות.</p>'; return; } orders = o; paint(); });
+    store.watchOrders(function (o, err) { if (err) { $('#ap').innerHTML = '<p>אין הרשאה לקרוא הזמנות.</p>'; return; } orders = o; paint(); checkReminders(orders); });
+    if (window._remTimer) clearInterval(window._remTimer);
+    window._remTimer = setInterval(function () { if (location.hash === '#admin') checkReminders(orders); }, 60000);
     store.watchCoupons(function (c) { if (c) { coupons = c; if (tab !== 'promo') paint(); } });
     store.getPromo().then(function (p) { if (p) { promo = p; if (tab === 'promo') paint(); } });
   }
@@ -1525,7 +1569,7 @@ section.rcat .rc { text-align: right; }
   $('#fcart').onclick = openCheckout;
   window.addEventListener('scroll', spy, { passive: true });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (!closeLb()) closeModal(); } });
-  function route() { var adm = location.hash === '#admin', st = $('#sidetab'); if (st) st.style.display = adm ? 'none' : ''; var fc = $('#fcart'); if (fc) fc.style.display = adm ? 'none' : ''; var ar = $('#a11y-root'); if (ar) ar.style.display = adm ? 'none' : ''; if (location.hash === '#admin') renderAdmin(); else { closeModal(); renderMenu(); spy(); } }
+  function route() { var adm = location.hash === '#admin', st = $('#sidetab'); if (st) st.style.display = adm ? 'none' : ''; var fc = $('#fcart'); if (fc) fc.style.display = adm ? 'none' : ''; var ar = $('#a11y-root'); if (ar) ar.style.display = adm ? 'none' : ''; if (location.hash === '#admin') renderAdmin(); else { remStop(); closeModal(); renderMenu(); spy(); } }
   window.addEventListener('hashchange', route);
   var init = CONFIG.firebase ? fbStore().catch(function () { return localStore(); }) : Promise.resolve(localStore());
   mountSideTab();
