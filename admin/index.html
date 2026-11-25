@@ -1461,7 +1461,8 @@ section.rcat .rc { text-align: right; }
   }
   function customersHtml() {
     if (custErr) return '<p>אין הרשאה לקרוא או לשמור לקוחות. יש להוסיף ל-Firestore Rules כלל לאוסף <b>customers</b>.</p>';
-    var list = CUSTOMERS.slice().sort(function (a, b) { return (b.last || 0) - (a.last || 0); });
+    var lastOf = function (c) { var m = Number(c.last) || 0; (c.orders || []).forEach(function (o) { if ((o.d || 0) > m) m = o.d; }); return m; };   // תאריך ההזמנה האחרונה של הלקוח
+    var list = CUSTOMERS.slice().sort(function (a, b) { return lastOf(b) - lastOf(a); });   // מהחדש לישן
     if (!list.length) return '<p>אין לקוחות עדיין. לקוחות נשמרים כאן אוטומטית מההזמנות.</p>';
     return '<p class="custwarn">שליחת הודעות שיווק (וואטסאפ, SMS, מייל) דורשת בישראל הסכמה מראש של הלקוח</p><p class="custn">' + list.length + ' לקוחות</p>' + list.map(function (c) {
       var r = Number(c.rating) || 0, ords = (c.orders || []).slice().sort(function (a, b) { return (b.d || 0) - (a.d || 0); });
