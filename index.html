@@ -409,6 +409,10 @@ html.a11y-links a { text-decoration: underline !important; background: #ffe74a !
 .remwrap { position: fixed; inset: 0; z-index: 71; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none; }
 .remwrap .rembox { pointer-events: auto; position: relative; width: min(420px, 100%); background: #ecdcb8; border: 2px solid var(--gold); border-radius: 10px; padding: 18px 20px 16px; box-shadow: 0 12px 40px rgba(0,0,0,.4); text-align: right; font-family: 'Playpen Sans Hebrew', 'Heebo', sans-serif; font-weight: 400; line-height: 1.45; color: #4a3519; animation: remin .2s ease-out; }
 .rembox .remx { position: absolute; top: 8px; left: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: #4a3519; color: #ecdcb8; font-family: 'Heebo', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.backrow { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; }
+.backrow small { font-size: .78rem; color: #4a3519; }
+.backarrow { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 40px; border-radius: 99px; background: linear-gradient(180deg, #ffc93c 0%, #f59a1b 100%); border: 3px solid #4a3519; text-decoration: none; }
+.backarrow:active { transform: scale(.95); }
 .rembox .remh { font-size: 1.1rem; font-weight: 700; margin: 0 0 8px; padding-left: 36px; }
 .rembox .remt { font-size: 1rem; margin: 0; }
 @keyframes remin { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
@@ -1469,7 +1473,7 @@ section.rcat .rc { text-align: right; }
   function renderAdmin() {
     $('#cartbar').hidden = true; closeModal();
     var root = $('#app');
-    root.innerHTML = '<div class="wrap admin"><p><a href="#">← חזרה לתפריט</a></p><h1>ניהול הזמנות</h1><div id="adm"></div></div>';
+    root.innerHTML = '<div class="wrap admin"><p class="backrow"><a href="#" class="backarrow" aria-label="חזרה לאפליקציה"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="#4a3519" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></a><small>(חזרה לאפליקציה)</small></p><h1>Dashboard ניהול</h1><div id="adm"></div></div>';
     if (store.mode === 'firebase') {
       fb.auth.onAuthStateChanged(function (u) {
         var box = $('#adm'); if (!box) return;
