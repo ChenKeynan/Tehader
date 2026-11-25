@@ -412,6 +412,29 @@ html.a11y-links a { text-decoration: underline !important; background: #ffe74a !
 .rembox .remh { font-size: 1.1rem; font-weight: 700; margin: 0 0 8px; padding-left: 36px; }
 .rembox .remt { font-size: 1rem; margin: 0; }
 @keyframes remin { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+/* מתג הצגה באתר (לשונית הודעות בניהול): מופעל = ימינה, כבוי = שמאלה */
+.tg { position: relative; display: inline-block; width: 50px; height: 28px; flex: none; }
+.tg input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.tg i { position: absolute; inset: 0; border-radius: 99px; background: #cfc6b4; transition: background .18s; }
+.tg i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); transition: left .18s; }
+.tg input:checked + i { background: var(--green); }
+.tg input:checked + i::after { left: 25px; }
+.tg input:focus-visible + i { outline: 3px solid #e8892b; outline-offset: 2px; }
+/* לשונית לקוחות בניהול */
+.custn { margin: 0 0 8px; color: var(--muted); }
+.cust { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; color: #4a3519; }
+.cust .cn { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 0; font-size: 1.1rem; font-weight: 800; color: #4a3519; }
+.cust .cph { font-size: .85rem; font-weight: 600; color: #4a3519; text-decoration: none; opacity: .8; white-space: nowrap; }
+.cust .ca { margin: 2px 0 8px; font-weight: 400; }
+.cust .co { list-style: none; margin: 0 0 8px; padding: 0; font-size: .9rem; }
+.cust .co li { padding: 4px 0; border-top: 1px dashed var(--line); }
+.cust .co li:first-child { border-top: 0; }
+.cust .cr { display: flex; align-items: center; gap: 2px; }
+.cust .star { width: 36px; height: 36px; padding: 4px; border: 0; background: none; cursor: pointer; }
+.cust .star svg { width: 100%; height: 100%; fill: none; stroke: #f5b301; stroke-width: 1.8; stroke-linejoin: round; }
+.cust .star.on svg { fill: #f5b301; }
+.cust .star:focus-visible { outline: 3px solid #e8892b; outline-offset: 2px; border-radius: 8px; }
+.cust .crl { margin-inline-start: 8px; font-size: .85rem; }
 /* אזור צור קשר בתחתית האתר */
 .sitefoot { background: #1c1c1a; color: #e9e4d8; text-align: center; font-family: 'Heebo', sans-serif; padding: 46px 20px calc(116px + env(safe-area-inset-bottom)); margin: 34px 0 -96px; }
 .sitefoot .sfblock { max-width: 520px; margin: 0 auto; scroll-margin-top: 90px; }
@@ -619,6 +642,8 @@ section.rcat .rc { text-align: right; }
       getCoupon: function (code) { var a = lsGet('salads.coupons', DEMO_COUPONS); return Promise.resolve(a.filter(function (c) { return c.code === code; })[0] || null); },
       watchCoupons: function (cb) { cb(lsGet('salads.coupons', DEMO_COUPONS)); },
       saveCoupon: function (c) { var a = lsGet('salads.coupons', DEMO_COUPONS).filter(function (x) { return x.code !== c.code; }); a.push(c); lsSet('salads.coupons', a); return Promise.resolve(); },
+      watchCustomers: function (cb) { cb(lsGet('salads.customers', [])); },
+      saveCustomer: function (c) { var a = lsGet('salads.customers', []), i = -1; a.forEach(function (x, j) { if (x.phone === c.phone) i = j; }); if (i >= 0) a[i] = Object.assign({}, a[i], c); else a.push(c); lsSet('salads.customers', a); return Promise.resolve(); },
       deleteCoupon: function (code) { lsSet('salads.coupons', lsGet('salads.coupons', DEMO_COUPONS).filter(function (x) { return x.code !== code; })); return Promise.resolve(); }
     };
   }
@@ -628,7 +653,7 @@ section.rcat .rc { text-align: right; }
     return loadScript(base + 'app-compat.js').then(function () { return loadScript(base + 'firestore-compat.js'); }).then(function () { return loadScript(base + 'auth-compat.js'); }).then(function () { return CONFIG.appCheckKey ? loadScript(base + 'app-check-compat.js') : 0; }).then(function () {
       firebase.initializeApp(CONFIG.firebase);
       if (CONFIG.appCheckKey) { try { var AC = firebase.appCheck, prov = AC.ReCaptchaEnterpriseProvider ? new AC.ReCaptchaEnterpriseProvider(CONFIG.appCheckKey) : CONFIG.appCheckKey; firebase.appCheck().activate(prov, true); } catch (e) {} } var db = firebase.firestore(); fb = { db: db, auth: firebase.auth() };
-      var O = db.collection('orders'), C = db.collection('coupons'), P = db.collection('pulse'), ST = db.collection('settings'), RC = db.collection('recipes'), PN = db.collection('pantry');
+      var O = db.collection('orders'), C = db.collection('coupons'), P = db.collection('pulse'), ST = db.collection('settings'), RC = db.collection('recipes'), PN = db.collection('pantry'), CU = db.collection('customers');
       return {
         mode: 'firebase',
         saveOrder: function (o) { var d = Object.assign({}, o); d.ts = firebase.firestore.FieldValue.serverTimestamp(); return O.doc(o.id).set(d).then(function () { try { var pd = { ts: firebase.firestore.FieldValue.serverTimestamp() }; if (o.city) pd.city = o.city; P.doc(o.id).set(pd).catch(function () { }); } catch (e) { } }); },
@@ -648,6 +673,8 @@ section.rcat .rc { text-align: right; }
         getCoupon: function (code) { return C.doc(code).get().then(function (d) { return d.exists ? d.data() : null; }); },
         watchCoupons: function (cb) { C.onSnapshot(function (s) { cb(s.docs.map(function (d) { return d.data(); })); }, function (e) { cb(null, e); }); },
         saveCoupon: function (c) { return C.doc(c.code).set(c); },
+        watchCustomers: function (cb) { CU.onSnapshot(function (s) { cb(s.docs.map(function (d) { return d.data(); })); }, function (e) { cb(null, e); }); },
+        saveCustomer: function (c) { return CU.doc(c.phone).set(JSON.parse(JSON.stringify(c)), { merge: true }); },
         deleteCoupon: function (code) { return C.doc(code).delete(); }
       };
     });
@@ -1147,10 +1174,12 @@ section.rcat .rc { text-align: right; }
     var now = new Date(), t = new Date(now); t.setDate(now.getDate() + ((4 - now.getDay() + 7) % 7)); t.setHours(16, 0, 0, 0);
     if (t <= now) t.setDate(t.getDate() + 7);
     var ms = t - now; if (ms > 72 * 3600e3) return '';
-    var h = Math.floor(ms / 3600e3), m = Math.floor(ms % 3600e3 / 60e3), d = Math.floor(h / 24), left;
-    if (d >= 1) { var hh = h - d * 24; left = (d === 1 ? 'יום' : d === 2 ? 'יומיים' : d + ' ימים') + (hh ? ' ו-' + hh + ' שעות' : ''); }
-    else left = h ? h + ' שעות' + (m ? ' ו-' + m + ' דקות' : '') : m + ' דקות';
-    return '⏳ ההזמנות לשבת נסגרות ביום חמישי ב-16:00 · נותרו ' + left;
+    var h = Math.floor(ms / 3600e3), m = Math.floor(ms % 3600e3 / 60e3), d = Math.floor(h / 24), hh = h - d * 24, parts = [];
+    if (d >= 1) parts.push(d === 1 ? 'יום' : d === 2 ? 'יומיים' : d + ' ימים');
+    if (hh) parts.push(heb(hh, 'שעה', 'שעות'));
+    if (!d && m) parts.push(heb(m, 'דקה', 'דקות'));          // פחות מיום: מוסיפים גם דקות
+    if (!parts.length) parts.push(heb(m, 'דקה', 'דקות'));
+    return '⏳ הזמנות לשבת נסגרות בעוד ' + parts.join(' ו-');
   }
   // אימוג'י לפי מילים בהודעה (הכלל הראשון שמתאים קובע). מילים מזוהות גם עם אות שימוש בראשן (ה/ב/ל/ו/מ/כ/ש)
   var MSG_EMO = [
@@ -1401,6 +1430,42 @@ section.rcat .rc { text-align: right; }
     w.querySelector('.remx').addEventListener('click', function () { w.remove(); remBox = null; showNextReminder(); });
   }
   function remStop() { remQueue = []; if (remBox) { remBox.remove(); remBox = null; } if (window._remTimer) { clearInterval(window._remTimer); window._remTimer = null; } }
+  // ---- לקוחות לשיווק: נגזרים מההזמנות ונשמרים בנפרד (גם אם ההזמנה נמחקת); הדירוג נשמר ידנית ----
+  var CUSTOMERS = [], custReady = false, custErr = false;
+  var RATE_T = ['לא מדורג', 'לקוח גרוע', 'לקוח בסדר', 'לקוח מצוין'];
+  var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6.1 6.7.9-4.9 4.6 1.2 6.6L12 17.5l-5.9 3.3 1.2-6.6L2.4 9.6l6.7-.9z"/></svg>';
+  function phoneKey(p) { var d = String(p || '').replace(/\D/g, ''); if (d.indexOf('972') === 0) d = '0' + d.slice(3); return d.length >= 9 ? d : ''; }
+  function custAddr(o) { var a = String(o.address || ''); return a + (o.city && a.indexOf(o.city) < 0 ? ', ' + o.city : ''); }
+  function custItems(o) { return (o.items || []).map(function (i) { return i.qty + '× ' + i.name + (i.opt ? ' (' + i.opt + ')' : ''); }).join(', '); }
+  function dmyOnly(ms) { if (!ms) return ''; var d = new Date(ms); return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear(); }
+  function syncCustomers(list, st, done) {
+    if (!custReady || !list || !list.length) return;
+    var base = {}, upd = {};
+    CUSTOMERS.forEach(function (c) { base[c.phone] = c; });
+    list.slice().sort(function (a, b) { return (a.tsd || 0) - (b.tsd || 0); }).forEach(function (o) {
+      var k = phoneKey(o.phone); if (!k) return;
+      var u = upd[k], c = u || base[k];
+      if (c && (c.orders || []).some(function (x) { return x.id === o.id; })) return;
+      if (!u) { u = upd[k] = { phone: k, name: (c && c.name) || o.name, address: (c && c.address) || '', orders: ((c && c.orders) || []).slice(), last: (c && c.last) || 0 }; if (!c) u.rating = 0; }
+      u.orders.push({ id: o.id, d: o.tsd || 0, items: custItems(o), total: o.total || 0 });
+      u.name = o.name; if (o.delivery && o.address) u.address = custAddr(o);
+      u.last = Math.max(u.last || 0, o.tsd || 0);
+    });
+    var keys = Object.keys(upd); if (!keys.length) return;
+    Promise.all(keys.map(function (k) { return st.saveCustomer(upd[k]).catch(function () { }); })).then(function () { if (done) done(); });
+  }
+  function customersHtml() {
+    if (custErr) return '<p>אין הרשאה לקרוא או לשמור לקוחות. יש להוסיף ל-Firestore Rules כלל לאוסף <b>customers</b>.</p>';
+    var list = CUSTOMERS.slice().sort(function (a, b) { return (b.last || 0) - (a.last || 0); });
+    if (!list.length) return '<p>אין לקוחות עדיין. לקוחות נשמרים כאן אוטומטית מההזמנות.</p>';
+    return '<p class="custn">' + list.length + ' לקוחות</p>' + list.map(function (c) {
+      var r = Number(c.rating) || 0, ords = (c.orders || []).slice().sort(function (a, b) { return (b.d || 0) - (a.d || 0); });
+      return '<div class="cust"><h3 class="cn"><span>' + esc(c.name) + '</span><a class="cph" dir="ltr" href="tel:' + esc(c.phone) + '">' + esc(c.phone) + '</a></h3>' +
+        '<div class="ca">(' + (c.address ? esc(c.address) : 'ללא כתובת, איסוף עצמי') + ')</div>' +
+        '<ul class="co">' + ords.map(function (o) { return '<li><bdi dir="ltr">' + dmyOnly(o.d) + '</bdi> · ' + esc(o.items) + ' · <b>' + money(o.total) + '</b></li>'; }).join('') + '</ul>' +
+        '<div class="cr" role="radiogroup" aria-label="דירוג לקוח">' + [1, 2, 3].map(function (n) { return '<button type="button" class="star' + (n <= r ? ' on' : '') + '" role="radio" aria-checked="' + (r === n) + '" data-ck="' + esc(c.phone) + '" data-rate="' + n + '" aria-label="' + RATE_T[n] + '" title="' + RATE_T[n] + '">' + STAR + '</button>'; }).join('') + '<span class="crl">' + RATE_T[r] + '</span></div></div>';
+    }).join('');
+  }
   function renderAdmin() {
     $('#cartbar').hidden = true; closeModal();
     var root = $('#app');
@@ -1434,7 +1499,7 @@ section.rcat .rc { text-align: right; }
   var TRASH = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5h6M4 7h16"/><path d="M6.2 7l.9 12a2 2 0 0 0 2 1.8h5.8a2 2 0 0 0 2-1.8l.9-12" fill="currentColor" fill-opacity=".18"/><path d="M10 11v6M14 11v6"/></svg>';
   function adminBody() {
     var box = $('#adb') || $('#adm');
-    var TABS = [['orders', 'הזמנות'], ['coupons', 'קופונים'], ['promo', 'הודעות מלאי / מבצע'], ['pantry', 'מזווה'], ['recipes', 'מתכונים'], ['bom', 'BOM']];
+    var TABS = [['orders', 'הזמנות'], ['customers', 'לקוחות'], ['coupons', 'קופונים'], ['promo', 'הודעות מלאי / מבצע'], ['pantry', 'מזווה'], ['recipes', 'מתכונים'], ['bom', 'BOM']];
     box.innerHTML = '<div class="tabs" role="tablist">' + TABS.map(function (t) { return '<button class="chip" role="tab" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div><div id="ap"></div>';
     var tab = 'orders', orders = [], coupons = [], promo = {};
     function paint() {
@@ -1450,15 +1515,22 @@ section.rcat .rc { text-align: right; }
         p.innerHTML = '<div class="tblwrap"><table class="tbl cpt"><tr><th>קוד</th><th>הנחה</th><th>מינימום</th><th class="nw">תוקף</th><th></th></tr>' + coupons.map(function (c) { return '<tr><td><b>' + esc(c.code) + '</b></td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td><td>' + (c.min ? money(c.min) : '—') + '</td><td class="nw">' + esc(c.expires ? dmy(c.expires) : '—') + '</td><td><button class="opt" data-del="' + esc(c.code) + '">מחק</button></td></tr>'; }).join('') + '</table></div>' +
           '<h3>קופון חדש</h3><div class="grid2"><label class="field"><span>קוד</span><input id="nc" type="text" maxlength="20" style="text-transform:uppercase"></label><label class="field"><span>סוג</span><select id="nt"><option value="percent">אחוזים</option><option value="fixed">סכום קבוע (₪)</option></select></label><label class="field"><span>ערך</span><input id="nv" type="number" min="1" max="1000"></label><label class="field"><span>מינימום הזמנה (₪)</span><input id="nm" type="number" min="0" value="0"></label><label class="field"><span>תוקף עד (אופציונלי)</span><input id="ne" type="date"></label></div><button class="btn" id="nadd">הוסף קופון</button><div class="msg err" id="nerr"></div>';
       } else if (tab === 'promo') {
-        p.innerHTML = '<h3 style="margin-top:0">הודעות מלאי / מבצע (בלשונית באתר)</h3><p style="margin:0 0 8px;color:var(--muted)">עד 5 שורות. כל שורה שאינה ריקה מוצגת בתורה. האימוג\'י נבחר אוטומטית לפי המילים בהודעה.</p>' + [0, 1, 2, 3, 4].map(function (i) { var PL = promo.lines && promo.lines.length ? promo.lines : [promo.text || '']; return '<label class="field"><span>שורה ' + (i + 1) + (i === 0 ? ' (למשל: נשארו 6 חלות להיום)' : '') + '</span><input class="ptext" type="text" maxlength="80" value="' + esc(PL[i] || '') + '"></label>'; }).join('') + '<label class="field" style="display:flex;gap:8px;align-items:center"><input id="pon" type="checkbox"' + (promo.on ? ' checked' : '') + '><span style="margin:0">להציג באתר</span></label><button class="btn alt" id="psave">שמור הודעות</button><div class="msg" id="pmsg"></div>';
+        p.innerHTML = '<h3 style="margin-top:0">הודעות מלאי / מבצע (בלשונית באתר)</h3><p style="margin:0 0 8px;color:var(--muted)">עד 5 שורות. כל שורה שאינה ריקה מוצגת בתורה. האימוג\'י נבחר אוטומטית לפי המילים בהודעה.</p>' + [0, 1, 2, 3, 4].map(function (i) { var PL = promo.lines && promo.lines.length ? promo.lines : [promo.text || '']; return '<label class="field"><span>שורה ' + (i + 1) + (i === 0 ? ' (למשל: נשארו 6 חלות להיום)' : '') + '</span><input class="ptext" type="text" maxlength="80" value="' + esc(PL[i] || '') + '"></label>'; }).join('') + '<label class="field" style="display:flex;gap:12px;align-items:center"><span style="margin:0">להציג באתר</span><span class="tg"><input id="pon" type="checkbox" role="switch"' + (promo.on ? ' checked' : '') + '><i></i></span></label><button class="btn alt" id="psave">שמור הודעות</button><div class="msg" id="pmsg"></div>';
       } else {
-        if (tab === 'recipes') p.innerHTML = recipesHtml();
+        if (tab === 'customers') p.innerHTML = customersHtml();
+        else if (tab === 'recipes') p.innerHTML = recipesHtml();
         else if (tab === 'pantry') p.innerHTML = pantryHtml();
         else p.innerHTML = '<div class="soon"><b>' + '🧾 BOM' + '</b>הלשונית הזו עדיין בבנייה.</div>';
       }
     }
     box.querySelector('.tabs').addEventListener('click', function (e) { var c = e.target.closest('[data-tab]'); if (!c) return; tab = c.dataset.tab; paint(); try { box.querySelector('.tabs').scrollIntoView({ block: 'start' }); } catch (x) { } });
     $('#ap').addEventListener('click', function (e) {
+      var rt = e.target.closest('[data-rate]');
+      if (rt) {
+        var cc = CUSTOMERS.filter(function (x) { return x.phone === rt.dataset.ck; })[0], nn = Number(rt.dataset.rate);
+        if (cc) { cc.rating = (Number(cc.rating) === nn) ? 0 : nn; paint(); store.saveCustomer({ phone: cc.phone, rating: cc.rating }).then(function () { if (store.mode === 'local') loadCustomers(); }).catch(function () { alert('שמירת הדירוג נכשלה'); }); }
+        return;
+      }
       var a = e.target.closest('[data-adv]'); if (a) { store.setStatus(a.dataset.adv, a.dataset.to).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; if (tab !== 'promo') paint(); }); } }); return; }
       var dz = e.target.closest('[data-delord]'); if (dz) { if (!confirm('למחוק את ההזמנה הזו לצמיתות?')) return; store.deleteOrder(dz.dataset.delord).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }).catch(function () { alert('המחיקה נכשלה'); }); return; }
       var d = e.target.closest('[data-del]'); if (d) { store.deleteCoupon(d.dataset.del).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } }); return; }
@@ -1527,7 +1599,14 @@ section.rcat .rc { text-align: right; }
     $('#ap').addEventListener('toggle', function (e) { var d = e.target; if (d && d.classList && d.classList.contains('rc') && d.open) { var sm = d.querySelector('summary'); if (sm) sm.scrollIntoView({ block: 'start', behavior: 'smooth' }); } }, true);
     function loadRecipes() { store.watchRecipes(function (r) { if (r) { RECIPES = r; if (tab === 'recipes') paint(); } }); }
     function loadPantry() { store.watchPantry(function (r) { if (r) { PANTRY = r; if (tab === 'pantry' && !pnForm) paint(); } }); }
-    loadRecipes(); loadPantry();
+    function loadCustomers() {
+      store.watchCustomers(function (c, err) {
+        if (err) { custErr = true; if (tab === 'customers') paint(); return; }
+        custErr = false; CUSTOMERS = c || []; custReady = true; if (tab === 'customers') paint();
+        syncCustomers(orders, store, function () { if (store.mode === 'local') loadCustomers(); });
+      });
+    }
+    loadRecipes(); loadPantry(); loadCustomers();
     if (window._rcSpy) window.removeEventListener('scroll', window._rcSpy);
     window._rcSpy = function () {
       var pan = tab === 'pantry';
@@ -1539,7 +1618,7 @@ section.rcat .rc { text-align: right; }
       var id = cur.replace(/^[rp]cat-/, ''); if (pan) { if (id !== pnActive) { pnActive = id; pnMark(); } } else if (id !== rcActive) { rcActive = id; rcMark(); }
     };
     window.addEventListener('scroll', window._rcSpy, { passive: true });
-    store.watchOrders(function (o, err) { if (err) { $('#ap').innerHTML = '<p>אין הרשאה לקרוא הזמנות.</p>'; return; } orders = o; paint(); checkReminders(orders); });
+    store.watchOrders(function (o, err) { if (err) { $('#ap').innerHTML = '<p>אין הרשאה לקרוא הזמנות.</p>'; return; } orders = o; paint(); checkReminders(orders); syncCustomers(orders, store, function () { if (store.mode === 'local') loadCustomers(); }); });
     if (window._remTimer) clearInterval(window._remTimer);
     window._remTimer = setInterval(function () { if (location.hash === '#admin') checkReminders(orders); }, 60000);
     store.watchCoupons(function (c) { if (c) { coupons = c; if (tab !== 'promo') paint(); } });
