@@ -1409,7 +1409,8 @@ section.rcat .rc { text-align: right; }
     return '<div class="rc"><label class="field"><span>שם המוצר</span><input id="pnname" type="text" maxlength="60"></label><div class="grid2 pg3"><label class="field"><span>מלאי מינימום</span><input id="pnmin" type="number" min="0" step="any" inputmode="decimal" value="1"></label><label class="field"><span>יחידת מידה</span>' + pnUnitSel('יחידה', 'id="pnunit"') + '</label><div class="field"><span>מלאי קיים</span><span class="stepper"><button type="button" data-fstep="-1" aria-label="הפחת">−</button><input id="pnstock" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="מלאי קיים"><button type="button" data-fstep="1" aria-label="הוסף">+</button></span></div></div><label class="field"><span>תמונה (אופציונלי)</span><input id="pnfile" type="file" accept="image/*"></label><input type="hidden" id="pncat" value="' + c + '"><button class="btn" id="pnsave">הוסף</button> <button class="btn ghost" id="pncancel">ביטול</button><div class="msg err" id="pnerr"></div></div>';
   }
   // ---- BOM: כמה חומר גלם נדרש לכל מוצר מוכן. משותף לבעלים (settings/bom). ----
-  var BOM = [{ name: 'אורז בסמטי', raw: 133, unit: 'גרם', prod: "קופסה 500 גר'" }];
+  var BOM_PRODS = ['יחידה', "קופסא לסלט 250 גר'", "קופסא לסלט 500 גר'", "קופסא לתוספות 500 גר'", "קופסא לתוספות 1000 גר'"];
+  var BOM = [{ name: 'אורז בסמטי', raw: 133, unit: 'גרם', prod: "קופסא לתוספות 500 גר'" }];
   function bomUnitTxt(u, n) { u = u || 'גרם'; return u === 'גרם' ? "גר'" : pnUnitTxt(u, n); }
   function bomHtml() {
     var rows = BOM.length ? BOM.map(function (b, i) {
@@ -1417,7 +1418,7 @@ section.rcat .rc { text-align: right; }
     }).join('') : '<p class="meta">אין שורות עדיין.</p>';
     var form = '<div class="rc"><h3 style="margin:0 0 8px">שורה חדשה</h3><div class="grid2"><label class="field"><span>חומר גלם</span><input id="bomname" type="text" maxlength="40"></label><label class="field"><span>כמות</span><input id="bomraw" type="number" min="0" step="any" inputmode="decimal"></label></div>' +
       '<label class="field"><span>יחידת מידה</span>' + pnUnitSel('גרם', 'id="bomunit"') + '</label>' +
-      '<label class="field"><span>מייצר (למשל: קופסה 500 גר\')</span><input id="bomprod" type="text" maxlength="40"></label><button type="button" class="btn" id="bomadd" style="margin-top:8px">➕ הוסף</button></div>';
+      '<label class="field"><span>מייצר (יחידת מידה)</span><select id="bomprod">' + BOM_PRODS.map(function (u) { return '<option>' + esc(u) + '</option>'; }).join('') + '</select></label><button type="button" class="btn" id="bomadd" style="margin-top:8px">➕ הוסף</button></div>';
     return '<section class="rcat"><h2>BOM</h2>' + rows + form + '</section>';
   }
   function bomSave() { return store.saveBom({ items: BOM }); }
@@ -1572,7 +1573,7 @@ section.rcat .rc { text-align: right; }
       var bd = e.target.closest('[data-bomdel]'); if (bd) { if (!confirm('למחוק את השורה?')) return; BOM.splice(Number(bd.dataset.bomdel), 1); bomSave(); paint(); return; }
       if (e.target.id === 'bomadd') {
         var bn = $('#bomname').value.trim(), br = Number($('#bomraw').value), bp = $('#bomprod').value.trim();
-        if (!bn || !(br > 0) || !bp) { alert('יש למלא חומר גלם, כמות ומה זה מייצר'); return; }
+        if (!bn || !(br > 0) || !bp) { alert('יש למלא חומר גלם וכמות'); return; }
         BOM.push({ name: bn.slice(0, 40), raw: br, unit: $('#bomunit').value || 'גרם', prod: bp.slice(0, 40) }); bomSave(); paint(); return;
       }
       var pnb = e.target.closest('[data-pcat]'); if (pnb) { pnActive = pnb.dataset.pcat; pnLock = Date.now() + 900; pnMark(); var px = $('#pcat-' + pnActive); if (px) px.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
