@@ -637,6 +637,8 @@ section.rcat .rc { text-align: right; }
       getPulse: function () { return Promise.resolve(lsGet('salads.pulse', [])); },
       getPromo: function () { return Promise.resolve(lsGet('salads.promo', null)); },
       getPnSet: function () { return Promise.resolve(lsGet('salads.pnset', null)); },
+      getBom: function () { return Promise.resolve(lsGet('salads.bom', null)); },
+      saveBom: function (v) { lsSet('salads.bom', v); return Promise.resolve(); },
       savePnSet: function (v) { lsSet('salads.pnset', v); return Promise.resolve(); },
       watchPantry: function (cb) { cb(lsGet('salads.pantry', []).sort(function (a, b) { return (a.ord || 0) - (b.ord || 0); })); },
       savePantry: function (r) { var a = lsGet('salads.pantry', []).filter(function (x) { return x.id !== r.id; }); a.push(JSON.parse(JSON.stringify(r))); lsSet('salads.pantry', a); return Promise.resolve(); },
@@ -675,6 +677,8 @@ section.rcat .rc { text-align: right; }
         deleteRecipe: function (id) { return RC.doc(id).delete(); },
         getPromo: function () { return ST.doc('promo').get().then(function (d) { return d.exists ? d.data() : null; }).catch(function () { return null; }); },
         savePromo: function (p) { return ST.doc('promo').set(p); },
+        getBom: function () { return ST.doc('bom').get().then(function (d) { return d.exists ? d.data() : null; }).catch(function () { return null; }); },
+        saveBom: function (v) { return ST.doc('bom').set(v); },
         getPnSet: function () { return ST.doc('pantry').get().then(function (d) { return d.exists ? d.data() : null; }).catch(function () { return null; }); },
         savePnSet: function (v) { return ST.doc('pantry').set(v); },
         watchOrders: function (cb) { O.orderBy('ts', 'desc').limit(200).onSnapshot(function (s) { cb(s.docs.map(function (d) { var x = d.data(); x.id = d.id; x.tsd = x.ts && x.ts.toDate ? x.ts.toDate().getTime() : Date.now(); return x; })); }, function (e) { cb(null, e); }); },
@@ -1404,6 +1408,17 @@ section.rcat .rc { text-align: right; }
   function pnAddForm(c) {
     return '<div class="rc"><label class="field"><span>שם המוצר</span><input id="pnname" type="text" maxlength="60"></label><div class="grid2 pg3"><label class="field"><span>מלאי מינימום</span><input id="pnmin" type="number" min="0" step="any" inputmode="decimal" value="1"></label><label class="field"><span>יחידת מידה</span>' + pnUnitSel('יחידה', 'id="pnunit"') + '</label><div class="field"><span>מלאי קיים</span><span class="stepper"><button type="button" data-fstep="-1" aria-label="הפחת">−</button><input id="pnstock" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="מלאי קיים"><button type="button" data-fstep="1" aria-label="הוסף">+</button></span></div></div><label class="field"><span>תמונה (אופציונלי)</span><input id="pnfile" type="file" accept="image/*"></label><input type="hidden" id="pncat" value="' + c + '"><button class="btn" id="pnsave">הוסף</button> <button class="btn ghost" id="pncancel">ביטול</button><div class="msg err" id="pnerr"></div></div>';
   }
+  // ---- BOM: כמה חומר גלם נדרש לכל מוצר מוכן. משותף לבעלים (settings/bom). ----
+  var BOM = [{ name: 'אורז בסמטי', raw: 133, prod: "קופסה 500 גר'" }];
+  function bomHtml() {
+    var rows = BOM.length ? BOM.map(function (b, i) {
+      return '<div class="rc" style="display:flex;align-items:center;gap:8px;justify-content:space-between"><span><b>' + esc(b.name) + '</b>: ' + (Number(b.raw) || 0) + " גר' = " + esc(b.prod) + '</span><button type="button" class="pdel" data-bomdel="' + i + '" aria-label="מחק שורה">✕</button></div>';
+    }).join('') : '<p class="meta">אין שורות עדיין.</p>';
+    var form = '<div class="rc"><h3 style="margin:0 0 8px">שורה חדשה</h3><div class="grid2"><label class="field"><span>חומר גלם</span><input id="bomname" type="text" maxlength="40"></label><label class="field"><span>כמות (גרם)</span><input id="bomraw" type="number" min="0" step="any" inputmode="decimal"></label></div>' +
+      '<label class="field"><span>מייצר (למשל: קופסה 500 גר\')</span><input id="bomprod" type="text" maxlength="40"></label><button type="button" class="btn" id="bomadd" style="margin-top:8px">➕ הוסף</button></div>';
+    return '<section class="rcat"><h2>BOM</h2>' + rows + form + '</section>';
+  }
+  function bomSave() { return store.saveBom({ items: BOM }); }
   function pantryHtml() {
     var nav = '<nav class="rcnav" id="pnnav"><div class="row">' + PN_CATS.map(function (c) { return '<button type="button" class="chip" data-pcat="' + c[0] + '"' + (c[0] === pnActive ? ' aria-current="true"' : '') + '>' + c[1] + '</button>'; }).join('') + '</div></nav>';
     var cnt = PANTRY.filter(function (x) { return pnRec(x) > 0; }).length;
@@ -1535,7 +1550,8 @@ section.rcat .rc { text-align: right; }
         if (tab === 'customers') p.innerHTML = customersHtml();
         else if (tab === 'recipes') p.innerHTML = recipesHtml();
         else if (tab === 'pantry') p.innerHTML = pantryHtml();
-        else p.innerHTML = '<div class="soon"><b>' + '🧾 BOM' + '</b>הלשונית הזו עדיין בבנייה.</div>';
+        else if (tab === 'bom') p.innerHTML = bomHtml();
+        else p.innerHTML = '<div class="soon">הלשונית הזו עדיין בבנייה.</div>';
       }
     }
     box.addEventListener('change', function (e) { if (e.target && e.target.id === 'pnthr') { PN_THR = Number(e.target.value); store.savePnSet({ thr: PN_THR }); paint(); } });
@@ -1551,6 +1567,12 @@ section.rcat .rc { text-align: right; }
       var dz = e.target.closest('[data-delord]'); if (dz) { if (!confirm('למחוק את ההזמנה הזו לצמיתות?')) return; store.deleteOrder(dz.dataset.delord).then(function () { if (store.mode === 'local') { store.watchOrders(function (o) { orders = o; paint(); }); } }).catch(function () { alert('המחיקה נכשלה'); }); return; }
       var d = e.target.closest('[data-del]'); if (d) { store.deleteCoupon(d.dataset.del).then(function () { if (store.mode === 'local') { store.watchCoupons(function (c) { coupons = c; paint(); }); } }); return; }
       var rcb = e.target.closest('[data-rcat]'); if (rcb) { rcActive = rcb.dataset.rcat; rcLock = Date.now() + 900; rcMark(); var sx = $('#rcat-' + rcActive); if (sx) sx.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+      var bd = e.target.closest('[data-bomdel]'); if (bd) { if (!confirm('למחוק את השורה?')) return; BOM.splice(Number(bd.dataset.bomdel), 1); bomSave(); paint(); return; }
+      if (e.target.id === 'bomadd') {
+        var bn = $('#bomname').value.trim(), br = Number($('#bomraw').value), bp = $('#bomprod').value.trim();
+        if (!bn || !(br > 0) || !bp) { alert('יש למלא חומר גלם, כמות ומה זה מייצר'); return; }
+        BOM.push({ name: bn.slice(0, 40), raw: br, prod: bp.slice(0, 40) }); bomSave(); paint(); return;
+      }
       var pnb = e.target.closest('[data-pcat]'); if (pnb) { pnActive = pnb.dataset.pcat; pnLock = Date.now() + 900; pnMark(); var px = $('#pcat-' + pnActive); if (px) px.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
       if (e.target.id === 'pnwa') { var tx = pnShopText(); if (!tx) { alert('אין מה להזמין: כל המלאי מגיע למינימום'); return; } window.open('https://wa.me/?text=' + encodeURIComponent(tx), '_blank'); return; }
       var pa = e.target.closest('[data-padd]'); if (pa) { pnForm = pa.dataset.padd; pnImg = ''; paint(); var pf = $('#pnname'); if (pf) pf.focus(); return; }
@@ -1622,6 +1644,7 @@ section.rcat .rc { text-align: right; }
         syncCustomers(orders, store, function () { if (store.mode === 'local') loadCustomers(); });
       });
     }
+    store.getBom().then(function (v) { if (v && Array.isArray(v.items)) { BOM = v.items; if (tab === 'bom') paint(); } });
     loadRecipes(); loadPantry(); loadCustomers();
     if (window._rcSpy) window.removeEventListener('scroll', window._rcSpy);
     window._rcSpy = function () {
