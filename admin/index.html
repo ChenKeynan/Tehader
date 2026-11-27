@@ -634,6 +634,8 @@ section.rcat .rc { text-align: right; }
       saveOrder: function (o) { var a = lsGet('salads.orders', []); a.unshift(o); lsSet('salads.orders', a); var p = lsGet('salads.pulse', []); p.unshift({ t: Date.now(), city: o.city || '' }); lsSet('salads.pulse', p.slice(0, 20)); return Promise.resolve(); },
       getPulse: function () { return Promise.resolve(lsGet('salads.pulse', [])); },
       getPromo: function () { return Promise.resolve(lsGet('salads.promo', null)); },
+      getPnSet: function () { return Promise.resolve(lsGet('salads.pnset', null)); },
+      savePnSet: function (v) { lsSet('salads.pnset', v); return Promise.resolve(); },
       watchPantry: function (cb) { cb(lsGet('salads.pantry', []).sort(function (a, b) { return (a.ord || 0) - (b.ord || 0); })); },
       savePantry: function (r) { var a = lsGet('salads.pantry', []).filter(function (x) { return x.id !== r.id; }); a.push(JSON.parse(JSON.stringify(r))); lsSet('salads.pantry', a); return Promise.resolve(); },
       deletePantry: function (id) { lsSet('salads.pantry', lsGet('salads.pantry', []).filter(function (x) { return x.id !== id; })); return Promise.resolve(); },
@@ -671,6 +673,8 @@ section.rcat .rc { text-align: right; }
         deleteRecipe: function (id) { return RC.doc(id).delete(); },
         getPromo: function () { return ST.doc('promo').get().then(function (d) { return d.exists ? d.data() : null; }).catch(function () { return null; }); },
         savePromo: function (p) { return ST.doc('promo').set(p); },
+        getPnSet: function () { return ST.doc('pantry').get().then(function (d) { return d.exists ? d.data() : null; }).catch(function () { return null; }); },
+        savePnSet: function (v) { return ST.doc('pantry').set(v); },
         watchOrders: function (cb) { O.orderBy('ts', 'desc').limit(200).onSnapshot(function (s) { cb(s.docs.map(function (d) { var x = d.data(); x.id = d.id; x.tsd = x.ts && x.ts.toDate ? x.ts.toDate().getTime() : Date.now(); return x; })); }, function (e) { cb(null, e); }); },
         watchNew: function (cb) { return O.where('status', '==', 'new').onSnapshot(function (sn) { cb(sn.size); }, function () { cb(0); }); },
         setStatus: function (id, st) { return O.doc(id).update({ status: st }); },
@@ -1375,7 +1379,9 @@ section.rcat .rc { text-align: right; }
   var PN_STEP = { 'גרם': 50, 'יחידה': 1, 'שקית': 0.5, 'ק"ג': 0.5, 'חבילה': 0.5, 'מגשית': 1, 'צרור': 1, 'בקבוק': 0.5, 'מארז': 1, 'מיכל': 0.5 };
   function pnStepOf(unit) { return PN_STEP[unit || 'יחידה'] || 1; }
   function pnRound(n) { return Math.round(n * 100) / 100; }
-  function pnRec(it) { return Math.max(0, pnRound((Number(it.min) || 0) - (Number(it.stock) || 0))); }
+  var PN_THR = 25;   // אחוז מהמינימום שמתחתיו מתחילים להמליץ. משותף לכל הבעלים (נשמר ב-settings/pantry)
+  function pnThr() { return PN_THR; }
+  function pnRec(it) { var mn = Number(it.min) || 0, sk = Number(it.stock) || 0; if (sk > mn * pnThr() / 100) return 0; return Math.max(0, pnRound(mn - sk)); }
   function pnRow(it) {
     return '<div class="pr" data-pid="' + esc(it.id) + '">' + (function () { var src = it.img || pnPic(it.name); return src ? '<img class="pi" alt="" src="' + esc(src) + '" onerror="var d=document.createElement(\'span\');d.className=\'pi\';d.textContent=\'📦\';this.replaceWith(d)">' : '<span class="pi" aria-hidden="true">📦</span>'; })() +
       '<div class="pmain"><div class="ptop"><span class="pn">' + esc(it.name) + '</span><button type="button" class="pdel" data-pdel="' + esc(it.id) + '" aria-label="מחק פריט">✕</button></div>' +
@@ -1400,7 +1406,8 @@ section.rcat .rc { text-align: right; }
     var nav = '<nav class="rcnav" id="pnnav"><div class="row">' + PN_CATS.map(function (c) { return '<button type="button" class="chip" data-pcat="' + c[0] + '"' + (c[0] === pnActive ? ' aria-current="true"' : '') + '>' + c[1] + '</button>'; }).join('') + '</div></nav>';
     var cnt = PANTRY.filter(function (x) { return pnRec(x) > 0; }).length;
     var wa = '<div style="margin-bottom:8px"><button type="button" class="btn" id="pnwa" style="width:100%">📲 שלח רשימת קניות' + (cnt ? ' (' + cnt + ')' : '') + '</button></div>';
-    return wa + nav + PN_CATS.map(function (c) { return '<section class="rcat" id="pcat-' + c[0] + '"><h2>' + c[1] + '</h2>' + (function () { var a = PANTRY.filter(function (x) { return x.cat === c[0]; }); return a.length ? a.map(pnRow).join('') : '<p class="rcempty">אין פריטים בקטגוריה</p>'; })() + (pnForm === c[0] ? pnAddForm(c[0]) : '<button class="btn alt padd" data-padd="' + c[0] + '">➕ פריט חדש</button>') + '</section>'; }).join('');
+    var thr = pnThr(), sel = '<label class="field" style="margin:0 0 8px"><span>להמליץ לקנות כשהמלאי ירד ל-</span><select id="pnthr">' + [100, 75, 50, 25, 10].map(function (v) { return '<option value="' + v + '"' + (v === thr ? ' selected' : '') + '>' + v + '% מהמינימום או פחות' + '</option>'; }).join('') + '</select></label>';
+    return wa + sel + nav + PN_CATS.map(function (c) { return '<section class="rcat" id="pcat-' + c[0] + '"><h2>' + c[1] + '</h2>' + (function () { var a = PANTRY.filter(function (x) { return x.cat === c[0]; }); return a.length ? a.map(pnRow).join('') : '<p class="rcempty">אין פריטים בקטגוריה</p>'; })() + (pnForm === c[0] ? pnAddForm(c[0]) : '<button class="btn alt padd" data-padd="' + c[0] + '">➕ פריט חדש</button>') + '</section>'; }).join('');
   }
   // ---- תזכורות הכנה בניהול הזמנות: 24 ו-12 שעות לפני מועד המסירה, כל תזכורת פעם אחת לכל הזמנה (נשמר במכשיר) ----
   var REM_KEY = 'tehader.reminders', remQueue = [], remBox = null;
@@ -1529,6 +1536,7 @@ section.rcat .rc { text-align: right; }
         else p.innerHTML = '<div class="soon"><b>' + '🧾 BOM' + '</b>הלשונית הזו עדיין בבנייה.</div>';
       }
     }
+    box.addEventListener('change', function (e) { if (e.target && e.target.id === 'pnthr') { PN_THR = Number(e.target.value); store.savePnSet({ thr: PN_THR }); paint(); } });
     box.querySelector('.tabs').addEventListener('click', function (e) { var c = e.target.closest('[data-tab]'); if (!c) return; tab = c.dataset.tab; paint(); try { box.querySelector('.tabs').scrollIntoView({ block: 'start' }); } catch (x) { } });
     $('#ap').addEventListener('click', function (e) {
       var rt = e.target.closest('[data-rate]');
@@ -1604,7 +1612,7 @@ section.rcat .rc { text-align: right; }
     });
     $('#ap').addEventListener('toggle', function (e) { var d = e.target; if (d && d.classList && d.classList.contains('rc') && d.open) { var sm = d.querySelector('summary'); if (sm) sm.scrollIntoView({ block: 'start', behavior: 'smooth' }); } }, true);
     function loadRecipes() { store.watchRecipes(function (r) { if (r) { RECIPES = r; if (tab === 'recipes') paint(); } }); }
-    function loadPantry() { store.watchPantry(function (r) { if (r) { PANTRY = r; if (tab === 'pantry' && !pnForm) paint(); } }); }
+    function loadPantry() { store.getPnSet().then(function (v) { if (v && Number(v.thr) > 0) { PN_THR = Number(v.thr); if (tab === 'pantry' && !pnForm) paint(); } }); store.watchPantry(function (r) { if (r) { PANTRY = r; if (tab === 'pantry' && !pnForm) paint(); } }); }
     function loadCustomers() {
       store.watchCustomers(function (c, err) {
         if (err) { custErr = true; if (tab === 'customers') paint(); return; }
